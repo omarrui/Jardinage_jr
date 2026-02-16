@@ -1,15 +1,10 @@
-// src/pages/Signup.jsx
+// Signup.jsx
+// Allows a customer to create an account
 
-// I import useState so I can store and update data inside this component
-// (form inputs and messages).
-import React from "react";
-
-import { useState } from "react";
-
+import React, { useState } from "react";
 import { signupCustomer } from "../api/api";
 
-function Signup() {
-
+function Signup({ goToLogin, goHome }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -20,10 +15,6 @@ function Signup() {
   const [message, setMessage] = useState("");
 
   function handleChange(e) {
-
-    // I update only the field that changed
-    // e.target.name = input name (name, email, etc.)
-    // e.target.value = what the user typed
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -31,64 +22,40 @@ function Signup() {
   }
 
   async function handleSubmit(e) {
-
     e.preventDefault();
 
     const response = await signupCustomer(formData);
 
     if (response.error) {
       setMessage(response.error);
-    }
-    else {
+    } else {
       setMessage(response.message);
     }
   }
 
   return (
     <div>
-      {/* Page title */}
       <h2>Customer Signup</h2>
 
-      {/* The form calls handleSubmit when submitted */}
       <form onSubmit={handleSubmit}>
+        <input type="text" name="name" placeholder="Name" onChange={handleChange} />
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} />
+        <input type="password" name="password" placeholder="Password" onChange={handleChange} />
+        <input type="text" name="phone" placeholder="Phone" onChange={handleChange} />
 
-        {/* Name input */}
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          onChange={handleChange}
-        />
-
-        {/* Email input */}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-        />
-
-        {/* Password input */}
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
-
-        {/* Phone number input */}
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone"
-          onChange={handleChange}
-        />
-
-        {/* Submit button */}
         <button type="submit">Sign Up</button>
       </form>
 
-      {/* If there is a message, show it */}
+      <p>
+        Already have an account?{" "}
+        <button onClick={goToLogin}>Log in</button>
+      </p>
+
+      <p>
+        Changed your mind?{" "}
+        <button onClick={goHome}>Go Home</button>
+      </p>
+
       {message && <p>{message}</p>}
     </div>
   );
