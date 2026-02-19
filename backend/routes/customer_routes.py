@@ -52,4 +52,6 @@ def register_customer_routes(app):
         if not check_password_hash(customer.password, password):
             return jsonify({"error": "Invalid email or password"}), 401
 
-        return jsonify({"message": "Login successful"}), 200
+        return jsonify({"message": "Login successful",
+        "customer_id": customer.id   
+        }), 200

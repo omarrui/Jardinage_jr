@@ -27,16 +27,6 @@ class Customer(db.Model):
     # Phone number is stored so the admin can contact the customer if needed
 
 
-class Appointment(db.Model):
-    # This table stores appointments booked by customers.
-    # Each appointment belongs to one customer.
-    id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"), nullable=False)
-    date = db.Column(db.String(50), nullable=False)
-    time = db.Column(db.String(50), nullable=False)
-    status = db.Column(db.String(50), nullable=False)
-    # Example statuses: pending, confirmed, cancelled
-
 
 class Availability(db.Model):
     # This table stores days that are blocked by the admin.
@@ -62,3 +52,22 @@ class ContactRequest(db.Model):
     name = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(150), nullable=False)
     message = db.Column(db.String(500), nullable=False)
+
+
+class ServiceRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    customer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("customer.id"),
+        nullable=False
+    )
+
+    preferred_date = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(500), nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="pending")
+
+    # ADMIN SCHEDULING
+    scheduled_start_date = db.Column(db.String(50), nullable=True)
+    scheduled_end_date = db.Column(db.String(50), nullable=True)
+    scheduled_time = db.Column(db.String(50), nullable=True)

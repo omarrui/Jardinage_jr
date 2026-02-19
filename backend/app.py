@@ -30,6 +30,7 @@ register_customer_routes(app)
 register_appointment_routes(app)
 register_admin_routes(app)
 
+
 @app.route("/")
 def home():
     return "Backend is running"

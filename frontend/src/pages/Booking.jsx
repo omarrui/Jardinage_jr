@@ -34,6 +34,7 @@ function Booking({ goHome }) {
     fetch(`http://127.0.0.1:5000/api/customer/service-requests?customer_id=${customerId}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("DATA FROM BACKEND:", data);
         if (Array.isArray(data)) {
           setAppointments(data);
         }
@@ -128,7 +129,15 @@ function Booking({ goHome }) {
           <ul>
             {appointments.map((appt) => (
               <li key={appt.id}>
-                {appt.preferred_date} — {appt.status}
+                <strong>Requested:</strong> {appt.preferred_date} <br />
+                <strong>status:</strong> {appt.status} <br />
+                {appt.status === "scheduled" && (
+                   <>
+                    <strong>Start:</strong> {appt.scheduled_start_date} <br />
+                    <strong>End:</strong> {appt.scheduled_end_date || "—"} <br />
+                    <strong>Time:</strong> {appt.scheduled_time || "—"} 
+                   </>
+                )}
               </li>
             ))}
           </ul>

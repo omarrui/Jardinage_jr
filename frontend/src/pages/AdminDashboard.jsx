@@ -8,8 +8,9 @@ function AdminDashboard({ goHome }) {
   const [endDate, setEndDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [message, setMessage] = useState("");
-  const todayStr = new Date().toISOString().split("T")[0];
 
+  // ✅ Define today string HERE (not inside JSX)
+  const todayStr = new Date().toISOString().split("T")[0];
 
   // Fetch all service requests
   useEffect(() => {
@@ -32,6 +33,11 @@ function AdminDashboard({ goHome }) {
       return;
     }
 
+    if (endDate && endDate < startDate) {
+      alert("End date cannot be before start date.");
+      return;
+    }
+
     await fetch(
       `http://127.0.0.1:5000/api/admin/service-requests/${selectedRequest.id}`,
       {
@@ -46,8 +52,19 @@ function AdminDashboard({ goHome }) {
       }
     );
 
+    // Update UI without reloading page
+    setRequests(prev =>
+      prev.map(req =>
+        req.id === selectedRequest.id
+          ? { ...req, status: "scheduled" }
+          : req
+      )
+    );
+
     setSelectedRequest(null);
-    window.location.reload();
+    setStartDate("");
+    setEndDate("");
+    setScheduledTime("");
   };
 
   return (
@@ -104,11 +121,10 @@ function AdminDashboard({ goHome }) {
               <h3>Schedule Service</h3>
 
               <label>Start Date:</label><br />
-              const todayStr = new Date().toISOString().split("T")[0];
               <input
                 type="date"
                 value={startDate}
-                min={todayStr}
+                min={todayStr}   // ✅ past dates grey
                 onChange={(e) => setStartDate(e.target.value)}
               />
               <br /><br />
@@ -117,15 +133,18 @@ function AdminDashboard({ goHome }) {
               <input
                 type="date"
                 value={endDate}
+                min={startDate || todayStr}   // ✅ cannot be before start
                 onChange={(e) => setEndDate(e.target.value)}
-              /><br /><br />
+              />
+              <br /><br />
 
               <label>Time:</label><br />
               <input
                 type="time"
                 value={scheduledTime}
                 onChange={(e) => setScheduledTime(e.target.value)}
-              /><br /><br />
+              />
+              <br /><br />
 
               <button onClick={handleConfirm}>
                 Confirm Appointment

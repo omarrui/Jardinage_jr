@@ -1,15 +1,11 @@
-# routes/admin_routes.py
-# This file contains all admin-related API routes.
-# Admins can log in and manage appointments.
-
 from flask import request, jsonify
 from werkzeug.security import check_password_hash
-from models import Admin, Appointment, Customer, db
+from models import Admin, ServiceRequest, Customer, db
+from datetime import datetime
 
 
 def register_admin_routes(app):
 
-    # Admin login
     @app.route("/api/admin/login", methods=["POST"])
     def admin_login():
         data = request.get_json()
@@ -29,39 +25,83 @@ def register_admin_routes(app):
 
         return jsonify({"message": "Admin login successful"}), 200
 
-    # View all appointments
-    @app.route("/api/admin/appointments", methods=["GET"])
-    def admin_get_appointments():
-        appointments = Appointment.query.all()
+
+    # ADMIN VIEW ALL SERVICE REQUESTS
+    @app.route("/api/admin/service-requests", methods=["GET"])
+    def admin_get_all_service_requests():
+
+        requests = ServiceRequest.query.all()
         result = []
 
-        for appointment in appointments:
-            customer = Customer.query.get(appointment.customer_id)
+        for req in requests:
+            customer = Customer.query.get(req.customer_id)
 
             result.append({
-                "id": appointment.id,
+                "id": req.id,
                 "customer_name": customer.name if customer else "Unknown",
-                "date": appointment.date,
-                "time": appointment.time,
-                "status": appointment.status
+                "customer_email": customer.email if customer else "Unknown",
+                "customer_phone": customer.phone if customer else "Unknown",
+                "preferred_date": req.preferred_date,
+                "description": req.description,
+                "status": req.status,
+                "scheduled_start_date": req.scheduled_start_date,
+                "scheduled_end_date": req.scheduled_end_date,
+                "scheduled_time": req.scheduled_time
             })
-
         return jsonify(result), 200
+    
+    # ADMIN UPDATE SERVICE REQUEST
+    from datetime import datetime
 
-    # Update appointment status
-    @app.route("/api/admin/appointments/<int:appointment_id>", methods=["PUT"])
-    def admin_update_appointment(appointment_id):
+    # ADMIN UPDATE SERVICE REQUEST
+    @app.route("/api/admin/service-requests/<int:request_id>", methods=["PUT"])
+    def admin_update_service_request(request_id):
+
         data = request.get_json()
+
+        service_request = ServiceRequest.query.get(request_id)
+
+        if not service_request:
+            return jsonify({"error": "Service request not found"}), 404
+
         new_status = data.get("status")
+        start_date = data.get("scheduled_start_date")
+        end_date = data.get("scheduled_end_date")
+        time = data.get("scheduled_time")
 
-        if new_status not in ["pending", "confirmed", "cancelled"]:
-            return jsonify({"error": "Invalid status"}), 400
+        today = datetime.today().date()
 
-        appointment = Appointment.query.get(appointment_id)
-        if not appointment:
-            return jsonify({"error": "Appointment not found"}), 404
+        # Validate dates if provided
+        if start_date:
+            start = datetime.strptime(start_date, "%Y-%m-%d").date()
 
-        appointment.status = new_status
+            if start < today:
+                return jsonify({"error": "Start date cannot be in the past"}), 400
+
+        if end_date:
+            end = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+            if start_date:
+                start = datetime.strptime(start_date, "%Y-%m-%d").date()
+            else:
+                start = datetime.strptime(service_request.scheduled_start_date, "%Y-%m-%d").date()
+
+            if end < start:
+                return jsonify({"error": "End date cannot be before start date"}), 400
+
+        # If everything valid → update
+        if new_status:
+            service_request.status = new_status
+
+        if start_date:
+            service_request.scheduled_start_date = start_date
+
+        if end_date:
+            service_request.scheduled_end_date = end_date
+
+        if time:
+            service_request.scheduled_time = time
+
         db.session.commit()
 
-        return jsonify({"message": "Appointment status updated"}), 200
+        return jsonify({"message": "Service request updated successfully"}), 200
