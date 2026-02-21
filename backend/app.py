@@ -8,6 +8,7 @@ from routes.customer_routes import register_customer_routes
 from routes.appointment_routes import register_appointment_routes
 from routes.admin_routes import register_admin_routes
 
+
 app = Flask(__name__)
 
 # CORS FIX

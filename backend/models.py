@@ -20,10 +20,13 @@ class Customer(db.Model):
     # This table is for customers who sign up and log in.
     # Customers can book, view, and cancel their own appointments.
     id = db.Column(db.Integer, primary_key=True)
+
     name = db.Column(db.String(150), nullable=False)
-    email = db.Column(db.String(150), nullable=False, unique=True)
-    password = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(150), nullable=True, unique=True)
     phone = db.Column(db.String(50), nullable=False)
+
+    password = db.Column(db.String(200), nullable=True)  # now optional
+    has_account = db.Column(db.Boolean, default=False)
     # Phone number is stored so the admin can contact the customer if needed
 
 
@@ -71,3 +74,5 @@ class ServiceRequest(db.Model):
     scheduled_start_date = db.Column(db.String(50), nullable=True)
     scheduled_end_date = db.Column(db.String(50), nullable=True)
     scheduled_time = db.Column(db.String(50), nullable=True)
+
+

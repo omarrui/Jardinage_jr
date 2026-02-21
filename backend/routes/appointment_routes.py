@@ -1,56 +1,30 @@
+# backend/routes/appointment_routes.py
+
 from flask import request, jsonify
-from models import db, ServiceRequest
+from services import appointment_service
+
 
 def register_appointment_routes(app):
 
-    # CREATE SERVICE REQUEST
     @app.route("/api/service-requests", methods=["POST"])
     def create_service_request():
+
         data = request.get_json()
 
-        customer_id = data.get("customer_id")
-        preferred_date = data.get("preferred_date")
-        description = data.get("description", "")
-
-        if not customer_id or not preferred_date:
-            return jsonify({
-                "error": "Customer and preferred date are required"
-            }), 400
-
-        new_request = ServiceRequest(
-            customer_id=customer_id,
-            preferred_date=preferred_date,
-            description=description,
-            status="pending"
+        response, status = appointment_service.create_service_request(
+            data.get("customer_id"),
+            data.get("preferred_date"),
+            data.get("description", "")
         )
 
-        db.session.add(new_request)
-        db.session.commit()
-
-        return jsonify({
-            "message": "Service request created successfully"
-        }), 201
+        return jsonify(response), status
 
 
-    # GET CUSTOMER REQUESTS
     @app.route("/api/customer/service-requests", methods=["GET"])
     def get_customer_service_requests():
+
         customer_id = request.args.get("customer_id")
 
-        if not customer_id:
-            return jsonify({"error": "Customer ID is required"}), 400
+        response, status = appointment_service.get_customer_requests(customer_id)
 
-        requests = ServiceRequest.query.filter_by(customer_id=customer_id).all()
-
-        result = []
-        for req in requests:
-            result.append({
-                "id": req.id,
-                "preferred_date": req.preferred_date,
-                "description": req.description,
-                "status": req.status,
-                "scheduled_start_date": req.scheduled_start_date,
-                "scheduled_end_date": req.scheduled_end_date,
-                "scheduled_time": req.scheduled_time
-            })
-        return jsonify(result), 200
+        return jsonify(response), status
