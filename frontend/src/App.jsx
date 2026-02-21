@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Booking from "./pages/Booking";
-import AdminDashboard from "./pages/AdminDashboard"; // create this later
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -11,10 +11,27 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [customerName, setCustomerName] = useState("");
 
-  function handleCustomerLogin(name) {
+  // 🔥 SESSION RESTORE ON PAGE RELOAD
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (token && role === "customer") {
+      setIsLoggedIn(true);
+      setIsAdmin(false);
+      setCurrentPage("home");
+    }
+
+    if (token && role === "admin") {
+      setIsLoggedIn(true);
+      setIsAdmin(true);
+      setCurrentPage("admin");
+    }
+  }, []);
+
+  function handleCustomerLogin() {
     setIsLoggedIn(true);
     setIsAdmin(false);
-    setCustomerName(name);
     setCurrentPage("home");
   }
 
@@ -22,6 +39,15 @@ function App() {
     setIsLoggedIn(true);
     setIsAdmin(true);
     setCurrentPage("admin");
+  }
+
+  function handleLogout() {
+    // 🔥 CLEAR EVERYTHING
+    localStorage.clear();
+    setIsLoggedIn(false);
+    setIsAdmin(false);
+    setCustomerName("");
+    setCurrentPage("home");
   }
 
   return (
@@ -45,24 +71,17 @@ function App() {
               <button onClick={() => setCurrentPage("admin")}>
                 Go to Dashboard
               </button>
-              <button onClick={() => {
-                setIsLoggedIn(false);
-                setIsAdmin(false);
-              }}>
+              <button onClick={handleLogout}>
                 Logout
               </button>
             </>
           ) : (
             <>
-              <h2>Welcome, {customerName} 👋</h2>
+              <h2>Welcome 👋</h2>
               <button onClick={() => setCurrentPage("booking")}>
                 Request Service
               </button>
-              <button onClick={() => {
-                localStorage.removeItem("customer_id");
-                setIsLoggedIn(false);
-                setCustomerName("");
-              }}>
+              <button onClick={handleLogout}>
                 Logout
               </button>
             </>

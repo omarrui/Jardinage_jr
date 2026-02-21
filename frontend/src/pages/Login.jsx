@@ -20,43 +20,63 @@ function Login({ onCustomerLogin, onAdminLogin, goHome }) {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    let response;
-
     try {
-      // 🔥 Auto-detect admin by email
+      let response;
+      let data;
+
+      // ADMIN LOGIN
       if (formData.email === "admin@gardening.com") {
+
         response = await fetch("http://127.0.0.1:5000/api/admin/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
 
-        const data = await response.json();
+        data = await response.json();
 
         if (data.error) {
           setMessage(data.error);
-        } else {
-          setMessage("Admin login successful");
-          onAdminLogin(); // redirect to admin dashboard
+          return;
         }
 
+        // This will be used later to protect admin routes
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", "admin");
+
+        setMessage("Admin login successful");
+        onAdminLogin();
+
       } else {
-        // Customer login
+
+        // CUSTOMER LOGIN
         response = await fetch("http://127.0.0.1:5000/api/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
 
-        const data = await response.json();
+        data = await response.json();
 
         if (data.error) {
           setMessage(data.error);
-        } else {
-          localStorage.setItem("customer_id", data.customer_id);
-          setMessage("Login successful");
-          onCustomerLogin(data.name); // pass name to App
+          return;
         }
+
+        // Store customer_id (needed for bookings)
+        localStorage.setItem("customer_id", data.customer_id);
+
+        // This makes system scalable and production-ready
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+
+        localStorage.setItem("role", "customer");
+
+        setMessage("Login successful");
+
+        // REMOVED data.name (backend does not send it)
+        onCustomerLogin();
       }
 
     } catch (error) {

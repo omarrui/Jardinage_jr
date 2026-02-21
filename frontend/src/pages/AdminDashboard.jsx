@@ -2,39 +2,61 @@
 import React, { useState, useEffect } from "react";
 
 function AdminDashboard({ goHome }) {
+  const [adminSection, setAdminSection] = useState("home");
+
   const [requests, setRequests] = useState([]);
+  const [clients, setClients] = useState([]);
+
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
+
   const [message, setMessage] = useState("");
 
-  // ✅ Define today string HERE (not inside JSX)
   const todayStr = new Date().toISOString().split("T")[0];
 
-  // Fetch all service requests
+  /* =============================
+     LOAD APPOINTMENTS
+  ============================= */
+
   useEffect(() => {
+    if (adminSection !== "appointments") return;
+
     fetch("http://127.0.0.1:5000/api/admin/service-requests")
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         if (Array.isArray(data)) {
           setRequests(data);
         }
       })
-      .catch(() => {
-        setMessage("Failed to load service requests.");
-      });
-  }, []);
+      .catch(() => setMessage("Failed to load appointments"));
+  }, [adminSection]);
 
-  // Confirm appointment
+  /* =============================
+     LOAD CLIENTS
+  ============================= */
+
+  useEffect(() => {
+    if (adminSection !== "clients") return;
+
+    fetch("http://127.0.0.1:5000/api/admin/customers")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setClients(data);
+        }
+      })
+      .catch(() => setMessage("Failed to load clients"));
+  }, [adminSection]);
+
+  /* =============================
+     CONFIRM APPOINTMENT
+  ============================= */
+
   const handleConfirm = async () => {
     if (!startDate) {
-      alert("Please select a start date");
-      return;
-    }
-
-    if (endDate && endDate < startDate) {
-      alert("End date cannot be before start date.");
+      alert("Select start date");
       return;
     }
 
@@ -52,112 +74,162 @@ function AdminDashboard({ goHome }) {
       }
     );
 
-    // Update UI without reloading page
-    setRequests(prev =>
-      prev.map(req =>
-        req.id === selectedRequest.id
-          ? { ...req, status: "scheduled" }
-          : req
-      )
-    );
-
     setSelectedRequest(null);
-    setStartDate("");
-    setEndDate("");
-    setScheduledTime("");
   };
 
   return (
     <div>
       <h2>Admin Dashboard</h2>
 
-      <button onClick={goHome} style={{ marginBottom: "15px" }}>
-        Home
-      </button>
+      {/* =============================
+         HOME SECTION
+      ============================= */}
+      {adminSection === "home" && (
+        <>
+          <button onClick={() => setAdminSection("appointments")}>
+            Appointments
+          </button>
 
-      {requests.length === 0 ? (
-        <p>No service requests found.</p>
-      ) : (
-        <div>
-          <h3>Service Requests:</h3>
-          <ul>
-            {requests.map((req) => (
-              <li key={req.id} style={{ marginBottom: "15px" }}>
-                <strong>{req.customer_name}</strong><br />
-                Preferred Date: {req.preferred_date}<br />
-                Status: {req.status}<br />
-                <button onClick={() => setSelectedRequest(req)}>
-                  View
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <button
+            onClick={() => setAdminSection("clients")}
+            style={{ marginLeft: "10px" }}
+          >
+            Clients
+          </button>
+
+          <button
+            onClick={goHome}
+            style={{ marginLeft: "10px" }}
+          >
+            Logout
+          </button>
+        </>
       )}
 
-      {/* MODAL */}
+      {/* =============================
+         APPOINTMENTS SECTION
+      ============================= */}
+      {adminSection === "appointments" && (
+        <>
+          <button onClick={() => setAdminSection("home")}>
+            ⬅ Back
+          </button>
+
+          <h3>Appointments</h3>
+
+          {requests.length === 0 ? (
+            <p>No service requests found.</p>
+          ) : (
+            <div>
+              {requests.map(req => (
+                <div
+                  key={req.id}
+                  style={{
+                    border: "1px solid #ddd",
+                    padding: "15px",
+                    marginBottom: "15px",
+                    borderRadius: "8px"
+                  }}
+                >
+                  <strong>{req.customer_name}</strong>
+                  <p>Preferred: {req.preferred_date}</p>
+                  <p>Status: {req.status}</p>
+
+                  <button onClick={() => setSelectedRequest(req)}>
+                    View
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* =============================
+         CLIENTS SECTION
+      ============================= */}
+      {adminSection === "clients" && (
+        <>
+          <button onClick={() => setAdminSection("home")}>
+            ⬅ Back
+          </button>
+
+          <h3>Clients</h3>
+
+          <button
+            style={{
+              fontSize: "18px",
+              marginBottom: "15px"
+            }}
+          >
+            ➕ Add Client
+          </button>
+
+          {clients.length === 0 ? (
+            <p>No clients found.</p>
+          ) : (
+            <div>
+              {clients.map(client => (
+                <div
+                  key={client.id}
+                  style={{
+                    border: "1px solid #ddd",
+                    padding: "15px",
+                    marginBottom: "15px",
+                    borderRadius: "8px"
+                  }}
+                >
+                  <strong>{client.name}</strong>
+                  <p>Email: {client.email}</p>
+                  <p>Phone: {client.phone}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* =============================
+         MODAL
+      ============================= */}
       {selectedRequest && (
         <div style={overlayStyle}>
           <div style={modalStyle}>
+            <h3>Schedule Service</h3>
 
-            {/* LEFT SIDE */}
-            <div style={leftStyle}>
-              <h3>Client Details</h3>
-              <p><strong>Name:</strong> {selectedRequest.customer_name}</p>
-              <p><strong>Email:</strong> {selectedRequest.customer_email}</p>
-              <p>
-                <strong>Phone:</strong>{" "}
-                <a href={`tel:${selectedRequest.customer_phone}`}>
-                  {selectedRequest.customer_phone}
-                </a>
-              </p>
-              <hr />
-              <p><strong>Description:</strong> {selectedRequest.description}</p>
-              <p><strong>Status:</strong> {selectedRequest.status}</p>
-            </div>
+            <input
+              type="date"
+              min={todayStr}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+            <br /><br />
 
-            {/* RIGHT SIDE */}
-            <div style={rightStyle}>
-              <h3>Schedule Service</h3>
+            <input
+              type="date"
+              min={startDate || todayStr}
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+            <br /><br />
 
-              <label>Start Date:</label><br />
-              <input
-                type="date"
-                value={startDate}
-                min={todayStr}   // ✅ past dates grey
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              <br /><br />
+            <input
+              type="time"
+              value={scheduledTime}
+              onChange={(e) => setScheduledTime(e.target.value)}
+            />
+            <br /><br />
 
-              <label>End Date (optional):</label><br />
-              <input
-                type="date"
-                value={endDate}
-                min={startDate || todayStr}   // ✅ cannot be before start
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-              <br /><br />
+            <button onClick={handleConfirm}>
+              Confirm
+            </button>
 
-              <label>Time:</label><br />
-              <input
-                type="time"
-                value={scheduledTime}
-                onChange={(e) => setScheduledTime(e.target.value)}
-              />
-              <br /><br />
-
-              <button onClick={handleConfirm}>
-                Confirm Appointment
-              </button>
-
-              <button
-                onClick={() => setSelectedRequest(null)}
-                style={{ marginLeft: "10px" }}
-              >
-                Close
-              </button>
-            </div>
-
+            <button
+              onClick={() => setSelectedRequest(null)}
+              style={{ marginLeft: "10px" }}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
@@ -183,14 +255,8 @@ const overlayStyle = {
 
 const modalStyle = {
   backgroundColor: "white",
-  width: "800px",
   padding: "20px",
-  display: "flex",
-  gap: "40px",
   borderRadius: "10px"
 };
-
-const leftStyle = { flex: 1 };
-const rightStyle = { flex: 1 };
 
 export default AdminDashboard;
