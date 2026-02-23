@@ -1,4 +1,3 @@
-// AdminDashboard.jsx
 import React, { useState, useEffect } from "react";
 
 function AdminDashboard({ goHome }) {
@@ -14,46 +13,49 @@ function AdminDashboard({ goHome }) {
 
   const [message, setMessage] = useState("");
 
+  // 🔥 Create Client State
+  const [showCreateClient, setShowCreateClient] = useState(false);
+  const [createLogin, setCreateLogin] = useState(false);
+  const [newClient, setNewClient] = useState({
+    name: "",
+    email: "",
+    phone: ""
+  });
+
   const todayStr = new Date().toISOString().split("T")[0];
 
   /* =============================
      LOAD APPOINTMENTS
   ============================= */
-
   useEffect(() => {
     if (adminSection !== "appointments") return;
 
     fetch("http://127.0.0.1:5000/api/admin/service-requests")
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          setRequests(data);
-        }
-      })
-      .catch(() => setMessage("Failed to load appointments"));
+        if (Array.isArray(data)) setRequests(data);
+      });
   }, [adminSection]);
 
   /* =============================
      LOAD CLIENTS
   ============================= */
-
-  useEffect(() => {
-    if (adminSection !== "clients") return;
-
+  const fetchClients = () => {
     fetch("http://127.0.0.1:5000/api/admin/customers")
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          setClients(data);
-        }
-      })
-      .catch(() => setMessage("Failed to load clients"));
+        if (Array.isArray(data)) setClients(data);
+      });
+  };
+
+  useEffect(() => {
+    if (adminSection !== "clients") return;
+    fetchClients();
   }, [adminSection]);
 
   /* =============================
      CONFIRM APPOINTMENT
   ============================= */
-
   const handleConfirm = async () => {
     if (!startDate) {
       alert("Select start date");
@@ -77,12 +79,52 @@ function AdminDashboard({ goHome }) {
     setSelectedRequest(null);
   };
 
+  /* =============================
+     CREATE CLIENT
+  ============================= */
+  const handleCreateClient = async () => {
+    const response = await fetch(
+      "http://127.0.0.1:5000/api/admin/customers",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newClient.name,
+          email: newClient.email,
+          phone: newClient.phone,
+          has_account: createLogin
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    if (data.temporary_password) {
+      alert(
+        "Client created.\nTemporary Password: " +
+        data.temporary_password
+      );
+    } else {
+      alert("Internal client created.");
+    }
+
+    setShowCreateClient(false);
+    setNewClient({ name: "", email: "", phone: "" });
+    setCreateLogin(false);
+    fetchClients();
+  };
+
   return (
     <div>
       <h2>Admin Dashboard</h2>
 
       {/* =============================
-         HOME SECTION
+         HOME
       ============================= */}
       {adminSection === "home" && (
         <>
@@ -107,7 +149,7 @@ function AdminDashboard({ goHome }) {
       )}
 
       {/* =============================
-         APPOINTMENTS SECTION
+         APPOINTMENTS
       ============================= */}
       {adminSection === "appointments" && (
         <>
@@ -120,33 +162,31 @@ function AdminDashboard({ goHome }) {
           {requests.length === 0 ? (
             <p>No service requests found.</p>
           ) : (
-            <div>
-              {requests.map(req => (
-                <div
-                  key={req.id}
-                  style={{
-                    border: "1px solid #ddd",
-                    padding: "15px",
-                    marginBottom: "15px",
-                    borderRadius: "8px"
-                  }}
-                >
-                  <strong>{req.customer_name}</strong>
-                  <p>Preferred: {req.preferred_date}</p>
-                  <p>Status: {req.status}</p>
+            requests.map(req => (
+              <div
+                key={req.id}
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "15px",
+                  marginBottom: "15px",
+                  borderRadius: "8px"
+                }}
+              >
+                <strong>{req.customer_name}</strong>
+                <p>Preferred: {req.preferred_date}</p>
+                <p>Status: {req.status}</p>
 
-                  <button onClick={() => setSelectedRequest(req)}>
-                    View
-                  </button>
-                </div>
-              ))}
-            </div>
+                <button onClick={() => setSelectedRequest(req)}>
+                  View
+                </button>
+              </div>
+            ))
           )}
         </>
       )}
 
       {/* =============================
-         CLIENTS SECTION
+         CLIENTS
       ============================= */}
       {adminSection === "clients" && (
         <>
@@ -157,10 +197,8 @@ function AdminDashboard({ goHome }) {
           <h3>Clients</h3>
 
           <button
-            style={{
-              fontSize: "18px",
-              marginBottom: "15px"
-            }}
+            onClick={() => setShowCreateClient(true)}
+            style={{ fontSize: "18px", marginBottom: "15px" }}
           >
             ➕ Add Client
           </button>
@@ -168,29 +206,90 @@ function AdminDashboard({ goHome }) {
           {clients.length === 0 ? (
             <p>No clients found.</p>
           ) : (
-            <div>
-              {clients.map(client => (
-                <div
-                  key={client.id}
-                  style={{
-                    border: "1px solid #ddd",
-                    padding: "15px",
-                    marginBottom: "15px",
-                    borderRadius: "8px"
-                  }}
-                >
-                  <strong>{client.name}</strong>
-                  <p>Email: {client.email}</p>
-                  <p>Phone: {client.phone}</p>
-                </div>
-              ))}
-            </div>
+            clients.map(client => (
+              <div
+                key={client.id}
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "15px",
+                  marginBottom: "15px",
+                  borderRadius: "8px"
+                }}
+              >
+                <strong>{client.name}</strong>
+                <p>Email: {client.email}</p>
+                <p>Phone: {client.phone}</p>
+              </div>
+            ))
           )}
         </>
       )}
 
       {/* =============================
-         MODAL
+         CREATE CLIENT MODAL
+      ============================= */}
+      {showCreateClient && (
+        <div style={overlayStyle}>
+          <div style={modalStyle}>
+            <h3>Create Client</h3>
+
+            <input
+              type="text"
+              placeholder="Name"
+              value={newClient.name}
+              onChange={(e) =>
+                setNewClient({ ...newClient, name: e.target.value })
+              }
+            />
+            <br /><br />
+
+            <input
+              type="email"
+              placeholder="Email"
+              value={newClient.email}
+              onChange={(e) =>
+                setNewClient({ ...newClient, email: e.target.value })
+              }
+            />
+            <br /><br />
+
+            <input
+              type="text"
+              placeholder="Phone"
+              value={newClient.phone}
+              onChange={(e) =>
+                setNewClient({ ...newClient, phone: e.target.value })
+              }
+            />
+            <br /><br />
+
+            <label>
+              <input
+                type="checkbox"
+                checked={createLogin}
+                onChange={() => setCreateLogin(!createLogin)}
+              />
+              Create login account
+            </label>
+
+            <br /><br />
+
+            <button onClick={handleCreateClient}>
+              Create
+            </button>
+
+            <button
+              onClick={() => setShowCreateClient(false)}
+              style={{ marginLeft: "10px" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* =============================
+         SCHEDULE MODAL
       ============================= */}
       {selectedRequest && (
         <div style={overlayStyle}>
@@ -240,7 +339,6 @@ function AdminDashboard({ goHome }) {
 }
 
 /* STYLES */
-
 const overlayStyle = {
   position: "fixed",
   top: 0,

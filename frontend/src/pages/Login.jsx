@@ -1,8 +1,12 @@
-// Single login page for both Customer and Admin
-
 import React, { useState } from "react";
 
-function Login({ onCustomerLogin, onAdminLogin, goHome }) {
+function Login({
+  onCustomerLogin,
+  onAdminLogin,
+  onForcePasswordChange,
+  goHome,
+  goToResetRequest
+}) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -40,11 +44,9 @@ function Login({ onCustomerLogin, onAdminLogin, goHome }) {
           return;
         }
 
-        // This will be used later to protect admin routes
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", "admin");
 
-        setMessage("Admin login successful");
         onAdminLogin();
 
       } else {
@@ -63,19 +65,20 @@ function Login({ onCustomerLogin, onAdminLogin, goHome }) {
           return;
         }
 
-        // Store customer_id (needed for bookings)
+        // FORCE PASSWORD CHANGE
+        if (data.force_password_change) {
+          onForcePasswordChange(data.customer_id);
+          return;
+        }
+
         localStorage.setItem("customer_id", data.customer_id);
 
-        // This makes system scalable and production-ready
         if (data.token) {
           localStorage.setItem("token", data.token);
         }
 
         localStorage.setItem("role", "customer");
 
-        setMessage("Login successful");
-
-        // REMOVED data.name (backend does not send it)
         onCustomerLogin();
       }
 
@@ -106,10 +109,18 @@ function Login({ onCustomerLogin, onAdminLogin, goHome }) {
         <button type="submit">Log In</button>
       </form>
 
+      {/* FORGOT PASSWORD BUTTON */}
       <p>
-        Changed your mind?{" "}
-        <button onClick={goHome}>Go Home</button>
+        Forgot your password?{" "}
+        <button
+          type="button"
+          onClick={goToResetRequest}
+        >
+          Reset here
+        </button>
       </p>
+
+      <button onClick={goHome}>Go Home</button>
 
       {message && <p>{message}</p>}
     </div>

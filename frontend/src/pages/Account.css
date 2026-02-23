@@ -1,0 +1,156 @@
+/* 🌿 Background */
+.account-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    background: linear-gradient(135deg, #0f3d1e, #1b5e20, #2e7d32);
+    padding: 40px;
+    font-family: "Segoe UI", sans-serif;
+  }
+  
+  /* 🌿 Main Card */
+  .account-card {
+    background: #ffffff;
+    width: 700px;
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  /* Title */
+  .account-card h2 {
+    margin-bottom: 30px;
+    color: #1b5e20;
+    font-weight: 600;
+  }
+  
+  /* 🌱 Row layout */
+  .account-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .account-row h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #2e7d32;
+  }
+  
+  .account-row p {
+    margin: 5px 0 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  /* ✏ Edit Button */
+  .edit-btn {
+    background: #66bb6a;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.3s ease;
+  }
+  
+  .edit-btn:hover {
+    background: #43a047;
+    color: white;
+  }
+  
+  /* ✨ Edit Mode Section */
+  .edit-section {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  
+  .edit-section input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 200px;
+  }
+  
+  .edit-section button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #2e7d32;
+    color: white;
+    transition: 0.3s ease;
+  }
+  
+  .edit-section button:hover {
+    background: #1b5e20;
+  }
+  
+  /* 🔐 Password Section */
+  .password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+  }
+  
+  .password-form input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .password-form button {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  .password-form button:hover {
+    background: #1b5e20;
+  }
+  
+  /* 🌱 Message */
+  .message {
+    margin-top: 15px;
+    color: #2e7d32;
+    font-weight: 500;
+  }
+  
+  /* 🔙 Back Button */
+  .back-btn {
+    margin-top: 20px;
+    background: transparent;
+    border: 2px solid #2e7d32;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  .back-btn:hover {
+    background: #2e7d32;
+    color: white;
+  }
+  
+  /* Smooth appearance */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

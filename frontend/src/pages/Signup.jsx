@@ -23,15 +23,20 @@ function Signup({ goToLogin, goHome }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
+  
     const response = await signupCustomer(formData);
-
+  
     if (response.error) {
       setMessage(response.error);
     } else {
-      setMessage(response.message);
+      setMessage("Account created successfully. Redirecting to login...");
+  
+      setTimeout(() => {
+        goToLogin();
+      }, 1500);
     }
   }
+  
 
   return (
     <div>
