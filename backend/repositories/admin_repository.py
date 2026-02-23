@@ -1,6 +1,20 @@
 from models import ServiceRequest, Customer, db
 from models import Admin
-from models import Customer
+
+def create_customer(name, email, phone, password, has_account, must_change_password=False):
+    customer = Customer(
+        name=name,
+        email=email,
+        phone=phone,
+        password=password,
+        has_account=has_account,
+        must_change_password=must_change_password
+    )
+
+    db.session.add(customer)
+    db.session.commit()
+
+    return customer
 
 def get_all_customers():
     return Customer.query.all()

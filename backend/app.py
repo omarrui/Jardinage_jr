@@ -39,7 +39,7 @@ def home():
 # Admin seeding (runs once)
 def seed_admin():
     admin_email = "admin@gardening.com"
-    admin_password = "admin123"
+    admin_password = "password11"
 
     existing_admin = Admin.query.filter_by(email=admin_email).first()
     if not existing_admin:

@@ -11,6 +11,13 @@ def register_admin_routes(app):
         return jsonify(response), status
     
 
+    @app.route("/api/admin/customers", methods=["POST"])
+    def admin_create_customer():
+        data = request.get_json()
+        response, status = admin_service.create_customer_by_admin(data)
+        return jsonify(response), status
+    
+
     @app.route("/api/admin/login", methods=["POST"])
     def admin_login():
         data = request.get_json()
