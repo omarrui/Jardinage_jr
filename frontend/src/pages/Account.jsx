@@ -62,7 +62,7 @@ function Account({ goHome }) {
     setMessage(data.message || data.error);
   }
 
-  // 🔥 CHANGE PASSWORD
+  //  CHANGE PASSWORD
   async function handlePasswordChange(e) {
     e.preventDefault();
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function ChangePassword({ goHome }) {
+function ChangePassword({ goToLogin, goHome }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -15,27 +15,37 @@ function ChangePassword({ goHome }) {
 
     const customerId = localStorage.getItem("customer_id");
 
-    const response = await fetch(
-      "http://127.0.0.1:5000/api/customer/change-password",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customer_id: customerId,
-          new_password: password,
-        }),
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:5000/api/customer/force-change-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customer_id: customerId,
+            new_password: password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.error || "Something went wrong");
+        return;
       }
-    );
 
-    const data = await response.json();
+      setMessage("Password updated successfully. Redirecting...");
 
-    if (data.error) {
-      setMessage(data.error);
-      return;
+      localStorage.clear();
+
+      setTimeout(() => {
+        goToLogin();
+      }, 1500);
+
+    } catch (error) {
+      setMessage("Server error. Please try again.");
     }
-
-    setMessage("Password updated successfully. Please log in again.");
-    localStorage.clear();
   }
 
   return (
@@ -46,12 +56,14 @@ function ChangePassword({ goHome }) {
         <input
           type="password"
           placeholder="New Password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <input
           type="password"
           placeholder="Confirm Password"
+          value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
 
@@ -60,6 +72,7 @@ function ChangePassword({ goHome }) {
 
       {message && <p>{message}</p>}
 
+      {/* Manual navigation option */}
       <button onClick={goHome}>Go Home</button>
     </div>
   );

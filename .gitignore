@@ -117,3 +117,6 @@ dmypy.json
 
 # Project secrets
 config.py
+
+node_modules/
+frontend/node_modules/

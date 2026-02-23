@@ -126,8 +126,12 @@ function App() {
 
       {/* FORCE CHANGE PASSWORD */}
       {currentPage === "changePassword" && (
-        <ChangePassword goHome={() => setCurrentPage("home")} />
+        <ChangePassword
+          goToLogin={() => setCurrentPage("login")}
+          goHome={() => setCurrentPage("home")}
+        />
       )}
+
 
       {currentPage === "account" && (
         <Account goHome={() => setCurrentPage("home")} />
