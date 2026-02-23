@@ -4,15 +4,26 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Booking from "./pages/Booking";
 import AdminDashboard from "./pages/AdminDashboard";
+import ChangePassword from "./pages/ChangePassword";
+import ResetPassword from "./ResetPassword";
+import Account from "./pages/Account";
+import RequestReset from "./pages/RequestReset";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("home");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [customerName, setCustomerName] = useState("");
 
-  // 🔥 SESSION RESTORE ON PAGE RELOAD
+  //  SESSION RESTORE + RESET LINK DETECTION
   useEffect(() => {
+    const path = window.location.pathname;
+
+    // If user clicked email reset link
+    if (path === "/reset-password") {
+      setCurrentPage("resetPassword");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
@@ -41,12 +52,15 @@ function App() {
     setCurrentPage("admin");
   }
 
+  function handleForcePasswordChange(customerId) {
+    localStorage.setItem("customer_id", customerId);
+    setCurrentPage("changePassword");
+  }
+
   function handleLogout() {
-    // 🔥 CLEAR EVERYTHING
     localStorage.clear();
     setIsLoggedIn(false);
     setIsAdmin(false);
-    setCustomerName("");
     setCurrentPage("home");
   }
 
@@ -54,6 +68,7 @@ function App() {
     <div>
       <h1>🌱 JR jardinage</h1>
 
+      {/* HOME */}
       {currentPage === "home" && (
         <>
           {!isLoggedIn ? (
@@ -67,9 +82,8 @@ function App() {
             </>
           ) : isAdmin ? (
             <>
-              <h2>Admin Dashboard</h2>
               <button onClick={() => setCurrentPage("admin")}>
-                Go to Dashboard
+                Admin Dashboard
               </button>
               <button onClick={handleLogout}>
                 Logout
@@ -77,9 +91,11 @@ function App() {
             </>
           ) : (
             <>
-              <h2>Welcome 👋</h2>
               <button onClick={() => setCurrentPage("booking")}>
                 Request Service
+              </button>
+              <button onClick={() => setCurrentPage("account")}>
+                My Account
               </button>
               <button onClick={handleLogout}>
                 Logout
@@ -89,14 +105,8 @@ function App() {
         </>
       )}
 
-      {currentPage === "login" && (
-        <Login
-          onCustomerLogin={handleCustomerLogin}
-          onAdminLogin={handleAdminLogin}
-          goHome={() => setCurrentPage("home")}
-        />
-      )}
 
+      {/* SIGNUP */}
       {currentPage === "signup" && (
         <Signup
           goHome={() => setCurrentPage("home")}
@@ -104,12 +114,48 @@ function App() {
         />
       )}
 
+      {/* BOOKING */}
       {currentPage === "booking" && (
         <Booking goHome={() => setCurrentPage("home")} />
       )}
 
+      {/* ADMIN */}
       {currentPage === "admin" && (
-        <AdminDashboard goHome={() => setCurrentPage("home")} />
+        <AdminDashboard goHome={handleLogout} />
+      )}
+
+      {/* FORCE CHANGE PASSWORD */}
+      {currentPage === "changePassword" && (
+        <ChangePassword goHome={() => setCurrentPage("home")} />
+      )}
+
+      {currentPage === "account" && (
+        <Account goHome={() => setCurrentPage("home")} />
+      )}
+
+      {/* RESET PASSWORD (EMAIL LINK PAGE) */}
+      {currentPage === "resetPassword" && (
+        <ResetPassword
+          goToLogin={() => setCurrentPage("login")}
+        />
+      )}
+
+      {currentPage === "requestReset" && (
+        <RequestReset
+          goToLogin={() => setCurrentPage("login")}
+        />
+      )}
+
+      {/* LOGIN */}
+
+      {currentPage === "login" && (
+        <Login
+          onCustomerLogin={handleCustomerLogin}
+          onAdminLogin={handleAdminLogin}
+          onForcePasswordChange={handleForcePasswordChange}
+          goHome={() => setCurrentPage("home")}
+          goToResetRequest={() => setCurrentPage("requestReset")}
+        />
       )}
     </div>
   );

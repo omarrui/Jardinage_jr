@@ -19,7 +19,9 @@ function Account({ goHome }) {
     new_password: ""
   });
 
-  // 🔥 FETCH CURRENT PROFILE
+  const [editingPassword, setEditingPassword] = useState(false);
+
+  // 🔥 FETCH PROFILE
   useEffect(() => {
     async function fetchProfile() {
       const response = await fetch(
@@ -36,7 +38,7 @@ function Account({ goHome }) {
     fetchProfile();
   }, [customerId]);
 
-  // 🔥 SAVE SINGLE FIELD
+  // 🔥 SAVE PROFILE FIELD
   async function handleSave(field) {
     const response = await fetch(
       "http://127.0.0.1:5000/api/customer/update-profile",
@@ -60,6 +62,7 @@ function Account({ goHome }) {
     setMessage(data.message || data.error);
   }
 
+  // 🔥 CHANGE PASSWORD
   async function handlePasswordChange(e) {
     e.preventDefault();
 
@@ -76,9 +79,19 @@ function Account({ goHome }) {
     );
 
     const data = await response.json();
+
+    if (response.ok) {
+      setEditingPassword(false);
+      setPasswordData({
+        current_password: "",
+        new_password: ""
+      });
+    }
+
     setMessage(data.message || data.error);
   }
 
+  // 🔥 RENDER PROFILE FIELD
   function renderField(label, field) {
     return (
       <div className="account-row">
@@ -125,33 +138,65 @@ function Account({ goHome }) {
 
         <hr />
 
-        <h3>🔐 Change Password</h3>
+        <h3>🔐 Security</h3>
 
-        <form onSubmit={handlePasswordChange} className="password-form">
-          <input
-            type="password"
-            placeholder="Current Password"
-            onChange={(e) =>
-              setPasswordData({
-                ...passwordData,
-                current_password: e.target.value
-              })
-            }
-          />
+        <div className="account-row">
+          <div>
+            <h4>Password</h4>
 
-          <input
-            type="password"
-            placeholder="New Password"
-            onChange={(e) =>
-              setPasswordData({
-                ...passwordData,
-                new_password: e.target.value
-              })
-            }
-          />
+            {editingPassword ? (
+              <form
+                onSubmit={handlePasswordChange}
+                className="password-form"
+              >
+                <input
+                  type="password"
+                  placeholder="Current Password"
+                  value={passwordData.current_password}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      current_password: e.target.value
+                    })
+                  }
+                />
 
-          <button type="submit">Update Password</button>
-        </form>
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  value={passwordData.new_password}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      new_password: e.target.value
+                    })
+                  }
+                />
+
+                <div className="edit-section">
+                  <button type="submit">Save</button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingPassword(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <p>********</p>
+            )}
+          </div>
+
+          {!editingPassword && (
+            <button
+              className="edit-btn"
+              onClick={() => setEditingPassword(true)}
+            >
+              Edit
+            </button>
+          )}
+        </div>
 
         {message && <p className="message">{message}</p>}
 
