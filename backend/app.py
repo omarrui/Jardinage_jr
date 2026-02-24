@@ -6,6 +6,7 @@ from config import SECRET_KEY, DATABASE_URL
 from models import db, Admin
 from werkzeug.security import generate_password_hash
 
+
 from routes.customer_routes import register_customer_routes
 from routes.appointment_routes import register_appointment_routes
 from routes.admin_routes import register_admin_routes

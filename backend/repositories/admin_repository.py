@@ -1,6 +1,13 @@
 from models import ServiceRequest, Customer, db
 from models import Admin
 
+
+def delete_customer(customer):
+    db.session.delete(customer)
+
+def commit():
+    db.session.commit()
+
 def create_customer(name, email, phone, password, has_account, must_change_password=False):
     customer = Customer(
         name=name,
