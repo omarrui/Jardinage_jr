@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 function RequestReset({ goToLogin }) {
-  const [step, setStep] = useState(1); // 1 = send code, 2 = verify code
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -26,8 +26,8 @@ function RequestReset({ goToLogin }) {
       return;
     }
 
-    setMessage("Reset code sent to your email.");
-    setStep(2); // move to step 2
+    setMessage("Code de réinitialisation envoyé à votre email.");
+    setStep(2);
   }
 
   async function handleResetPassword(e) {
@@ -53,7 +53,7 @@ function RequestReset({ goToLogin }) {
       return;
     }
 
-    setMessage("Password updated successfully. Redirecting...");
+    setMessage("Mot de passe mis à jour avec succès. Redirection...");
 
     setTimeout(() => {
       goToLogin();
@@ -62,18 +62,18 @@ function RequestReset({ goToLogin }) {
 
   return (
     <div>
-      <h2>Reset Password</h2>
+      <h2>Réinitialisation du mot de passe</h2>
 
       {step === 1 && (
         <form onSubmit={handleSendCode}>
           <input
             type="email"
-            placeholder="Enter your email"
+            placeholder="Entrez votre email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <button type="submit">Send Code</button>
+          <button type="submit">Envoyer le code</button>
         </form>
       )}
 
@@ -87,7 +87,7 @@ function RequestReset({ goToLogin }) {
 
           <input
             type="text"
-            placeholder="Enter reset code"
+            placeholder="Entrez le code de réinitialisation"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             required
@@ -95,19 +95,19 @@ function RequestReset({ goToLogin }) {
 
           <input
             type="password"
-            placeholder="New password"
+            placeholder="Nouveau mot de passe"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
           />
 
-          <button type="submit">Reset Password</button>
+          <button type="submit">Réinitialiser le mot de passe</button>
         </form>
       )}
 
       {message && <p>{message}</p>}
 
-      <button onClick={goToLogin}>Back to Login</button>
+      <button onClick={goToLogin}>Retour à la connexion</button>
     </div>
   );
 }

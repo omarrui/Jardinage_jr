@@ -2,18 +2,8 @@ import React, { useState, useEffect } from "react";
 
 function AdminDashboard({ goHome }) {
   const [adminSection, setAdminSection] = useState("home");
-
-  const [requests, setRequests] = useState([]);
   const [clients, setClients] = useState([]);
 
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [scheduledTime, setScheduledTime] = useState("");
-
-  const [message, setMessage] = useState("");
-
-  // 🔥 Create Client State
   const [showCreateClient, setShowCreateClient] = useState(false);
   const [createLogin, setCreateLogin] = useState(false);
   const [newClient, setNewClient] = useState({
@@ -22,20 +12,18 @@ function AdminDashboard({ goHome }) {
     phone: ""
   });
 
+  const [editingClient, setEditingClient] = useState(null);
+  const [editData, setEditData] = useState({ email: "", phone: "" });
+
+  const [clientToDelete, setClientToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [selectedClientForAppointment, setSelectedClientForAppointment] = useState(null);
+  const [appointmentStart, setAppointmentStart] = useState("");
+  const [appointmentEnd, setAppointmentEnd] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState("");
+
   const todayStr = new Date().toISOString().split("T")[0];
-
-  /* =============================
-     LOAD APPOINTMENTS
-  ============================= */
-  useEffect(() => {
-    if (adminSection !== "appointments") return;
-
-    fetch("http://127.0.0.1:5000/api/admin/service-requests")
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setRequests(data);
-      });
-  }, [adminSection]);
 
   /* =============================
      LOAD CLIENTS
@@ -49,35 +37,10 @@ function AdminDashboard({ goHome }) {
   };
 
   useEffect(() => {
-    if (adminSection !== "clients") return;
-    fetchClients();
-  }, [adminSection]);
-
-  /* =============================
-     CONFIRM APPOINTMENT
-  ============================= */
-  const handleConfirm = async () => {
-    if (!startDate) {
-      alert("Select start date");
-      return;
+    if (adminSection === "clients") {
+      fetchClients();
     }
-
-    await fetch(
-      `http://127.0.0.1:5000/api/admin/service-requests/${selectedRequest.id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: "scheduled",
-          scheduled_start_date: startDate,
-          scheduled_end_date: endDate,
-          scheduled_time: scheduledTime
-        })
-      }
-    );
-
-    setSelectedRequest(null);
-  };
+  }, [adminSection]);
 
   /* =============================
      CREATE CLIENT
@@ -104,94 +67,47 @@ function AdminDashboard({ goHome }) {
       return;
     }
 
-    if (data.temporary_password) {
-      alert(
-        "Client created.\nTemporary Password: " +
-        data.temporary_password
-      );
-    } else {
-      alert("Internal client created.");
-    }
-
+    alert("Client créé avec succès");
     setShowCreateClient(false);
     setNewClient({ name: "", email: "", phone: "" });
     setCreateLogin(false);
     fetchClients();
   };
 
-  return (
-    <div>
-      <h2>Admin Dashboard</h2>
+  /* =============================
+     RESEND TEMP PASSWORD
+  ============================= */
+  const resendTempPassword = async (customerId) => {
+    const response = await fetch(
+      `http://127.0.0.1:5000/api/admin/resend-temp-password/${customerId}`,
+      { method: "POST" }
+    );
 
-      {/* =============================
-         HOME
-      ============================= */}
+    const data = await response.json();
+    alert(data.message || data.error);
+    fetchClients();
+  };
+
+  return (
+    <div style={{ maxWidth: "1000px", margin: "40px auto" }}>
+      <h2 className="section-title">Espace administrateur</h2>
+
       {adminSection === "home" && (
         <>
-          <button onClick={() => setAdminSection("appointments")}>
-            Appointments
-          </button>
-
-          <button
-            onClick={() => setAdminSection("clients")}
-            style={{ marginLeft: "10px" }}
-          >
+          <button onClick={() => setAdminSection("clients")}>
             Clients
           </button>
 
-          <button
-            onClick={goHome}
-            style={{ marginLeft: "10px" }}
-          >
-            Logout
+          <button onClick={goHome} style={{ marginLeft: "10px" }}>
+            Déconnexion
           </button>
         </>
       )}
 
-      {/* =============================
-         APPOINTMENTS
-      ============================= */}
-      {adminSection === "appointments" && (
-        <>
-          <button onClick={() => setAdminSection("home")}>
-            ⬅ Back
-          </button>
-
-          <h3>Appointments</h3>
-
-          {requests.length === 0 ? (
-            <p>No service requests found.</p>
-          ) : (
-            requests.map(req => (
-              <div
-                key={req.id}
-                style={{
-                  border: "1px solid #ddd",
-                  padding: "15px",
-                  marginBottom: "15px",
-                  borderRadius: "8px"
-                }}
-              >
-                <strong>{req.customer_name}</strong>
-                <p>Preferred: {req.preferred_date}</p>
-                <p>Status: {req.status}</p>
-
-                <button onClick={() => setSelectedRequest(req)}>
-                  View
-                </button>
-              </div>
-            ))
-          )}
-        </>
-      )}
-
-      {/* =============================
-         CLIENTS
-      ============================= */}
       {adminSection === "clients" && (
         <>
           <button onClick={() => setAdminSection("home")}>
-            ⬅ Back
+            ⬅ Retour
           </button>
 
           <h3>Clients</h3>
@@ -200,11 +116,11 @@ function AdminDashboard({ goHome }) {
             onClick={() => setShowCreateClient(true)}
             style={{ fontSize: "18px", marginBottom: "15px" }}
           >
-            ➕ Add Client
+            ➕ Ajouter un client
           </button>
 
           {clients.length === 0 ? (
-            <p>No clients found.</p>
+            <p>Aucun client trouvé.</p>
           ) : (
             clients.map(client => (
               <div
@@ -217,31 +133,225 @@ function AdminDashboard({ goHome }) {
                 }}
               >
                 <strong>{client.name}</strong>
-                <p>Email: {client.email}</p>
-                <p>Phone: {client.phone}</p>
+
+                {editingClient?.id === client.id ? (
+                  <>
+                    <input
+                      type="email"
+                      value={editData.email}
+                      onChange={(e) =>
+                        setEditData({ ...editData, email: e.target.value })
+                      }
+                    />
+
+                    <input
+                      type="text"
+                      value={editData.phone}
+                      onChange={(e) =>
+                        setEditData({ ...editData, phone: e.target.value })
+                      }
+                    />
+
+                    <button
+                      onClick={async () => {
+                        await fetch(
+                          `http://127.0.0.1:5000/api/admin/customers/${client.id}`,
+                          {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(editData)
+                          }
+                        );
+                        setEditingClient(null);
+                        fetchClients();
+                      }}
+                    >
+                      💾 Enregistrer
+                    </button>
+
+                    <button onClick={() => setEditingClient(null)}>
+                      Annuler
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p>Email : {client.email}</p>
+                    <p>Téléphone : {client.phone}</p>
+
+                    <button
+                      onClick={() => {
+                        setEditingClient(client);
+                        setEditData({
+                          email: client.email,
+                          phone: client.phone
+                        });
+                      }}
+                    >
+                      ✏ Modifier
+                    </button>
+                  </>
+                )}
+
+                <p>
+                  Statut :{" "}
+                  {client.must_change_password ? (
+                    <span>🟠 Compte non activé</span>
+                  ) : (
+                    <span>🟢 Actif</span>
+                  )}
+                </p>
+
+                {/* GIVE APPOINTMENT BUTTON */}
+                <button
+                  onClick={() => setSelectedClientForAppointment(client)}
+                  style={{ marginRight: "8px" }}
+                >
+                  🗓 Donner un rendez-vous
+                </button>
+
+                {client.must_change_password && (
+                  <>
+                    <button onClick={() => resendTempPassword(client.id)}>
+                      🔁 Renvoyer mot de passe
+                    </button>
+
+                    <button
+                      onClick={() => setClientToDelete(client)}
+                      style={{
+                        marginLeft: "8px",
+                        backgroundColor: "#c62828",
+                        color: "white",
+                        border: "none",
+                        padding: "6px 12px",
+                        borderRadius: "5px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      🗑 Supprimer
+                    </button>
+                  </>
+                )}
               </div>
             ))
           )}
         </>
       )}
 
-      {/* =============================
-         CREATE CLIENT MODAL
-      ============================= */}
+      {/* APPOINTMENT MODAL */}
+      {selectedClientForAppointment && (
+        <div style={overlayStyle}>
+          <div style={modalStyle}>
+            <h3>
+              Rendez-vous pour {selectedClientForAppointment.name}
+            </h3>
+
+            <input
+              type="date"
+              min={todayStr}
+              value={appointmentStart}
+              onChange={(e) => setAppointmentStart(e.target.value)}
+            />
+
+            <input
+              type="date"
+              min={appointmentStart || todayStr}
+              value={appointmentEnd}
+              onChange={(e) => setAppointmentEnd(e.target.value)}
+            />
+
+            <input
+              type="time"
+              value={appointmentTime}
+              onChange={(e) => setAppointmentTime(e.target.value)}
+            />
+
+            <br /><br />
+
+            <button
+              onClick={async () => {
+                await fetch(
+                  "http://127.0.0.1:5000/api/admin/create-appointment",
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      customer_id: selectedClientForAppointment.id,
+                      scheduled_start_date: appointmentStart,
+                      scheduled_end_date: appointmentEnd,
+                      scheduled_time: appointmentTime
+                    })
+                  }
+                );
+
+                setSelectedClientForAppointment(null);
+                setAppointmentStart("");
+                setAppointmentEnd("");
+                setAppointmentTime("");
+              }}
+            >
+              Confirmer
+            </button>
+
+            <button
+              onClick={() => setSelectedClientForAppointment(null)}
+              style={{ marginLeft: "10px" }}
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE MODAL */}
+      {clientToDelete && (
+        <div style={overlayStyle}>
+          <div style={modalStyle}>
+            <h3>Confirmer la suppression</h3>
+
+            <p>
+              Supprimer {clientToDelete.name} ?
+            </p>
+
+            <button onClick={() => setClientToDelete(null)}>
+              Annuler
+            </button>
+
+            <button
+              disabled={isDeleting}
+              onClick={async () => {
+                setIsDeleting(true);
+
+                await fetch(
+                  `http://127.0.0.1:5000/api/admin/customers/${clientToDelete.id}`,
+                  { method: "DELETE" }
+                );
+
+                setIsDeleting(false);
+                setClientToDelete(null);
+                fetchClients();
+              }}
+              style={{ marginLeft: "10px", backgroundColor: "#c62828", color: "white" }}
+            >
+              Supprimer
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE CLIENT MODAL */}
       {showCreateClient && (
         <div style={overlayStyle}>
           <div style={modalStyle}>
-            <h3>Create Client</h3>
+            <h3>Créer un client</h3>
 
             <input
               type="text"
-              placeholder="Name"
+              placeholder="Nom"
               value={newClient.name}
               onChange={(e) =>
                 setNewClient({ ...newClient, name: e.target.value })
               }
             />
-            <br /><br />
 
             <input
               type="email"
@@ -251,17 +361,15 @@ function AdminDashboard({ goHome }) {
                 setNewClient({ ...newClient, email: e.target.value })
               }
             />
-            <br /><br />
 
             <input
               type="text"
-              placeholder="Phone"
+              placeholder="Téléphone"
               value={newClient.phone}
               onChange={(e) =>
                 setNewClient({ ...newClient, phone: e.target.value })
               }
             />
-            <br /><br />
 
             <label>
               <input
@@ -269,76 +377,22 @@ function AdminDashboard({ goHome }) {
                 checked={createLogin}
                 onChange={() => setCreateLogin(!createLogin)}
               />
-              Create login account
+              Créer un compte
             </label>
 
             <br /><br />
 
-            <button onClick={handleCreateClient}>
-              Create
-            </button>
-
-            <button
-              onClick={() => setShowCreateClient(false)}
-              style={{ marginLeft: "10px" }}
-            >
-              Cancel
+            <button onClick={handleCreateClient}>Créer</button>
+            <button onClick={() => setShowCreateClient(false)} style={{ marginLeft: "10px" }}>
+              Annuler
             </button>
           </div>
         </div>
       )}
-
-      {/* =============================
-         SCHEDULE MODAL
-      ============================= */}
-      {selectedRequest && (
-        <div style={overlayStyle}>
-          <div style={modalStyle}>
-            <h3>Schedule Service</h3>
-
-            <input
-              type="date"
-              min={todayStr}
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <br /><br />
-
-            <input
-              type="date"
-              min={startDate || todayStr}
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-            <br /><br />
-
-            <input
-              type="time"
-              value={scheduledTime}
-              onChange={(e) => setScheduledTime(e.target.value)}
-            />
-            <br /><br />
-
-            <button onClick={handleConfirm}>
-              Confirm
-            </button>
-
-            <button
-              onClick={() => setSelectedRequest(null)}
-              style={{ marginLeft: "10px" }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
-      {message && <p>{message}</p>}
     </div>
   );
 }
 
-/* STYLES */
 const overlayStyle = {
   position: "fixed",
   top: 0,
@@ -354,7 +408,8 @@ const overlayStyle = {
 const modalStyle = {
   backgroundColor: "white",
   padding: "20px",
-  borderRadius: "10px"
+  borderRadius: "10px",
+  minWidth: "300px"
 };
 
 export default AdminDashboard;

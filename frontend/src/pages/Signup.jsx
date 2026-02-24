@@ -1,5 +1,5 @@
 // Signup.jsx
-// Allows a customer to create an account
+// Permet à un client de créer un compte
 
 import React, { useState } from "react";
 import { signupCustomer } from "../api/api";
@@ -29,7 +29,7 @@ function Signup({ goToLogin, goHome }) {
     if (response.error) {
       setMessage(response.error);
     } else {
-      setMessage("Account created successfully. Redirecting to login...");
+      setMessage("Compte créé avec succès. Redirection vers la connexion...");
   
       setTimeout(() => {
         goToLogin();
@@ -40,25 +40,25 @@ function Signup({ goToLogin, goHome }) {
 
   return (
     <div>
-      <h2>Customer Signup</h2>
+      <h2>Inscription Client</h2>
 
       <form onSubmit={handleSubmit}>
-        <input type="text" name="name" placeholder="Name" onChange={handleChange} />
+        <input type="text" name="name" placeholder="Nom" onChange={handleChange} />
         <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} />
-        <input type="text" name="phone" placeholder="Phone" onChange={handleChange} />
+        <input type="password" name="password" placeholder="Mot de passe" onChange={handleChange} />
+        <input type="text" name="phone" placeholder="Téléphone" onChange={handleChange} />
 
-        <button type="submit">Sign Up</button>
+        <button type="submit">S'inscrire</button>
       </form>
 
       <p>
-        Already have an account?{" "}
-        <button onClick={goToLogin}>Log in</button>
+        Vous avez déjà un compte ?{" "}
+        <button onClick={goToLogin}>Se connecter</button>
       </p>
 
       <p>
-        Changed your mind?{" "}
-        <button onClick={goHome}>Go Home</button>
+        Vous changez d'avis ?{" "}
+        <button onClick={goHome}>Accueil</button>
       </p>
 
       {message && <p>{message}</p>}
