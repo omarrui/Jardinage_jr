@@ -9,7 +9,7 @@ function ChangePassword({ goToLogin, goHome }) {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setMessage("Passwords do not match");
+      setMessage("Les mots de passe ne correspondent pas");
       return;
     }
 
@@ -35,7 +35,7 @@ function ChangePassword({ goToLogin, goHome }) {
         return;
       }
 
-      setMessage("Password updated successfully. Redirecting...");
+      setMessage("Mot de passe mis à jour avec succès. Redirection...");
 
       localStorage.clear();
 
@@ -50,30 +50,29 @@ function ChangePassword({ goToLogin, goHome }) {
 
   return (
     <div>
-      <h2>Set New Password</h2>
+      <h2>Définir un nouveau mot de passe</h2>
 
       <form onSubmit={handleSubmit}>
         <input
           type="password"
-          placeholder="New Password"
+          placeholder="Nouveau mot de passe"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <input
           type="password"
-          placeholder="Confirm Password"
+          placeholder="Confirmer le mot de passe"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
 
-        <button type="submit">Update Password</button>
+        <button type="submit">Mettre à jour le mot de passe</button>
       </form>
 
       {message && <p>{message}</p>}
 
-      {/* Manual navigation option */}
-      <button onClick={goHome}>Go Home</button>
+      <button onClick={goHome}>Accueil</button>
     </div>
   );
 }

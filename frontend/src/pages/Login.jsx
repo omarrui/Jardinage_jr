@@ -28,7 +28,6 @@ function Login({
       let response;
       let data;
 
-      // ADMIN LOGIN
       if (formData.email === "admin@gardening.com") {
 
         response = await fetch("http://127.0.0.1:5000/api/admin/login", {
@@ -51,7 +50,6 @@ function Login({
 
       } else {
 
-        // CUSTOMER LOGIN
         response = await fetch("http://127.0.0.1:5000/api/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -65,7 +63,6 @@ function Login({
           return;
         }
 
-        // FORCE PASSWORD CHANGE
         if (data.force_password_change) {
           onForcePasswordChange(data.customer_id);
           return;
@@ -83,13 +80,13 @@ function Login({
       }
 
     } catch (error) {
-      setMessage("Server error. Try again.");
+      setMessage("Erreur serveur. Veuillez réessayer.");
     }
   }
 
   return (
     <div>
-      <h2>Login</h2>
+      <h2>Connexion</h2>
 
       <form onSubmit={handleSubmit}>
         <input
@@ -102,25 +99,24 @@ function Login({
         <input
           type="password"
           name="password"
-          placeholder="Password"
+          placeholder="Mot de passe"
           onChange={handleChange}
         />
 
-        <button type="submit">Log In</button>
+        <button type="submit">Se connecter</button>
       </form>
 
-      {/* FORGOT PASSWORD BUTTON */}
       <p>
-        Forgot your password?{" "}
+        Mot de passe oublié ?{" "}
         <button
           type="button"
           onClick={goToResetRequest}
         >
-          Reset here
+          Réinitialiser ici
         </button>
       </p>
 
-      <button onClick={goHome}>Go Home</button>
+      <button onClick={goHome}>Accueil</button>
 
       {message && <p>{message}</p>}
     </div>

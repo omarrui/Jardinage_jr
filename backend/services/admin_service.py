@@ -6,6 +6,8 @@ from utils.jwt_utils import generate_token
 import random
 import string
 from utils.email_utils import send_email
+from models import Customer
+from models import db 
 
 
 def create_customer_by_admin(data):
@@ -73,10 +75,57 @@ JR Jardinage
     )
 
     return {
-        "message": "Customer account created",
-        "temporary_password": temp_password
+        "message": "Customer account created and email sent"
     }, 201
 
+
+def resend_temp_password(customer_id):
+
+    from models import Customer, db
+
+    customer = Customer.query.get(customer_id)
+
+    if not customer:
+        return {"error": "Customer not found"}, 404
+
+    # 🔐 Only allow resend if not activated
+    if not customer.must_change_password:
+        return {
+            "error": "Customer has already activated their account"
+        }, 400
+
+    if not customer.email:
+        return {"error": "Customer has no email"}, 400
+
+    # Generate new temp password
+    temp_password = ''.join(
+        random.choices(string.ascii_letters + string.digits, k=8)
+    )
+
+    hashed_password = generate_password_hash(temp_password)
+
+    customer.password = hashed_password
+    customer.must_change_password = True  # still required
+
+    db.session.commit()
+
+    send_email(
+        customer.email,
+        "Your New Temporary Password - JR Jardinage",
+        f"""
+Hello {customer.name},
+
+Your temporary password has been reset.
+
+Temporary password: {temp_password}
+
+Please log in and change it immediately.
+
+JR Jardinage
+"""
+    )
+
+    return {"message": "Temporary password resent successfully"}, 200
 
 
 def authenticate_customer(email, password):
@@ -219,7 +268,72 @@ def get_all_customers():
             "id": customer.id,
             "name": customer.name,
             "email": customer.email,
-            "phone": customer.phone
+            "phone": customer.phone,
+            "must_change_password": customer.must_change_password
+
         })
     
     return result, 200
+def update_customer(customer_id, data):
+    customer = admin_repository.get_customer_by_id(customer_id)
+
+    if not customer:
+        return {"error": "Customer not found"}, 404
+
+    email = data.get("email")
+    phone = data.get("phone")
+
+    # Prevent duplicate email
+    if email and email != customer.email:
+        existing = get_customer_by_email(email)
+        if existing:
+            return {"error": "Email already in use"}, 400
+        customer.email = email
+
+    if phone:
+        customer.phone = phone
+
+    admin_repository.commit()
+
+    return {"message": "Customer updated successfully"}, 200
+
+def delete_customer(customer_id):
+    customer = admin_repository.get_customer_by_id(customer_id)
+
+    if not customer:
+        return {"error": "Customer not found"}, 404
+
+    if not customer.must_change_password:
+        return {"error": "Cannot delete activated customer"}, 400
+
+    admin_repository.delete_customer(customer)
+    admin_repository.commit()
+
+    return {"message": "Customer deleted successfully"}, 200
+def create_appointment(data):
+    from models import ServiceRequest, db
+
+    customer_id = data.get("customer_id")
+    start_date = data.get("scheduled_start_date")
+    end_date = data.get("scheduled_end_date")
+    time = data.get("scheduled_time")
+
+    if not customer_id or not start_date:
+        return {"error": "Customer and start date required"}, 400
+
+    new_request = ServiceRequest(
+        customer_id=customer_id,
+        preferred_date=start_date,
+        description="Scheduled by Admin",
+        status="scheduled",
+        scheduled_start_date=start_date,
+        scheduled_end_date=end_date,
+        scheduled_time=time
+    )
+
+    db.session.add(new_request)
+    db.session.commit()
+
+    return {"message": "Appointment created successfully"}, 201
+
+  

@@ -1,0 +1,155 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  body {
+    background-color: #f4f6f8;
+    color: #1f2937;
+  }
+  
+  /* BUTTONS */
+  button {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease;
+  }
+  
+  button:hover {
+    opacity: 0.85;
+  }
+  
+  /* PRIMARY BUTTON */
+  .primary-btn {
+    background-color: #2e7d32;
+    color: white;
+  }
+  
+  /* DANGER BUTTON */
+  .danger-btn {
+    background-color: #c62828;
+    color: white;
+  }
+  
+  /* CARD STYLE */
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+  }
+  
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+
+  /* ===== FLASHY BOOKING PAGE ===== */
+
+.booking-wrapper {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+  
+    background: linear-gradient(135deg, #1b5e20, #2e7d32, #66bb6a);
+    background-size: 200% 200%;
+    animation: gradientMove 8s ease infinite;
+  }
+  
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .booking-card {
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+  }
+  
+  .booking-card h2 {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  .booking-subtitle {
+    text-align: center;
+    margin-bottom: 30px;
+    opacity: 0.8;
+  }
+  
+  /* Inputs */
+  .booking-form input,
+  .booking-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    transition: 0.3s ease;
+  }
+  
+  .booking-form input:focus,
+  .booking-form textarea:focus {
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.4);
+    transform: scale(1.02);
+  }
+  
+  /* Flashy Button */
+  .booking-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    font-size: 15px;
+    background: linear-gradient(135deg, #ffffff, #e8f5e9);
+    color: #1b5e20;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  .booking-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  }
+  
+  /* Messages */
+  .booking-message {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .booking-message.success {
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+  }
+  
+  .booking-message.error {
+    background: rgba(211, 47, 47, 0.9);
+    color: white;
+  }

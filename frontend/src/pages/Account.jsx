@@ -62,7 +62,7 @@ function Account({ goHome }) {
     setMessage(data.message || data.error);
   }
 
-  //  CHANGE PASSWORD
+  // 🔐 CHANGE PASSWORD
   async function handlePasswordChange(e) {
     e.preventDefault();
 
@@ -104,8 +104,8 @@ function Account({ goHome }) {
                 value={tempValue}
                 onChange={(e) => setTempValue(e.target.value)}
               />
-              <button onClick={() => handleSave(field)}>Save</button>
-              <button onClick={() => setEditingField(null)}>Cancel</button>
+              <button onClick={() => handleSave(field)}>Enregistrer</button>
+              <button onClick={() => setEditingField(null)}>Annuler</button>
             </div>
           ) : (
             <p>{profile[field]}</p>
@@ -120,7 +120,7 @@ function Account({ goHome }) {
               setTempValue(profile[field]);
             }}
           >
-            Edit
+            Modifier
           </button>
         )}
       </div>
@@ -130,19 +130,19 @@ function Account({ goHome }) {
   return (
     <div className="account-container">
       <div className="account-card">
-        <h2>🌿 Account Information</h2>
+        <h2>🌿 Informations du compte</h2>
 
-        {renderField("Name", "name")}
+        {renderField("Nom", "name")}
         {renderField("Email", "email")}
-        {renderField("Phone", "phone")}
+        {renderField("Téléphone", "phone")}
 
         <hr />
 
-        <h3>🔐 Security</h3>
+        <h3>🔐 Sécurité</h3>
 
         <div className="account-row">
           <div>
-            <h4>Password</h4>
+            <h4>Mot de passe</h4>
 
             {editingPassword ? (
               <form
@@ -151,7 +151,7 @@ function Account({ goHome }) {
               >
                 <input
                   type="password"
-                  placeholder="Current Password"
+                  placeholder="Mot de passe actuel"
                   value={passwordData.current_password}
                   onChange={(e) =>
                     setPasswordData({
@@ -163,7 +163,7 @@ function Account({ goHome }) {
 
                 <input
                   type="password"
-                  placeholder="New Password"
+                  placeholder="Nouveau mot de passe"
                   value={passwordData.new_password}
                   onChange={(e) =>
                     setPasswordData({
@@ -174,12 +174,12 @@ function Account({ goHome }) {
                 />
 
                 <div className="edit-section">
-                  <button type="submit">Save</button>
+                  <button type="submit">Enregistrer</button>
                   <button
                     type="button"
                     onClick={() => setEditingPassword(false)}
                   >
-                    Cancel
+                    Annuler
                   </button>
                 </div>
               </form>
@@ -193,7 +193,7 @@ function Account({ goHome }) {
               className="edit-btn"
               onClick={() => setEditingPassword(true)}
             >
-              Edit
+              Modifier
             </button>
           )}
         </div>
@@ -201,7 +201,7 @@ function Account({ goHome }) {
         {message && <p className="message">{message}</p>}
 
         <button className="back-btn" onClick={goHome}>
-          Back
+          Retour
         </button>
       </div>
     </div>

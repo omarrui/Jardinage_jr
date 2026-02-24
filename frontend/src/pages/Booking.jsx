@@ -10,7 +10,6 @@ function Booking({ goHome }) {
 
   const todayStr = new Date().toISOString().split("T")[0];
 
-  // Reusable function to fetch appointments
   const fetchAppointments = async () => {
     const customerId = localStorage.getItem("customer_id");
 
@@ -34,31 +33,28 @@ function Booking({ goHome }) {
     }
   };
 
-  // Fetch once on mount
   useEffect(() => {
     fetchAppointments();
   }, []);
 
-  // Auto-hide message
   useEffect(() => {
     if (!message) return;
     const timer = setTimeout(() => setMessage(""), 3000);
     return () => clearTimeout(timer);
   }, [message]);
 
-  // Submit new request
   async function handleSubmit(e) {
     e.preventDefault();
 
     const customerId = localStorage.getItem("customer_id");
 
     if (!customerId || customerId === "undefined") {
-      setMessage("Session expired. Please log in again.");
+      setMessage("Session expirée. Veuillez vous reconnecter.");
       return;
     }
 
     if (!date) {
-      setMessage("Please select a date.");
+      setMessage("Veuillez sélectionner une date.");
       return;
     }
 
@@ -83,94 +79,62 @@ function Booking({ goHome }) {
         return;
       }
 
-      setMessage("Service request sent successfully!");
+      setMessage("Demande envoyée avec succès !");
       setDate("");
       setDescription("");
 
-      //  REFRESH THE PAGE
       await fetchAppointments();
 
     } catch (error) {
-      setMessage("Server error. Please try again.");
+      setMessage("Erreur serveur. Veuillez réessayer.");
     }
   }
 
   return (
-    <div>
-      <h2>Request a Gardening Service</h2>
-
-      <button onClick={goHome} style={{ marginBottom: "10px" }}>
-        Home
-      </button>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="date"
-          value={date}
-          min={todayStr}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <br /><br />
-
-        <textarea
-          placeholder="Describe what you need (optional)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows="4"
-          style={{ width: "250px" }}
-        />
-        <br /><br />
-
-        <button type="submit">Request Service</button>
-      </form>
-
-      <button
-        onClick={() => setShowAppointments(!showAppointments)}
-        style={{ marginTop: "15px" }}
-      >
-        {showAppointments ? "Hide My Requests" : "See My Requests"}
-      </button>
-
-      {showAppointments && appointments.length > 0 && (
-        <div style={{ marginTop: "15px" }}>
-          <h4>My Service Requests:</h4>
-          <ul>
-            {appointments.map((appt) => (
-              <li key={appt.id}>
-                <strong>Requested:</strong> {appt.preferred_date} <br />
-                <strong>Status:</strong> {appt.status} <br />
-                {appt.status === "scheduled" && (
-                  <>
-                    <strong>Start:</strong> {appt.scheduled_start_date} <br />
-                    <strong>End:</strong> {appt.scheduled_end_date || "—"} <br />
-                    <strong>Time:</strong> {appt.scheduled_time || "—"}
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {message && (
-        <div
-          style={{
-            marginTop: "15px",
-            padding: "10px",
-            borderRadius: "6px",
-            backgroundColor: message.includes("success")
-              ? "#d4edda"
-              : "#f8d7da",
-            color: message.includes("success")
-              ? "#155724"
-              : "#721c24",
-          }}
-        >
-          {message}
-        </div>
-      )}
+    <div className="booking-wrapper">
+      <div className="booking-card">
+        <h2 className="section-title">
+          🌿 Demande de service de jardinage
+        </h2>
+  
+        <p className="booking-subtitle">
+          Sélectionnez une date et décrivez votre besoin.
+        </p>
+  
+        <form onSubmit={handleSubmit} className="booking-form">
+          <label>Date souhaitée</label>
+          <input
+            type="date"
+            value={date}
+            min={todayStr}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+  
+          <label>Description (optionnel)</label>
+          <textarea
+            placeholder="Ex: Taille de haie, entretien général..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows="4"
+          />
+  
+          <button type="submit" className="primary-btn booking-btn">
+            Envoyer la demande
+          </button>
+        </form>
+  
+        {message && (
+          <div
+            className={`booking-message ${
+              message.includes("succès") ? "success" : "error"
+            }`}
+          >
+            {message}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-
 export default Booking;

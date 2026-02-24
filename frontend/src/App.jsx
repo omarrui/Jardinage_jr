@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 
+import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Booking from "./pages/Booking";
@@ -14,11 +15,9 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  //  SESSION RESTORE + RESET LINK DETECTION
   useEffect(() => {
     const path = window.location.pathname;
 
-    // If user clicked email reset link
     if (path === "/reset-password") {
       setCurrentPage("resetPassword");
       return;
@@ -66,103 +65,101 @@ function App() {
 
   return (
     <div>
-      <h1>🌱 JR jardinage</h1>
-
-      {/* HOME */}
-      {currentPage === "home" && (
-        <>
+      {/* NAVBAR */}
+      <nav className="navbar">
+        <div className="nav-left">
+          <h3 style={{ cursor: "pointer" }} onClick={() => setCurrentPage("home")}>
+            JR Jardinage
+          </h3>
+        </div>
+  
+        <div className="nav-right">
           {!isLoggedIn ? (
             <>
               <button onClick={() => setCurrentPage("login")}>
-                Log In
+                Connexion
               </button>
-              <button onClick={() => setCurrentPage("signup")}>
-                Sign Up
+              <button
+                onClick={() => setCurrentPage("signup")}
+                className="primary-btn"
+              >
+                Inscription
               </button>
             </>
           ) : isAdmin ? (
             <>
               <button onClick={() => setCurrentPage("admin")}>
-                Admin Dashboard
+                Admin
               </button>
-              <button onClick={handleLogout}>
-                Logout
+              <button onClick={handleLogout} className="danger-btn">
+                Déconnexion
               </button>
             </>
           ) : (
             <>
               <button onClick={() => setCurrentPage("booking")}>
-                Request Service
+                Demander un service
               </button>
               <button onClick={() => setCurrentPage("account")}>
-                My Account
+                Mon compte
               </button>
-              <button onClick={handleLogout}>
-                Logout
+              <button onClick={handleLogout} className="danger-btn">
+                Déconnexion
               </button>
             </>
           )}
-        </>
-      )}
-
-
-      {/* SIGNUP */}
-      {currentPage === "signup" && (
-        <Signup
-          goHome={() => setCurrentPage("home")}
-          goToLogin={() => setCurrentPage("login")}
-        />
-      )}
-
-      {/* BOOKING */}
-      {currentPage === "booking" && (
-        <Booking goHome={() => setCurrentPage("home")} />
-      )}
-
-      {/* ADMIN */}
-      {currentPage === "admin" && (
-        <AdminDashboard goHome={handleLogout} />
-      )}
-
-      {/* FORCE CHANGE PASSWORD */}
-      {currentPage === "changePassword" && (
-        <ChangePassword
-          goToLogin={() => setCurrentPage("login")}
-          goHome={() => setCurrentPage("home")}
-        />
-      )}
-
-
-      {currentPage === "account" && (
-        <Account goHome={() => setCurrentPage("home")} />
-      )}
-
-      {/* RESET PASSWORD (EMAIL LINK PAGE) */}
-      {currentPage === "resetPassword" && (
-        <ResetPassword
-          goToLogin={() => setCurrentPage("login")}
-        />
-      )}
-
-      {currentPage === "requestReset" && (
-        <RequestReset
-          goToLogin={() => setCurrentPage("login")}
-        />
-      )}
-
-      {/* LOGIN */}
-
-      {currentPage === "login" && (
-        <Login
-          onCustomerLogin={handleCustomerLogin}
-          onAdminLogin={handleAdminLogin}
-          onForcePasswordChange={handleForcePasswordChange}
-          goHome={() => setCurrentPage("home")}
-          goToResetRequest={() => setCurrentPage("requestReset")}
-        />
-      )}
+        </div>
+      </nav>
+  
+      {/* PAGE CONTENT */}
+      <div className="page-container">
+        {currentPage === "home" && <Home />}
+  
+        {currentPage === "signup" && (
+          <Signup
+            goHome={() => setCurrentPage("home")}
+            goToLogin={() => setCurrentPage("login")}
+          />
+        )}
+  
+        {currentPage === "login" && (
+          <Login
+            onCustomerLogin={handleCustomerLogin}
+            onAdminLogin={handleAdminLogin}
+            onForcePasswordChange={handleForcePasswordChange}
+            goHome={() => setCurrentPage("home")}
+            goToResetRequest={() => setCurrentPage("requestReset")}
+          />
+        )}
+  
+        {currentPage === "booking" && (
+          <Booking goHome={() => setCurrentPage("home")} />
+        )}
+  
+        {currentPage === "account" && (
+          <Account goHome={() => setCurrentPage("home")} />
+        )}
+  
+        {currentPage === "admin" && (
+          <AdminDashboard goHome={handleLogout} />
+        )}
+  
+        {currentPage === "changePassword" && (
+          <ChangePassword
+            goToLogin={() => setCurrentPage("login")}
+            goHome={() => setCurrentPage("home")}
+          />
+        )}
+  
+        {currentPage === "resetPassword" && (
+          <ResetPassword goToLogin={() => setCurrentPage("login")} />
+        )}
+  
+        {currentPage === "requestReset" && (
+          <RequestReset goToLogin={() => setCurrentPage("login")} />
+        )}
+      </div>
     </div>
   );
 }
-
-export default App;
+export default App
