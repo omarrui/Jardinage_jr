@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
+
 from flask import Flask
 from flask_cors import CORS
 from config import SECRET_KEY, DATABASE_URL
 from models import db, Admin
 from werkzeug.security import generate_password_hash
-
 
 from routes.customer_routes import register_customer_routes
 from routes.appointment_routes import register_appointment_routes
@@ -39,6 +39,7 @@ register_admin_routes(app)
 def home():
     return "Backend is running"
 
+
 # Admin seeding (runs once)
 def seed_admin():
     admin_email = "admin@gardening.com"
@@ -53,6 +54,7 @@ def seed_admin():
         print("Admin user created")
     else:
         print("Admin already exists")
+
 
 if __name__ == "__main__":
     with app.app_context():

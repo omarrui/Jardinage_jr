@@ -197,10 +197,10 @@ def get_all_service_requests():
             "customer_phone": customer.phone if customer else "Unknown",
             "preferred_date": req.preferred_date,
             "description": req.description,
+            "address": req.address,
             "status": req.status,
-            "scheduled_start_date": req.scheduled_start_date,
-            "scheduled_end_date": req.scheduled_end_date,
-            "scheduled_time": req.scheduled_time
+            "scheduled_start": req.scheduled_start.isoformat() if req.scheduled_start else None,
+            "scheduled_end": req.scheduled_end.isoformat() if req.scheduled_end else None
         })
 
     return result, 200
@@ -214,49 +214,37 @@ def update_service_request(request_id, data):
         return {"error": "Service request not found"}, 404
 
     new_status = data.get("status")
-    start_date = data.get("scheduled_start_date")
-    end_date = data.get("scheduled_end_date")
-    time = data.get("scheduled_time")
+    scheduled_start = data.get("scheduled_start")
+    scheduled_end = data.get("scheduled_end")
 
-    today = datetime.today().date()
+    # Validate start datetime
+    if scheduled_start:
+        try:
+            start_dt = datetime.fromisoformat(scheduled_start)
+            if start_dt < datetime.now():
+                return {"error": "Start time cannot be in the past"}, 400
+            service_request.scheduled_start = start_dt
+        except ValueError:
+            return {"error": "Invalid start datetime format. Use ISO format"}, 400
 
-    # Validate start date
-    if start_date:
-        start = datetime.strptime(start_date, "%Y-%m-%d").date()
-        if start < today:
-            return {"error": "Start date cannot be in the past"}, 400
+    # Validate end datetime
+    if scheduled_end:
+        try:
+            end_dt = datetime.fromisoformat(scheduled_end)
+            if service_request.scheduled_start and end_dt < service_request.scheduled_start:
+                return {"error": "End time cannot be before start time"}, 400
+            service_request.scheduled_end = end_dt
+        except ValueError:
+            return {"error": "Invalid end datetime format. Use ISO format"}, 400
 
-    # Validate end date
-    if end_date:
-        end = datetime.strptime(end_date, "%Y-%m-%d").date()
-
-        if start_date:
-            start = datetime.strptime(start_date, "%Y-%m-%d").date()
-        else:
-            start = datetime.strptime(
-                service_request.scheduled_start_date,
-                "%Y-%m-%d"
-            ).date()
-
-        if end < start:
-            return {"error": "End date cannot be before start date"}, 400
-
-    # Apply updates
+    # Apply status update
     if new_status:
         service_request.status = new_status
-
-    if start_date:
-        service_request.scheduled_start_date = start_date
-
-    if end_date:
-        service_request.scheduled_end_date = end_date
-
-    if time:
-        service_request.scheduled_time = time
 
     admin_repository.commit()
 
     return {"message": "Service request updated successfully"}, 200
+
 
 def get_all_customers():
     customers = admin_repository.get_all_customers()
@@ -314,21 +302,38 @@ def create_appointment(data):
     from models import ServiceRequest, db
 
     customer_id = data.get("customer_id")
-    start_date = data.get("scheduled_start_date")
-    end_date = data.get("scheduled_end_date")
-    time = data.get("scheduled_time")
+    scheduled_start = data.get("scheduled_start")
+    scheduled_end = data.get("scheduled_end")
+    description = data.get("description", "Scheduled by Admin")
+    address = data.get("address", "")
 
-    if not customer_id or not start_date:
-        return {"error": "Customer and start date required"}, 400
+    if not customer_id or not scheduled_start:
+        return {"error": "Customer and start time required"}, 400
+
+    try:
+        # Parse ISO datetime strings
+        start_dt = datetime.fromisoformat(scheduled_start)
+        end_dt = datetime.fromisoformat(scheduled_end) if scheduled_end else None
+        
+        # Validate not in past
+        if start_dt < datetime.now():
+            return {"error": "Start time cannot be in the past"}, 400
+            
+        # Validate end is after start
+        if end_dt and end_dt < start_dt:
+            return {"error": "End time cannot be before start time"}, 400
+
+    except ValueError:
+        return {"error": "Invalid datetime format. Use ISO format (YYYY-MM-DDTHH:MM:SS)"}, 400
 
     new_request = ServiceRequest(
         customer_id=customer_id,
-        preferred_date=start_date,
-        description="Scheduled by Admin",
-        status="scheduled",
-        scheduled_start_date=start_date,
-        scheduled_end_date=end_date,
-        scheduled_time=time
+        preferred_date=start_dt.strftime("%Y-%m-%d"),
+        description=description,
+        address=address,
+        status="confirmed",
+        scheduled_start=start_dt,
+        scheduled_end=end_dt
     )
 
     db.session.add(new_request)
@@ -336,4 +341,3 @@ def create_appointment(data):
 
     return {"message": "Appointment created successfully"}, 201
 
-  
