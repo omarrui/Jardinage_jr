@@ -257,8 +257,8 @@ def get_all_customers():
             "name": customer.name,
             "email": customer.email,
             "phone": customer.phone,
-            "must_change_password": customer.must_change_password
-
+            "must_change_password": customer.must_change_password,
+            "has_account": customer.has_account
         })
     
     return result, 200
@@ -301,43 +301,61 @@ def delete_customer(customer_id):
 def create_appointment(data):
     from models import ServiceRequest, db
 
+    request_id = data.get("request_id")
     customer_id = data.get("customer_id")
     scheduled_start = data.get("scheduled_start")
     scheduled_end = data.get("scheduled_end")
-    description = data.get("description", "Scheduled by Admin")
     address = data.get("address", "")
+    description = data.get("description", "Scheduled by admin")
 
-    if not customer_id or not scheduled_start:
-        return {"error": "Customer and start time required"}, 400
+    if not scheduled_start:
+        return {"error": "Start time required"}, 400
 
+    # Validaite datetime format
     try:
-        # Parse ISO datetime strings
         start_dt = datetime.fromisoformat(scheduled_start)
         end_dt = datetime.fromisoformat(scheduled_end) if scheduled_end else None
-        
-        # Validate not in past
+
         if start_dt < datetime.now():
             return {"error": "Start time cannot be in the past"}, 400
-            
-        # Validate end is after start
+
         if end_dt and end_dt < start_dt:
             return {"error": "End time cannot be before start time"}, 400
 
     except ValueError:
         return {"error": "Invalid datetime format. Use ISO format (YYYY-MM-DDTHH:MM:SS)"}, 400
 
-    new_request = ServiceRequest(
-        customer_id=customer_id,
-        preferred_date=start_dt.strftime("%Y-%m-%d"),
-        description=description,
-        address=address,
-        status="confirmed",
-        scheduled_start=start_dt,
-        scheduled_end=end_dt
-    )
+    # CASE 1: Confirm existing request
+    if request_id:
+        service_request = ServiceRequest.query.get(request_id)
+        
+        if not service_request:
+            return {"error": "Service request not found"}, 404
 
-    db.session.add(new_request)
-    db.session.commit()
+        service_request.status = "scheduled"
+        service_request.scheduled_start = start_dt
+        service_request.scheduled_end = end_dt
+        if address:
+            service_request.address = address
 
-    return {"message": "Appointment created successfully"}, 201
+        db.session.commit()
+        return {"message": "Appointment scheduled successfully"}, 200
 
+    # CASE 2: Create new appointment directly
+    elif customer_id:
+        new_request = ServiceRequest(
+            customer_id=customer_id,
+            preferred_date=start_dt.strftime("%Y-%m-%d"),
+            description=description,
+            address=address,
+            status="scheduled",
+            scheduled_start=start_dt,
+            scheduled_end=end_dt
+        )
+        
+        db.session.add(new_request)
+        db.session.commit()
+        return {"message": "Appointment created successfully"}, 201
+
+    else:
+        return {"error": "Missing request_id or customer_id"}, 400

@@ -69,6 +69,17 @@ def register_admin_routes(app):
         response, status = admin_service.create_appointment(data)
         return jsonify(response), status
     
+    @app.route("/api/admin/appointments", methods=["POST"])
+    def create_appointment_v2():
+        data = request.get_json()
+        response, status = admin_service.create_appointment(data)
+        return jsonify(response), status
+    
+    @app.route("/api/admin/appointment-requests", methods=["GET"])
+    def get_appointment_requests():
+        response, status = admin_service.get_all_service_requests()
+        return jsonify(response), status
+
     @app.route("/api/admin/availability", methods=["POST"])
     def block_date():
         data = request.get_json()
