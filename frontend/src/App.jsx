@@ -6,20 +6,31 @@ import Login from "./pages/Login";
 import Booking from "./pages/Booking";
 import AdminDashboard from "./pages/AdminDashboard";
 import ChangePassword from "./pages/ChangePassword";
-import ResetPassword from "./ResetPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Account from "./pages/Account";
 import RequestReset from "./pages/RequestReset";
+import logo from "./gallery/logojr.webp";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("home");
+  const [currentPage, setCurrentPage] = useState(() => {
+    if (
+      window.location.pathname === "/reset-password" ||
+      window.location.search.includes("token=")
+    ) {
+      return "resetPassword";
+    }
+    return "home";
+  });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const path = window.location.pathname;
 
-    if (path === "/reset-password") {
-      setCurrentPage("resetPassword");
+    if (
+      window.location.pathname === "/reset-password" ||
+      window.location.search.includes("token=")
+    ) {
       return;
     }
 
@@ -63,23 +74,73 @@ function App() {
     setCurrentPage("home");
   }
 
+  if (currentPage === "resetPassword") {
+    return (
+      <ResetPassword goToLogin={() => setCurrentPage("login")} />
+    );
+  }
+
   return (
     <div>
       {/* NAVBAR */}
-      <nav className="navbar">
-        <div className="nav-left">
-          <h3 style={{ cursor: "pointer" }} onClick={() => setCurrentPage("home")}>
-            JR Jardinage
-          </h3>
+      <nav
+        style={{
+          background: "linear-gradient(90deg, #1b5e20, #2e7d32)",
+          padding: "15px 40px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          color: "white",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.15)"
+        }}
+>        <div className="nav-left">
+        <div
+  onClick={() => setCurrentPage("home")}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    cursor: "pointer"
+  }}
+>
+  <img
+    src={logo}
+    alt="JR Jardinage Logo"
+    style={{
+      height: "56px",
+      width: "56px",
+      objectFit: "contain"
+    }}
+  />
+  <span
+    style={{
+      fontWeight: 600,
+      fontSize: "18px",
+      letterSpacing: "0.5px"
+    }}
+  >
+    JR Jardinage
+  </span>
+</div>
         </div>
   
-        <div className="nav-right">
+        <div
+          className="nav-right"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "16px"
+          }}
+        >
           {!isLoggedIn ? (
             <>
-              <button onClick={() => setCurrentPage("login")}>
+              <button
+                onClick={() => setCurrentPage("login")}
+                className="primary-btn"
+              >
                 Connexion
               </button>
-              <button
+                <button
                 onClick={() => setCurrentPage("signup")}
                 className="primary-btn"
               >
@@ -88,7 +149,10 @@ function App() {
             </>
           ) : isAdmin ? (
             <>
-              <button onClick={() => setCurrentPage("admin")}>
+              <button
+                onClick={() => setCurrentPage("admin")}
+                className="primary-btn"
+              >
                 Admin
               </button>
               <button onClick={handleLogout} className="danger-btn">
@@ -97,10 +161,16 @@ function App() {
             </>
           ) : (
             <>
-              <button onClick={() => setCurrentPage("booking")}>
+              <button
+                onClick={() => setCurrentPage("booking")}
+                className="primary-btn"
+              >
                 Demander un service
               </button>
-              <button onClick={() => setCurrentPage("account")}>
+              <button
+                onClick={() => setCurrentPage("account")}
+                className="primary-btn"
+              >
                 Mon compte
               </button>
               <button onClick={handleLogout} className="danger-btn">
@@ -113,8 +183,15 @@ function App() {
   
       {/* PAGE CONTENT */}
       <div className="page-container">
-        {currentPage === "home" && <Home />}
-  
+      {currentPage === "home" && (
+      <Home
+        goToBooking={() =>
+          isLoggedIn
+            ? setCurrentPage("booking")
+            : setCurrentPage("login")
+        }
+      />
+)}  
         {currentPage === "signup" && (
           <Signup
             goHome={() => setCurrentPage("home")}
@@ -149,10 +226,6 @@ function App() {
             goToLogin={() => setCurrentPage("login")}
             goHome={() => setCurrentPage("home")}
           />
-        )}
-  
-        {currentPage === "resetPassword" && (
-          <ResetPassword goToLogin={() => setCurrentPage("login")} />
         )}
   
         {currentPage === "requestReset" && (

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 function Booking({ goHome }) {
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
+  const [address, setAddress] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [showAppointments, setShowAppointments] = useState(false);
   const [message, setMessage] = useState("");
@@ -58,6 +59,11 @@ function Booking({ goHome }) {
       return;
     }
 
+    if (!address) {
+      setMessage("Veuillez entrer l'adresse d'intervention.");
+      return;
+    }
+
     try {
       const response = await fetch(
         "http://127.0.0.1:5000/api/service-requests",
@@ -67,6 +73,7 @@ function Booking({ goHome }) {
           body: JSON.stringify({
             customer_id: customerId,
             preferred_date: date,
+            address: address,
             description: description || ""
           }),
         }
@@ -82,6 +89,7 @@ function Booking({ goHome }) {
       setMessage("Demande envoyée avec succès !");
       setDate("");
       setDescription("");
+      setAddress("");
 
       await fetchAppointments();
 
@@ -108,6 +116,15 @@ function Booking({ goHome }) {
             value={date}
             min={todayStr}
             onChange={(e) => setDate(e.target.value)}
+            required
+          />
+  
+          <label>Adresse d'intervention</label>
+          <input
+            type="text"
+            placeholder="Ex: 12 rue des Oliviers, Le Muy"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             required
           />
   

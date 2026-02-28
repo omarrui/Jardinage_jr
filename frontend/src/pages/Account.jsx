@@ -21,7 +21,7 @@ function Account({ goHome }) {
 
   const [editingPassword, setEditingPassword] = useState(false);
 
-  // 🔥 FETCH PROFILE
+  // FETCH PROFILE
   useEffect(() => {
     async function fetchProfile() {
       const response = await fetch(
@@ -38,7 +38,7 @@ function Account({ goHome }) {
     fetchProfile();
   }, [customerId]);
 
-  // 🔥 SAVE PROFILE FIELD
+  // SAVE PROFILE FIELD
   async function handleSave(field) {
     const response = await fetch(
       "http://127.0.0.1:5000/api/customer/update-profile",
@@ -62,7 +62,7 @@ function Account({ goHome }) {
     setMessage(data.message || data.error);
   }
 
-  // 🔐 CHANGE PASSWORD
+  // CHANGE PASSWORD
   async function handlePasswordChange(e) {
     e.preventDefault();
 
