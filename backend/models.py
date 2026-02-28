@@ -11,7 +11,7 @@ class Admin(db.Model):
     # This table is for the business owner (admin).
     # Admins can log in and manage appointments and availability.
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(150), nullable=False, unique=True)
+    email = db.Column(db.String(150), nullable=True, unique=True)
     password = db.Column(db.String(200), nullable=False)
     # Password will be stored hashed later
 
@@ -21,7 +21,7 @@ class Customer(db.Model):
     # Customers can book, view, and cancel their own appointments.
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
-    email = db.Column(db.String(150), nullable=False, unique=True)
+    email = db.Column(db.String(150), nullable=True, unique=True)
     password = db.Column(db.String(200), nullable=True)
     phone = db.Column(db.String(50), nullable=False)
 
@@ -68,11 +68,11 @@ class ServiceRequest(db.Model):
 
     preferred_date = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(500), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50), nullable=False, default="pending")
 
     # ADMIN SCHEDULING
-    scheduled_start_date = db.Column(db.String(50), nullable=True)
-    scheduled_end_date = db.Column(db.String(50), nullable=True)
-    scheduled_time = db.Column(db.String(50), nullable=True)
+    scheduled_start = db.Column(db.DateTime, nullable=True)
+    scheduled_end = db.Column(db.DateTime, nullable=True)
 
 

@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from services import admin_service
+from models import Availability, db
 
 
 
@@ -68,3 +69,41 @@ def register_admin_routes(app):
         response, status = admin_service.create_appointment(data)
         return jsonify(response), status
     
+    @app.route("/api/admin/appointments", methods=["POST"])
+    def create_appointment_v2():
+        data = request.get_json()
+        response, status = admin_service.create_appointment(data)
+        return jsonify(response), status
+    
+    @app.route("/api/admin/appointment-requests", methods=["GET"])
+    def get_appointment_requests():
+        response, status = admin_service.get_all_service_requests()
+        return jsonify(response), status
+
+    @app.route("/api/admin/availability", methods=["POST"])
+    def block_date():
+        data = request.get_json()
+        date = data.get("date")
+
+        new_block = Availability(date=date)
+        db.session.add(new_block)
+        db.session.commit()
+
+        return {"message": "Date bloquée"}, 201
+
+    @app.route("/api/admin/availability", methods=["GET"])
+    def get_blocked_dates():
+        dates = Availability.query.all()
+        return jsonify([{"date": d.date} for d in dates]), 200
+    
+    @app.route("/api/admin/availability/<string:date>", methods=["DELETE"])
+    def delete_availability(date):
+        blocked = Availability.query.filter_by(date=date).first()
+
+        if not blocked:
+            return {"error": "Date non trouvée"}, 404
+
+        db.session.delete(blocked)
+        db.session.commit()
+
+        return {"message": "Date débloquée"}, 200
