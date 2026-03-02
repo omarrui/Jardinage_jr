@@ -25,6 +25,8 @@ function AdminDashboard({ goHome }) {
   const [appointmentStart, setAppointmentStart] = useState("");
   const [appointmentEnd, setAppointmentEnd] = useState("");
   const [appointmentAddress, setAppointmentAddress] = useState("");
+  const [appointmentStartTime, setAppointmentStartTime] = useState("09:00");
+  const [appointmentEndTime, setAppointmentEndTime] = useState("17:00");
 
   const todayStr = new Date().toISOString().split("T")[0];
 
@@ -480,6 +482,9 @@ function AdminDashboard({ goHome }) {
                 Rendez-vous pour {selectedClientForAppointment.name}
               </h3>
 
+              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+                Date de début
+              </label>
               <input
                 type="date"
                 min={todayStr}
@@ -488,6 +493,19 @@ function AdminDashboard({ goHome }) {
                 style={{ display: "block", marginBottom: "10px", width: "100%" }}
               />
 
+              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+                Heure de début
+              </label>
+              <input
+                type="time"
+                value={appointmentStartTime}
+                onChange={(e) => setAppointmentStartTime(e.target.value)}
+                style={{ display: "block", marginBottom: "15px", width: "100%" }}
+              />
+
+              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+                Date de fin
+              </label>
               <input
                 type="date"
                 min={appointmentStart || todayStr}
@@ -496,7 +514,19 @@ function AdminDashboard({ goHome }) {
                 style={{ display: "block", marginBottom: "10px", width: "100%" }}
               />
 
+              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+                Heure de fin
+              </label>
+              <input
+                type="time"
+                value={appointmentEndTime}
+                onChange={(e) => setAppointmentEndTime(e.target.value)}
+                style={{ display: "block", marginBottom: "15px", width: "100%" }}
+              />
               
+              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+                Adresse d'intervention
+              </label>
               <input
                 type="text"
                 placeholder="Adresse d'intervention"
@@ -504,7 +534,6 @@ function AdminDashboard({ goHome }) {
                 onChange={(e) => setAppointmentAddress(e.target.value)}
                 style={{ display: "block", marginBottom: "15px", width: "100%" }}
               />
-              
 
               <button
                 onClick={async () => {
@@ -513,18 +542,16 @@ function AdminDashboard({ goHome }) {
                     return;
                   }
 
-                  // Add time to dates
-                  const scheduledStart = `${appointmentStart}T09:00:00`;
-                  const scheduledEnd = `${appointmentEnd}T17:00:00`;
+                  // Combine date and time
+                  const scheduledStart = `${appointmentStart}T${appointmentStartTime}:00`;
+                  const scheduledEnd = `${appointmentEnd}T${appointmentEndTime}:00`;
 
-                  // Build payload
                   const payload = {
                     scheduled_start: scheduledStart,
                     scheduled_end: scheduledEnd,
                     address: appointmentAddress
                   };
 
-                  // Add request_id OR customer_id
                   if (selectedClientForAppointment.request_id) {
                     payload.request_id = selectedClientForAppointment.request_id;
                   } else {
@@ -532,11 +559,11 @@ function AdminDashboard({ goHome }) {
                   }
 
                   const response = await fetch(
-                    "http://127.0.0.1:5000/api/admin/appointments",  // ✅ CHANGED
+                    "http://127.0.0.1:5000/api/admin/appointments",
                     {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify(payload)  // ✅ CHANGED
+                      body: JSON.stringify(payload)  
                     }
                   );
 
@@ -557,6 +584,8 @@ function AdminDashboard({ goHome }) {
                   setSelectedClientForAppointment(null);
                   setAppointmentStart("");
                   setAppointmentEnd("");
+                  setAppointmentStartTime("09:00");
+                  setAppointmentEndTime("17:00");
                   setAppointmentAddress("");
                 }}
                 style={{

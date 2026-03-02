@@ -9,6 +9,7 @@ import ChangePassword from "./pages/ChangePassword";
 import ResetPassword from "./pages/ResetPassword";
 import Account from "./pages/Account";
 import RequestReset from "./pages/RequestReset";
+import ClientAppointments from "./pages/ClientAppointments";
 import logo from "./gallery/logojr.webp";
 
 function App() {
@@ -168,6 +169,12 @@ function App() {
                 Demander un service
               </button>
               <button
+                onClick={() => setCurrentPage("appointments")}
+                className="primary-btn"
+              >
+                Mes rendez-vous
+              </button>
+              <button
                 onClick={() => setCurrentPage("account")}
                 className="primary-btn"
               >
@@ -184,14 +191,19 @@ function App() {
       {/* PAGE CONTENT */}
       <div className="page-container">
       {currentPage === "home" && (
-      <Home
-        goToBooking={() =>
-          isLoggedIn
-            ? setCurrentPage("booking")
-            : setCurrentPage("login")
-        }
-      />
-)}  
+        <Home
+          goToBooking={() =>
+            isLoggedIn
+              ? setCurrentPage("booking")
+              : setCurrentPage("login")
+          }
+          goToClientAppointments={
+            isLoggedIn && !isAdmin
+              ? () => setCurrentPage("appointments")
+              : null
+          }
+        />
+      )}  
         {currentPage === "signup" && (
           <Signup
             goHome={() => setCurrentPage("home")}
@@ -211,6 +223,10 @@ function App() {
   
         {currentPage === "booking" && (
           <Booking goHome={() => setCurrentPage("home")} />
+        )}
+
+        {currentPage === "appointments" && (
+          <ClientAppointments goHome={() => setCurrentPage("home")} />
         )}
   
         {currentPage === "account" && (

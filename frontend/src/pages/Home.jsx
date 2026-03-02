@@ -12,7 +12,7 @@ import votreJardinImg from "../gallery/votrejardain.jpg";
 import instaLogo from "../gallery/insta.webp";
 import jardiniersSapLogo from "../gallery/jardiniersap.png";
 
-function Home({ goToBooking }) {
+function Home({ goToBooking, goToClientAppointments }) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const wrapperRef = useRef(null);
@@ -78,8 +78,18 @@ function Home({ goToBooking }) {
           </p>
           <div className="hero-buttons">
             <button className="primary-btn" onClick={goToBooking}>
-              Demander un devis
+              Demander un service
             </button>
+
+            {goToClientAppointments && (
+              <button
+                className="secondary-btn"
+                onClick={goToClientAppointments}
+              >
+                Mes rendez-vous
+              </button>
+            )}
+
             <button
               className="secondary-btn"
               onClick={() => {
@@ -360,12 +370,22 @@ function Home({ goToBooking }) {
       </section>
 
       <div style={{ textAlign: "center", marginTop: "40px", marginBottom: "60px" }}>
-        <button 
+        <button
           className="primary-btn"
           onClick={goToBooking}
+          style={{ marginRight: "15px" }}
         >
           Demander un devis
         </button>
+
+        {goToClientAppointments && (
+          <button
+            className="secondary-btn"
+            onClick={goToClientAppointments}
+          >
+            📅 Mes rendez-vous
+          </button>
+        )}
       </div>
 
       <script

@@ -13,22 +13,20 @@ function Booking({ goHome }) {
 
   const fetchAppointments = async () => {
     const customerId = localStorage.getItem("customer_id");
-
+  
     if (!customerId || customerId === "undefined") {
       console.log("Invalid customer ID:", customerId);
       return;
     }
-
+  
     try {
       const res = await fetch(
         `http://127.0.0.1:5000/api/customer/service-requests?customer_id=${customerId}`
       );
-
+  
       const data = await res.json();
-
-      if (Array.isArray(data)) {
-        setAppointments(data);
-      }
+  
+      setAppointments(data.requests || []);
     } catch (error) {
       console.error("Failed to fetch appointments");
     }
@@ -140,6 +138,17 @@ function Booking({ goHome }) {
             Envoyer la demande
           </button>
         </form>
+        <button
+          type="button"
+          className="secondary-btn"
+          onClick={() => {
+            fetchAppointments();
+            setShowAppointments(!showAppointments);
+          }}
+          style={{ marginTop: "15px" }}
+        >
+          📋 Mes rendez-vous
+        </button>
   
         {message && (
           <div
@@ -148,6 +157,68 @@ function Booking({ goHome }) {
             }`}
           >
             {message}
+          </div>
+        )}
+
+        {showAppointments && (
+          <div className="appointments-section" style={{ marginTop: "30px", textAlign: "left" }}>
+            <h3 style={{ marginBottom: "15px", color: "#1b5e20" }}>
+              📅 Mes rendez-vous
+            </h3>
+
+            {appointments.length === 0 ? (
+              <p>Aucun rendez-vous pour le moment.</p>
+            ) : (
+              appointments.map((appt) => (
+                <div
+                  key={appt.id}
+                  style={{
+                    border: "1px solid #e0e0e0",
+                    padding: "18px",
+                    borderRadius: "12px",
+                    marginBottom: "15px",
+                    backgroundColor: "#ffffff",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                    color: "#1b1b1b"
+                  }}
+                >
+                  <p><strong>Date demandée :</strong> {appt.preferred_date}</p>
+                  <p><strong>Adresse :</strong> {appt.address}</p>
+                  <p>
+                    <strong>Status :</strong>{" "}
+                    <span
+                      style={{
+                        padding: "4px 8px",
+                        borderRadius: "6px",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        backgroundColor:
+                          appt.status === "scheduled"
+                            ? "#e8f5e9"
+                            : appt.status === "pending"
+                            ? "#fff8e1"
+                            : "#fdecea",
+                        color:
+                          appt.status === "scheduled"
+                            ? "#2e7d32"
+                            : appt.status === "pending"
+                            ? "#f57c00"
+                            : "#c62828"
+                      }}
+                    >
+                      {appt.status}
+                    </span>
+                  </p>
+
+                  {appt.scheduled_start && (
+                    <p>
+                      <strong>Rendez-vous prévu :</strong>{" "}
+                      {new Date(appt.scheduled_start).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>

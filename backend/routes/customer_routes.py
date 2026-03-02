@@ -188,3 +188,18 @@ def register_customer_routes(app):
             "email": customer.email,
             "phone": customer.phone
         }), 200
+
+    @app.route("/api/customer/cancel-appointment/<int:request_id>", methods=["DELETE"])
+    def cancel_customer_appointment(request_id):
+        from models import ServiceRequest, db
+        
+        service_request = ServiceRequest.query.get(request_id)
+        
+        if not service_request:
+            return jsonify({"error": "Rendez-vous introuvable"}), 404
+        
+        # Update status to cancelled instead of deleting
+        service_request.status = "cancelled"
+        db.session.commit()
+        
+        return jsonify({"message": "Rendez-vous annulé avec succès"}), 200
