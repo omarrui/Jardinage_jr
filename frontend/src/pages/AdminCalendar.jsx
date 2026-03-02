@@ -105,13 +105,25 @@ function AdminCalendar() {
       return;
     }
 
-    const hasEvent = events.some(e => {
-      const eventDate = new Date(e.start);
-      eventDate.setHours(0, 0, 0, 0);
-      return eventDate.getTime() === clickedDate.getTime();
+    const overlappingEvents = events.filter(e => {
+      const eventStart = new Date(e.start);
+      const eventEnd = new Date(e.end);
+
+      eventStart.setHours(0, 0, 0, 0);
+      eventEnd.setHours(0, 0, 0, 0);
+
+      return clickedDate >= eventStart && clickedDate <= eventEnd;
     });
 
-    if (hasEvent) return;
+    if (overlappingEvents.length > 0) {
+      const names = overlappingEvents.map(e => e.title).join(", ");
+
+      const confirmAdd = window.confirm(
+        `⚠️ Cette date contient déjà un rendez-vous avec : ${names}.\n\nVoulez-vous ajouter un autre rendez-vous ce jour-là ?`
+      );
+
+      if (!confirmAdd) return;
+    }
 
     setSelectedDateToBlock(clickedDate);
   };
