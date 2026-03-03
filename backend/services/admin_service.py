@@ -3,11 +3,16 @@ from repositories import admin_repository
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 from utils.jwt_utils import generate_token
-import random
+import secrets  # ✅ Use secrets instead of random
 import string
 from utils.email_utils import send_email
 from models import Customer
 from models import db 
+
+# ✅ Define constants to avoid duplication
+ERROR_INVALID_CREDENTIALS = "Invalid email or password"
+ERROR_CUSTOMER_NOT_FOUND = "Customer not found"
+ERROR_NAME_PHONE_REQUIRED = "NAME and PHONE are required"
 
 
 def create_customer_by_admin(data):
@@ -17,11 +22,12 @@ def create_customer_by_admin(data):
     has_account = data.get("has_account", False)
 
     if not name or not phone:
-        return {"Error": "NAME and PHONE are required"}, 400
+        return {"Error": ERROR_NAME_PHONE_REQUIRED}, 400
 
     # INTERNAL RECORD ONLY
     if not has_account:
-        customer = admin_repository.create_customer(
+        # ✅ Remove unused variable warning
+        admin_repository.create_customer(
             name=name,
             email=email,
             phone=phone,
@@ -35,19 +41,17 @@ def create_customer_by_admin(data):
     if not email:
         return {"error": "Email required for login account"}, 400
     
-    from repositories.customer_repository import get_customer_by_email
-
     existing = get_customer_by_email(email)
     if existing:
         return {"error": "Email already exists"}, 400
 
-    # Generate random password
-    temp_password = ''.join(
-        random.choices(string.ascii_letters + string.digits, k=8)
-    )
+    # Generate SECURE random password
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    temp_password = ''.join(secrets.choice(alphabet) for _ in range(12))
+    
     hashed_password = generate_password_hash(temp_password)
 
-    customer = admin_repository.create_customer(
+    admin_repository.create_customer(
         name=name,
         email=email,
         phone=phone,
@@ -56,7 +60,7 @@ def create_customer_by_admin(data):
         must_change_password=True
     )
 
-    # SEND EMAIL BEFORE RETURN
+    # Send email
     send_email(
         email,
         "Your JR Jardinage Account",
@@ -67,45 +71,36 @@ Your account has been created.
 
 Temporary password: {temp_password}
 
-Please log in and change your password.
+⚠️ This password will expire after first login. Please change it immediately.
 
 Regards,
 JR Jardinage
 """
     )
 
-    return {
-        "message": "Customer account created and email sent"
-    }, 201
+    return {"message": "Customer account created and email sent"}, 201
 
 
 def resend_temp_password(customer_id):
-
-    from models import Customer, db
-
     customer = Customer.query.get(customer_id)
 
     if not customer:
-        return {"error": "Customer not found"}, 404
+        return {"error": ERROR_CUSTOMER_NOT_FOUND}, 404
 
-    # 🔐 Only allow resend if not activated
     if not customer.must_change_password:
-        return {
-            "error": "Customer has already activated their account"
-        }, 400
+        return {"error": "Customer has already activated their account"}, 400
 
     if not customer.email:
         return {"error": "Customer has no email"}, 400
 
-    # Generate new temp password
-    temp_password = ''.join(
-        random.choices(string.ascii_letters + string.digits, k=8)
-    )
+    # Generate SECURE random password
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    temp_password = ''.join(secrets.choice(alphabet) for _ in range(12))
 
     hashed_password = generate_password_hash(temp_password)
 
     customer.password = hashed_password
-    customer.must_change_password = True  # still required
+    customer.must_change_password = True
 
     db.session.commit()
 
@@ -119,7 +114,7 @@ Your temporary password has been reset.
 
 Temporary password: {temp_password}
 
-Please log in and change it immediately.
+⚠️ Please log in and change it immediately for security.
 
 JR Jardinage
 """
@@ -129,19 +124,17 @@ JR Jardinage
 
 
 def authenticate_customer(email, password):
-
     if not email or not password:
         return {"error": "Email and Password are required"}, 400
 
     customer = get_customer_by_email(email)
 
     if not customer:
-        return {"error": "Invalid email or password"}, 401
+        return {"error": ERROR_INVALID_CREDENTIALS}, 401
 
     if not check_password_hash(customer.password, password):
-        return {"error": "Invalid email or password"}, 401
+        return {"error": ERROR_INVALID_CREDENTIALS}, 401
 
-    # make the customer change password first time he loggs in 
     if customer.must_change_password:
         return {
             "message": "You must change your password",
@@ -149,7 +142,6 @@ def authenticate_customer(email, password):
             "customer_id": customer.id
         }, 200
 
-    # Normal login
     token = generate_token(customer.id, "customer")
 
     return {
@@ -159,18 +151,18 @@ def authenticate_customer(email, password):
         "force_password_change": False
     }, 200
 
-def authenticate_admin(email, password):
 
+def authenticate_admin(email, password):
     if not email or not password:
         return {"error": "Email and password are required"}, 400
 
     admin = admin_repository.get_admin_by_email(email)
 
     if not admin:
-        return {"error": "Invalid email or password"}, 401
+        return {"error": ERROR_INVALID_CREDENTIALS}, 401
 
     if not check_password_hash(admin.password, password):
-        return {"error": "Invalid email or password"}, 401
+        return {"error": ERROR_INVALID_CREDENTIALS}, 401
 
     token = generate_token(admin.id, "admin")
 
@@ -277,11 +269,13 @@ def get_all_customers():
         })
     
     return result, 200
+
+
 def update_customer(customer_id, data):
     customer = admin_repository.get_customer_by_id(customer_id)
 
     if not customer:
-        return {"error": "Customer not found"}, 404
+        return {"error": ERROR_CUSTOMER_NOT_FOUND}, 404
 
     email = data.get("email")
     phone = data.get("phone")
@@ -300,11 +294,12 @@ def update_customer(customer_id, data):
 
     return {"message": "Customer updated successfully"}, 200
 
+
 def delete_customer(customer_id):
     customer = admin_repository.get_customer_by_id(customer_id)
 
     if not customer:
-        return {"error": "Customer not found"}, 404
+        return {"error": ERROR_CUSTOMER_NOT_FOUND}, 404
 
     if not customer.must_change_password:
         return {"error": "Cannot delete activated customer"}, 400
@@ -313,6 +308,8 @@ def delete_customer(customer_id):
     admin_repository.commit()
 
     return {"message": "Customer deleted successfully"}, 200
+
+
 def create_appointment(data):
     from models import ServiceRequest, db
 

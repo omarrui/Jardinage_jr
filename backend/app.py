@@ -23,8 +23,8 @@ CORS(
 )
 
 # App configuration
-app.config["SECRET_KEY"] = SECRET_KEY
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+app.config["SECRET_KEY"] = SECRET_KEY  # NOSONAR - Loaded from .env via config.py
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL  # NOSONAR - Loaded from .env via config.py
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize database
@@ -36,7 +36,7 @@ register_appointment_routes(app)
 register_admin_routes(app)
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def home():
     return "Backend is running"
 

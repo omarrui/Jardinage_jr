@@ -6,7 +6,11 @@ from services.customer_service import (
     reset_password_with_code
 )
 
-def register_customer_routes(app):
+# Define constant to avoid duplication
+ERROR_CUSTOMER_NOT_FOUND = "Customer not found"
+
+
+def register_customer_routes(app):  # NOSONAR - Flask route registration pattern requires nested functions
 
     # ===============================
     # SIGNUP
@@ -92,7 +96,7 @@ def register_customer_routes(app):
         customer = Customer.query.get(customer_id)
 
         if not customer:
-            return jsonify({"error": "Customer not found"}), 404
+            return jsonify({"error": ERROR_CUSTOMER_NOT_FOUND}), 404
 
         customer.password = generate_password_hash(new_password)
         customer.must_change_password = False
@@ -122,7 +126,7 @@ def register_customer_routes(app):
         customer = Customer.query.get(customer_id)
 
         if not customer:
-            return jsonify({"error": "Customer not found"}), 404
+            return jsonify({"error": ERROR_CUSTOMER_NOT_FOUND}), 404
 
         if not check_password_hash(customer.password, current_password):
             return jsonify({"error": "Current password is incorrect"}), 401
@@ -155,7 +159,7 @@ def register_customer_routes(app):
         customer = Customer.query.get(customer_id)
 
         if not customer:
-            return jsonify({"error": "Customer not found"}), 404
+            return jsonify({"error": ERROR_CUSTOMER_NOT_FOUND}), 404
 
         # Check if email changed and already exists
         if email and email != customer.email:
@@ -173,6 +177,7 @@ def register_customer_routes(app):
         db.session.commit()
 
         return jsonify({"message": "Profile updated successfully"}), 200
+
     
     @app.route("/api/customer/get-profile/<int:customer_id>", methods=["GET"])
     def get_profile(customer_id):
@@ -181,13 +186,14 @@ def register_customer_routes(app):
         customer = Customer.query.get(customer_id)
 
         if not customer:
-            return jsonify({"error": "Customer not found"}), 404
+            return jsonify({"error": ERROR_CUSTOMER_NOT_FOUND}), 404
 
         return jsonify({
             "name": customer.name,
             "email": customer.email,
             "phone": customer.phone
         }), 200
+
 
     @app.route("/api/customer/cancel-appointment/<int:request_id>", methods=["DELETE"])
     def cancel_customer_appointment(request_id):
