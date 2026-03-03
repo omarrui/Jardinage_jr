@@ -207,43 +207,54 @@ def get_all_service_requests():
 
 
 def update_service_request(request_id, data):
-
-    service_request = admin_repository.get_request_by_id(request_id)
-
+    from models import ServiceRequest, db
+    from datetime import datetime
+    
+    service_request = ServiceRequest.query.get(request_id)
+    
     if not service_request:
         return {"error": "Service request not found"}, 404
-
-    new_status = data.get("status")
+    
     scheduled_start = data.get("scheduled_start")
     scheduled_end = data.get("scheduled_end")
-
-    # Validate start datetime
+    address = data.get("address")
+    
     if scheduled_start:
-        try:
-            start_dt = datetime.fromisoformat(scheduled_start)
-            if start_dt < datetime.now():
-                return {"error": "Start time cannot be in the past"}, 400
-            service_request.scheduled_start = start_dt
-        except ValueError:
-            return {"error": "Invalid start datetime format. Use ISO format"}, 400
-
-    # Validate end datetime
+        # Parse the datetime string and make it timezone-naive
+        start_dt = datetime.fromisoformat(scheduled_start.replace('Z', '+00:00'))
+        if start_dt.tzinfo is not None:
+            start_dt = start_dt.replace(tzinfo=None)  # Remove timezone
+        
+        # Compare with timezone-naive datetime.now()
+        if start_dt < datetime.now():
+            return {"error": "Cannot schedule in the past"}, 400
+        
+        service_request.scheduled_start = start_dt
+    
     if scheduled_end:
-        try:
-            end_dt = datetime.fromisoformat(scheduled_end)
-            if service_request.scheduled_start and end_dt < service_request.scheduled_start:
-                return {"error": "End time cannot be before start time"}, 400
-            service_request.scheduled_end = end_dt
-        except ValueError:
-            return {"error": "Invalid end datetime format. Use ISO format"}, 400
+        # Parse and make timezone-naive
+        end_dt = datetime.fromisoformat(scheduled_end.replace('Z', '+00:00'))
+        if end_dt.tzinfo is not None:
+            end_dt = end_dt.replace(tzinfo=None)  # Remove timezone
+        
+        service_request.scheduled_end = end_dt
+    
+    if address:
+        service_request.address = address
+    
+    # Validate start < end
+    if service_request.scheduled_start and service_request.scheduled_end:
+        if service_request.scheduled_start >= service_request.scheduled_end:
+            return {"error": "Start time must be before end time"}, 400
+    
+    # Update status if provided (e.g., cancelled)
+    status = data.get("status")
+    if status:
+        service_request.status = status
 
-    # Apply status update
-    if new_status:
-        service_request.status = new_status
-
-    admin_repository.commit()
-
-    return {"message": "Service request updated successfully"}, 200
+    db.session.commit()
+    
+    return {"message": "Appointment updated successfully"}, 200
 
 
 def get_all_customers():
@@ -316,7 +327,7 @@ def create_appointment(data):
         start_dt = datetime.fromisoformat(scheduled_start)
         end_dt = datetime.fromisoformat(scheduled_end) if scheduled_end else None
 
-        if start_dt < datetime.now():
+        if start_dt.replace(tzinfo=None) < datetime.now():
             return {"error": "Start time cannot be in the past"}, 400
 
         if end_dt and end_dt < start_dt:

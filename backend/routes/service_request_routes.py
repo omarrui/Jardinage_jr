@@ -14,7 +14,7 @@ def register_appointment_routes(app):
         return jsonify(response), status
 
 
-    @app.route("api/service-requests", methods=["GET"])
+    @app.route("/api/service-requests", methods=["GET"])
     def get_customer_service_requests():
         customer_id = request.args.get("customer_id")
         response, status = get_customer_requests_service(customer_id)

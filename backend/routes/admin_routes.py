@@ -107,3 +107,36 @@ def register_admin_routes(app):
         db.session.commit()
 
         return {"message": "Date débloquée"}, 200
+
+    @app.route("/api/admin/appointments/<int:appointment_id>", methods=["DELETE"])
+    def delete_appointment(appointment_id):
+        from models import ServiceRequest, db
+        
+        service_request = ServiceRequest.query.get(appointment_id)
+        
+        if not service_request:
+            return jsonify({"error": "Rendez-vous introuvable"}), 404
+        
+        service_request.status = "cancelled"
+        db.session.commit()
+        
+        return jsonify({"message": "Rendez-vous annulé"}), 200
+
+    @app.route("/api/admin/appointments/<int:appointment_id>", methods=["PUT"])
+    def update_appointment(appointment_id):
+        from models import ServiceRequest, db
+        from datetime import datetime
+        
+        data = request.get_json()
+        service_request = ServiceRequest.query.get(appointment_id)
+        
+        if not service_request:
+            return jsonify({"error": "Rendez-vous introuvable"}), 404
+        
+        service_request.scheduled_start = datetime.fromisoformat(data["scheduled_start"])
+        service_request.scheduled_end = datetime.fromisoformat(data["scheduled_end"])
+        service_request.address = data.get("address", service_request.address)
+        
+        db.session.commit()
+        
+        return jsonify({"message": "Rendez-vous modifié"}), 200
