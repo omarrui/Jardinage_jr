@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import os
 from flask import Flask
 from flask_cors import CORS
 from config import SECRET_KEY, DATABASE_URL
@@ -42,8 +43,12 @@ def home():
 
 # Admin seeding (runs once)
 def seed_admin():
-    admin_email = "admin@gardening.com"
-    admin_password = "password11"
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@gardening.com")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+    
+    if not admin_password:
+        print("⚠️ WARNING: ADMIN_PASSWORD not set in .env file!")
+        return
 
     existing_admin = Admin.query.filter_by(email=admin_email).first()
     if not existing_admin:
@@ -51,13 +56,13 @@ def seed_admin():
         admin = Admin(email=admin_email, password=hashed_password)
         db.session.add(admin)
         db.session.commit()
-        print("Admin user created")
+        print("✅ Admin user created")
     else:
-        print("Admin already exists")
+        print("ℹ️ Admin already exists")
 
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         seed_admin()
-    app.run(debug=True)
+    app.run(debug=os.getenv("FLASK_ENV") == "development", host="127.0.0.1", port=5000)

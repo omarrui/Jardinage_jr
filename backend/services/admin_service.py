@@ -190,18 +190,22 @@ def get_all_service_requests():
     for req in requests:
         customer = admin_repository.get_customer_by_id(req.customer_id)
 
-        result.append({
+        request_data = {
             "id": req.id,
+            "customer_id": req.customer_id,
             "customer_name": customer.name if customer else "Unknown",
-            "customer_email": customer.email if customer else "Unknown",
-            "customer_phone": customer.phone if customer else "Unknown",
+            "customer_email": customer.email if (customer and customer.email) else None,  
+            "customer_phone": customer.phone if (customer and customer.phone) else None, 
             "preferred_date": req.preferred_date,
             "description": req.description,
             "address": req.address,
             "status": req.status,
             "scheduled_start": req.scheduled_start.isoformat() if req.scheduled_start else None,
             "scheduled_end": req.scheduled_end.isoformat() if req.scheduled_end else None
-        })
+        }
+        
+        print(f"🔍 Request data: {request_data}")
+        result.append(request_data)
 
     return result, 200
 

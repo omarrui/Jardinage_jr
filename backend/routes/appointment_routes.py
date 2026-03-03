@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 from services.appointment_service import AppointmentService
+from services import admin_service
 
 appointment_bp = Blueprint("appointments", __name__)
 appointment_service = AppointmentService()
@@ -34,8 +35,8 @@ def get_pending_requests_count():
 @appointment_bp.route("/api/admin/appointment-requests", methods=["GET"])
 def get_appointment_requests():
     """Get all appointment requests (pending and scheduled)"""
-    response, status = appointment_service.get_all_requests()
-    return jsonify(response), status
+    response, status = admin_service.get_all_service_requests()
+    return jsonify({"requests": response}), status
 
 
 def register_appointment_routes(app):
