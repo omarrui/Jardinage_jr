@@ -4,6 +4,8 @@ import AdminCalendar from "./AdminCalendar";
 function AdminDashboard({ goHome }) {
   const [adminSection, setAdminSection] = useState("planning");
   const [clients, setClients] = useState([]);
+  const [allClients, setAllClients] = useState([]);
+  const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [pendingRequests, setPendingRequests] = useState(0);
   const [appointmentRequests, setAppointmentRequests] = useState([]);
 
@@ -37,7 +39,10 @@ function AdminDashboard({ goHome }) {
     fetch("http://127.0.0.1:5000/api/admin/customers")
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) setClients(data);
+        if (Array.isArray(data)) {
+          setAllClients(data);
+          setClients(data);
+        }
       });
   };
 
@@ -69,6 +74,21 @@ function AdminDashboard({ goHome }) {
     }
     fetchAppointmentRequests();
   }, [adminSection]);
+
+  useEffect(() => {
+    if (!clientSearchQuery.trim()) {
+      setClients(allClients);
+      return;
+    }
+
+    const filtered = allClients.filter(client =>
+      client.name.toLowerCase().includes(clientSearchQuery.toLowerCase()) ||
+      client.email.toLowerCase().includes(clientSearchQuery.toLowerCase()) ||
+      client.phone.toLowerCase().includes(clientSearchQuery.toLowerCase())
+    );
+
+    setClients(filtered);
+  }, [clientSearchQuery, allClients]);
 
   /* =============================
      CREATE CLIENT
@@ -245,7 +265,52 @@ function AdminDashboard({ goHome }) {
         {adminSection === "clients" && (
           <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
 
-            <h3>Clients</h3>
+            <div style={{ 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center",
+              marginBottom: "20px" 
+            }}>
+              <h3 style={{ margin: 0 }}>Clients</h3>
+
+              <div style={{ position: "relative", width: "300px" }}>
+                <input
+                  type="text"
+                  placeholder="🔍 Rechercher un client..."
+                  value={clientSearchQuery}
+                  onChange={(e) => setClientSearchQuery(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 15px",
+                    border: "2px solid #e0e0e0",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    outline: "none",
+                    transition: "border-color 0.3s"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "#1b5e20"}
+                  onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                />
+                {clientSearchQuery && (
+                  <button
+                    onClick={() => setClientSearchQuery("")}
+                    style={{
+                      position: "absolute",
+                      right: "10px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "18px",
+                      color: "#999"
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
 
             <button
               onClick={() => setShowCreateClient(true)}
@@ -254,8 +319,18 @@ function AdminDashboard({ goHome }) {
               ➕ Ajouter un client
             </button>
 
+            {clientSearchQuery && (
+              <p style={{ 
+                marginBottom: "15px", 
+                color: "#666",
+                fontSize: "14px" 
+              }}>
+                {clients.length} résultat{clients.length !== 1 ? 's' : ''} trouvé{clients.length !== 1 ? 's' : ''}
+              </p>
+            )}
+
             {clients.length === 0 ? (
-              <p>Aucun client trouvé.</p>
+              <p>{clientSearchQuery ? "Aucun client trouvé." : "Aucun client."}</p>
             ) : (
               clients.map(client => (
                 <div
@@ -288,7 +363,6 @@ function AdminDashboard({ goHome }) {
                     🗓 Donner un rendez-vous
                   </button>
 
-                  {/* RESEND TEMP PASSWORD (only for login accounts not activated) */}
                   {client.has_account && client.must_change_password && (
                     <button
                       onClick={() => resendTempPassword(client.id)}
@@ -298,7 +372,6 @@ function AdminDashboard({ goHome }) {
                     </button>
                   )}
 
-                  {/* EDIT BUTTON */}
                   <button
                     onClick={() => {
                       setEditingClient(client);
@@ -312,7 +385,6 @@ function AdminDashboard({ goHome }) {
                     ✏ Modifier
                   </button>
 
-                  {/* DELETE BUTTON (only if not activated) */}
                   {client.must_change_password && (
                     <button
                       onClick={() => {
@@ -542,10 +614,49 @@ function AdminDashboard({ goHome }) {
                     return;
                   }
 
-                  // Combine date and time
                   const scheduledStart = `${appointmentStart}T${appointmentStartTime}:00`;
                   const scheduledEnd = `${appointmentEnd}T${appointmentEndTime}:00`;
 
+                  // ✅ Check for conflicts before creating
+                  try {
+                    const checkResponse = await fetch(
+                      "http://127.0.0.1:5000/api/admin/appointment-requests"
+                    );
+                    const checkData = await checkResponse.json();
+
+                    if (Array.isArray(checkData.requests)) {
+                      const startDate = new Date(scheduledStart);
+                      const endDate = new Date(scheduledEnd);
+
+                      const conflicts = checkData.requests.filter(req => {
+                        if (req.status !== "scheduled") return false;
+                        
+                        const reqStart = new Date(req.scheduled_start);
+                        const reqEnd = new Date(req.scheduled_end);
+
+                        return (
+                          (startDate >= reqStart && startDate < reqEnd) ||
+                          (endDate > reqStart && endDate <= reqEnd) ||
+                          (startDate <= reqStart && endDate >= reqEnd)
+                        );
+                      });
+
+                      if (conflicts.length > 0) {
+                        const conflictNames = conflicts.map(c => c.customer_name).join(", ");
+                        const confirmCreate = window.confirm(
+                          `⚠️ Cette date contient déjà ${conflicts.length} rendez-vous avec : ${conflictNames}.\n\nVoulez-vous créer un autre rendez-vous ce jour-là ?`
+                        );
+
+                        if (!confirmCreate) {
+                          return;
+                        }
+                      }
+                    }
+                  } catch (error) {
+                    console.error("Error checking conflicts:", error);
+                  }
+
+                  // ✅ Proceed with creation
                   const payload = {
                     scheduled_start: scheduledStart,
                     scheduled_end: scheduledEnd,
@@ -574,7 +685,7 @@ function AdminDashboard({ goHome }) {
                     return;
                   }
 
-                  alert("Rendez-vous créé avec succès!");
+                  alert("✅ Rendez-vous créé avec succès!");
 
                   fetchAppointmentRequests();
                   if (adminSection === "clients") {
