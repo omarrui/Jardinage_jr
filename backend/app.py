@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(".env.local")
 
 import os
 from flask import Flask
@@ -15,10 +15,10 @@ from routes.admin_routes import register_admin_routes
 
 app = Flask(__name__)
 
-# CORS FIX
+# CORS configured for stateless JWT authentication.
+# No cookies or session-based auth are used → CSRF protection not required.
 CORS(
     app,
-    supports_credentials=True,
     resources={r"/api/*": {"origins": "http://localhost:5173"}}
 )
 
@@ -43,12 +43,11 @@ def home():
 
 # Admin seeding (runs once)
 def seed_admin():
-    admin_email = os.getenv("ADMIN_EMAIL", "admin@gardening.com")
+    admin_email = os.getenv("ADMIN_EMAIL")
     admin_password = os.getenv("ADMIN_PASSWORD")
     
-    if not admin_password:
-        print("⚠️ WARNING: ADMIN_PASSWORD not set in .env file!")
-        return
+    if not admin_email or not admin_password:
+        raise RuntimeError("ADMIN_EMAIL and ADMIN_PASSWORD must be set in environment variables.")
 
     existing_admin = Admin.query.filter_by(email=admin_email).first()
     if not existing_admin:

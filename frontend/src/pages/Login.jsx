@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 function Login({
   onCustomerLogin,
@@ -80,6 +81,7 @@ function Login({
       }
 
     } catch (error) {
+      console.error("Login error:", error);
       setMessage("Erreur serveur. Veuillez réessayer.");
     }
   }
@@ -181,5 +183,13 @@ function Login({
     </div>
   );
 }
+
+Login.propTypes = {
+  onCustomerLogin: PropTypes.func.isRequired,
+  onAdminLogin: PropTypes.func.isRequired,
+  onForcePasswordChange: PropTypes.func.isRequired,
+  goHome: PropTypes.func.isRequired,
+  goToResetRequest: PropTypes.func.isRequired
+};
 
 export default Login;

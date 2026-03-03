@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 function ChangePassword({ goToLogin, goHome }) {
   const [password, setPassword] = useState("");
@@ -44,6 +45,7 @@ function ChangePassword({ goToLogin, goHome }) {
       }, 1500);
 
     } catch (error) {
+      console.error("Change password error:", error);
       setMessage("Server error. Please try again.");
     }
   }
@@ -152,5 +154,10 @@ function ChangePassword({ goToLogin, goHome }) {
     </div>
   );
 }
+
+ChangePassword.propTypes = {
+  goToLogin: PropTypes.func.isRequired,
+  goHome: PropTypes.func.isRequired
+};
 
 export default ChangePassword;

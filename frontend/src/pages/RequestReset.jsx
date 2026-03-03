@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 function RequestReset({ goToLogin }) {
   const [step, setStep] = useState(1);
@@ -187,3 +188,7 @@ function RequestReset({ goToLogin }) {
 }
 
 export default RequestReset;
+
+RequestReset.propTypes = {
+  goToLogin: PropTypes.func.isRequired
+};

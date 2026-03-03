@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 function ClientAppointments({ goHome }) {
   const [appointments, setAppointments] = useState([]);
@@ -74,11 +75,13 @@ function ClientAppointments({ goHome }) {
   const now = new Date();
 
   const upcomingAppointments = appointments.filter((appt) => {
+    if (appt.status === "cancelled") return false;
     if (!appt.scheduled_start) return true;
     return new Date(appt.scheduled_start) >= now;
   });
 
   const pastAppointments = appointments.filter((appt) => {
+    if (appt.status === "cancelled") return false;
     if (!appt.scheduled_start) return false;
     return new Date(appt.scheduled_start) < now;
   });
@@ -188,5 +191,10 @@ function ClientAppointments({ goHome }) {
     </div>
   );
 }
+
+// PropTypes validation
+ClientAppointments.propTypes = {
+  goHome: PropTypes.func.isRequired
+};
 
 export default ClientAppointments;

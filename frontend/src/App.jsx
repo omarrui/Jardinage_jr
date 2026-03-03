@@ -26,8 +26,6 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const path = window.location.pathname;
-
     if (
       window.location.pathname === "/reset-password" ||
       window.location.search.includes("token=")
@@ -75,6 +73,71 @@ function App() {
     setCurrentPage("home");
   }
 
+  const handleLogoClick = () => {
+    setCurrentPage("home");
+  };
+
+  //  Extract ternary into helper function
+  const handleGoToBooking = () => {
+    if (isLoggedIn) {
+      setCurrentPage("booking");
+    } else {
+      setCurrentPage("login");
+    }
+  };
+
+  // ✅ FIX: Make this a proper conditional function
+  const handleGoToAppointments = () => {
+    if (isLoggedIn && !isAdmin) {
+      setCurrentPage("appointments");
+    }
+    // Do nothing if not logged in or is admin
+  };
+
+  const renderAuthButtons = () => {
+    if (isAdmin) {
+      return (
+        <>
+          <button
+            onClick={() => setCurrentPage("admin")}
+            className="primary-btn"
+          >
+            Admin
+          </button>
+          <button onClick={handleLogout} className="danger-btn">
+            Déconnexion
+          </button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <button
+          onClick={() => setCurrentPage("booking")}
+          className="primary-btn"
+        >
+          Demander un service
+        </button>
+        <button
+          onClick={() => setCurrentPage("appointments")}
+          className="primary-btn"
+        >
+          Mes rendez-vous
+        </button>
+        <button
+          onClick={() => setCurrentPage("account")}
+          className="primary-btn"
+        >
+          Mon compte
+        </button>
+        <button onClick={handleLogout} className="danger-btn">
+          Déconnexion
+        </button>
+      </>
+    );
+  };
+
   if (currentPage === "resetPassword") {
     return (
       <ResetPassword goToLogin={() => setCurrentPage("login")} />
@@ -94,35 +157,42 @@ function App() {
           color: "white",
           boxShadow: "0 4px 15px rgba(0,0,0,0.15)"
         }}
->        <div className="nav-left">
-        <div
-  onClick={() => setCurrentPage("home")}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    cursor: "pointer"
-  }}
->
-  <img
-    src={logo}
-    alt="JR Jardinage Logo"
-    style={{
-      height: "56px",
-      width: "56px",
-      objectFit: "contain"
-    }}
-  />
-  <span
-    style={{
-      fontWeight: 600,
-      fontSize: "18px",
-      letterSpacing: "0.5px"
-    }}
-  >
-    JR Jardinage
-  </span>
-</div>
+      >
+        <div className="nav-left">
+          <button
+            onClick={handleLogoClick}
+            onKeyDown={(e) => e.key === 'Enter' && handleLogoClick()}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              cursor: "pointer",
+              background: "none",
+              border: "none",
+              color: "inherit",
+              padding: 0
+            }}
+            aria-label="Go to home page"
+          >
+            <img
+              src={logo}
+              alt="JR Jardinage Logo"
+              style={{
+                height: "56px",
+                width: "56px",
+                objectFit: "contain"
+              }}
+            />
+            <span
+              style={{
+                fontWeight: 600,
+                fontSize: "18px",
+                letterSpacing: "0.5px"
+              }}
+            >
+              JR Jardinage
+            </span>
+          </button>
         </div>
   
         <div
@@ -148,43 +218,8 @@ function App() {
                 Inscription
               </button>
             </>
-          ) : isAdmin ? (
-            <>
-              <button
-                onClick={() => setCurrentPage("admin")}
-                className="primary-btn"
-              >
-                Admin
-              </button>
-              <button onClick={handleLogout} className="danger-btn">
-                Déconnexion
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => setCurrentPage("booking")}
-                className="primary-btn"
-              >
-                Demander un service
-              </button>
-              <button
-                onClick={() => setCurrentPage("appointments")}
-                className="primary-btn"
-              >
-                Mes rendez-vous
-              </button>
-              <button
-                onClick={() => setCurrentPage("account")}
-                className="primary-btn"
-              >
-                Mon compte
-              </button>
-              <button onClick={handleLogout} className="danger-btn">
-                Déconnexion
-              </button>
-            </>
-          )}
+          ) : renderAuthButtons()
+          }
         </div>
       </nav>
   
@@ -192,16 +227,8 @@ function App() {
       <div className="page-container">
       {currentPage === "home" && (
         <Home
-          goToBooking={() =>
-            isLoggedIn
-              ? setCurrentPage("booking")
-              : setCurrentPage("login")
-          }
-          goToClientAppointments={
-            isLoggedIn && !isAdmin
-              ? () => setCurrentPage("appointments")
-              : null
-          }
+          goToBooking={handleGoToBooking}
+          goToClientAppointments={handleGoToAppointments} 
         />
       )}  
         {currentPage === "signup" && (
@@ -251,4 +278,4 @@ function App() {
     </div>
   );
 }
-export default App
+export default App;

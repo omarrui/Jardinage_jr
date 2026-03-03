@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import PropTypes from "prop-types";
 import "./Home.css";
 import background from "../gallery/background.jpg";
 import beforeImage from "../gallery/before.jpeg";
@@ -78,7 +79,7 @@ function Home({ goToBooking, goToClientAppointments }) {
           </p>
           <div className="hero-buttons">
             <button className="primary-btn" onClick={goToBooking}>
-              Demander un service
+              Demander un rendez-vous
             </button>
 
             {goToClientAppointments && (
@@ -254,13 +255,14 @@ function Home({ goToBooking, goToClientAppointments }) {
               />
             </div>
 
-            <div 
+            <button
+              type="button"
               className="slider-line"
               style={{ left: `${sliderPosition}%` }}
               onMouseDown={handleMouseDown}
             >
               <div className="slider-button">⟷</div>
-            </div>
+            </button>
           </div>
         </div>
       </section>
@@ -303,6 +305,25 @@ function Home({ goToBooking, goToClientAppointments }) {
           ></div>
         </div>
       </section>
+
+      <div className="bottom-cta">
+        <button
+          className="primary-btn"
+          onClick={goToBooking}
+          style={{ marginRight: "15px" }}
+        >
+          Demander un devis
+        </button>
+
+        {goToClientAppointments && (
+          <button
+            className="secondary-btn"
+            onClick={goToClientAppointments}
+          >
+            📅 Mes rendez-vous
+          </button>
+        )}
+      </div>
 
       {/* ================= CONTACT SECTION ================= */}
       <section className="contact-section">
@@ -366,27 +387,10 @@ function Home({ goToBooking, goToClientAppointments }) {
           style={{ border: 0 }}
           allowFullScreen=""
           loading="lazy"
+          title="Carte Google - Zone d'intervention JR Jardinage"
         />
       </section>
 
-      <div style={{ textAlign: "center", marginTop: "40px", marginBottom: "60px" }}>
-        <button
-          className="primary-btn"
-          onClick={goToBooking}
-          style={{ marginRight: "15px" }}
-        >
-          Demander un devis
-        </button>
-
-        {goToClientAppointments && (
-          <button
-            className="secondary-btn"
-            onClick={goToClientAppointments}
-          >
-            📅 Mes rendez-vous
-          </button>
-        )}
-      </div>
 
       <script
         type="application/ld+json"
@@ -426,5 +430,10 @@ function Home({ goToBooking, goToClientAppointments }) {
     </div>
   );
 }
+
+Home.propTypes = {
+  goToBooking: PropTypes.func.isRequired,
+  goToClientAppointments: PropTypes.func
+};
 
 export default Home;

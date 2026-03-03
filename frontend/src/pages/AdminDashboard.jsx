@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import AdminCalendar from "./AdminCalendar";
 
 function AdminDashboard({ goHome }) {
@@ -20,8 +21,6 @@ function AdminDashboard({ goHome }) {
   const [editingClient, setEditingClient] = useState(null);
   const [editData, setEditData] = useState({ email: "", phone: "" });
 
-  const [clientToDelete, setClientToDelete] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const [selectedClientForAppointment, setSelectedClientForAppointment] = useState(null);
   const [appointmentStart, setAppointmentStart] = useState("");
@@ -53,6 +52,9 @@ function AdminDashboard({ goHome }) {
     fetch("http://127.0.0.1:5000/api/admin/appointment-requests")
       .then(res => res.json())
       .then(data => {
+        console.log("📧 Full API Response:", data); // ✅ Add this
+        console.log("📧 First request:", data.requests?.[0]); // ✅Add this
+        
         if (Array.isArray(data.requests)) {
           const pending = data.requests.filter(r => r.status === "pending");
           setPendingRequests(pending.length);
@@ -68,12 +70,21 @@ function AdminDashboard({ goHome }) {
       });
   };
 
-  useEffect(() => {
-    if (adminSection === "clients") {
-      fetchClients();
-    }
+useEffect(() => {
+  if (adminSection === "clients") {
+    fetchClients();
+  }
+
+  // Initial load
+  fetchAppointmentRequests();
+
+  // Auto refresh every 5 seconds
+  const interval = setInterval(() => {
     fetchAppointmentRequests();
-  }, [adminSection]);
+  }, 10000);
+
+  return () => clearInterval(interval);
+}, [adminSection]);
 
   useEffect(() => {
     if (!clientSearchQuery.trim()) {
@@ -231,7 +242,9 @@ function AdminDashboard({ goHome }) {
                     background: "white"
                   }}
                 >
-                  <strong>Client ID : {req.customer_id}</strong>
+                  <strong>Client : {req.customer_name || `ID: ${req.customer_id}`}</strong>
+                  <p>Email : {req.customer_email || "Non disponible"}</p>
+                  <p>Téléphone : {req.customer_phone || "Non disponible"}</p>
                   <p>Date demandée : {req.preferred_date}</p>
                   <p>Adresse : {req.address}</p>
                   <p>Description : {req.description || "Aucune description"}</p>
@@ -241,7 +254,7 @@ function AdminDashboard({ goHome }) {
                       setSelectedClientForAppointment({
                         id: req.customer_id,
                         request_id: req.id,
-                        name: "Client"
+                        name: req.customer_name || "Client"
                       });
                     }}
                     style={{
@@ -554,10 +567,11 @@ function AdminDashboard({ goHome }) {
                 Rendez-vous pour {selectedClientForAppointment.name}
               </h3>
 
-              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+              <label htmlFor="appointmentStart" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
                 Date de début
               </label>
               <input
+                id="appointmentStart"
                 type="date"
                 min={todayStr}
                 value={appointmentStart}
@@ -565,20 +579,22 @@ function AdminDashboard({ goHome }) {
                 style={{ display: "block", marginBottom: "10px", width: "100%" }}
               />
 
-              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+              <label htmlFor="appointmentStartTime" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
                 Heure de début
               </label>
               <input
+                id="appointmentStartTime"
                 type="time"
                 value={appointmentStartTime}
                 onChange={(e) => setAppointmentStartTime(e.target.value)}
                 style={{ display: "block", marginBottom: "15px", width: "100%" }}
               />
 
-              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+              <label htmlFor="appointmentEnd" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
                 Date de fin
               </label>
               <input
+                id="appointmentEnd"
                 type="date"
                 min={appointmentStart || todayStr}
                 value={appointmentEnd}
@@ -586,20 +602,22 @@ function AdminDashboard({ goHome }) {
                 style={{ display: "block", marginBottom: "10px", width: "100%" }}
               />
 
-              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+              <label htmlFor="appointmentEndTime" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
                 Heure de fin
               </label>
               <input
+                id="appointmentEndTime"
                 type="time"
                 value={appointmentEndTime}
                 onChange={(e) => setAppointmentEndTime(e.target.value)}
                 style={{ display: "block", marginBottom: "15px", width: "100%" }}
               />
               
-              <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+              <label htmlFor="appointmentAddress" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
                 Adresse d'intervention
               </label>
               <input
+                id="appointmentAddress"
                 type="text"
                 placeholder="Adresse d'intervention"
                 value={appointmentAddress}
@@ -763,6 +781,10 @@ const modalStyle = {
   padding: "20px",
   borderRadius: "10px",
   minWidth: "300px"
+};
+
+AdminDashboard.propTypes = {
+  goHome: PropTypes.func.isRequired
 };
 
 export default AdminDashboard;
