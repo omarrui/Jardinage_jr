@@ -34,6 +34,7 @@
     align-items: center;
     padding: 20px 0;
     border-bottom: 1px solid #e0e0e0;
+    gap: 20px;
   }
   
   .account-row h4 {
@@ -46,17 +47,20 @@
     margin: 5px 0 0;
     font-size: 16px;
     font-weight: 500;
+    flex: 1;
   }
   
   /* ✏ Edit Button */
   .edit-btn {
     background: #66bb6a;
     border: none;
-    padding: 8px 14px;
+    padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     transition: 0.3s ease;
+    min-width: 100px;
+    font-weight: 500;
   }
   
   .edit-btn:hover {
@@ -68,24 +72,29 @@
   .edit-section {
     display: flex;
     gap: 10px;
-    margin-top: 8px;
+    margin-top: 10px;
+    align-items: center;
   }
   
   .edit-section input {
-    padding: 8px;
+    padding: 10px 12px;
     border-radius: 6px;
     border: 1px solid #ccc;
-    width: 200px;
+    flex: 1;
+    font-size: 14px;
   }
   
   .edit-section button {
-    padding: 6px 12px;
+    padding: 10px 20px;
     border-radius: 6px;
     border: none;
     cursor: pointer;
     background: #2e7d32;
     color: white;
     transition: 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 90px;
   }
   
   .edit-section button:hover {
@@ -101,19 +110,24 @@
   }
   
   .password-form input {
-    padding: 10px;
+    padding: 12px;
     border-radius: 8px;
     border: 1px solid #ccc;
+    font-size: 14px;
   }
   
   .password-form button {
     background: #2e7d32;
     color: white;
     border: none;
-    padding: 10px;
+    padding: 12px 20px;
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    align-self: flex-start;
+    min-width: 150px;
   }
   
   .password-form button:hover {
@@ -129,13 +143,16 @@
   
   /* 🔙 Back Button */
   .back-btn {
-    margin-top: 20px;
+    margin-top: 30px;
     background: transparent;
     border: 2px solid #2e7d32;
-    padding: 8px 14px;
+    padding: 12px 24px;
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 120px;
   }
   
   .back-btn:hover {

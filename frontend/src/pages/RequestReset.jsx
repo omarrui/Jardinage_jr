@@ -60,54 +60,128 @@ function RequestReset({ goToLogin }) {
     }, 1500);
   }
 
+  const containerStyle = {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "linear-gradient(135deg, #1b5e20, #2e7d32)",
+    padding: "20px"
+  };
+
+  const cardStyle = {
+    background: "white",
+    padding: "40px",
+    borderRadius: "16px",
+    width: "100%",
+    maxWidth: "420px",
+    boxShadow: "0 15px 40px rgba(0,0,0,0.2)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px"
+  };
+
+  const inputStyle = {
+    padding: "12px 14px",
+    borderRadius: "8px",
+    border: "1px solid #ddd",
+    fontSize: "14px",
+    outline: "none"
+  };
+
+  const primaryBtn = {
+    padding: "12px",
+    borderRadius: "8px",
+    border: "none",
+    background: "#e67e22",
+    color: "white",
+    fontWeight: "600",
+    cursor: "pointer"
+  };
+
+  const secondaryBtn = {
+    background: "none",
+    border: "none",
+    color: "#1b5e20",
+    fontWeight: "600",
+    cursor: "pointer"
+  };
+
   return (
-    <div>
-      <h2>Réinitialisation du mot de passe</h2>
+    <div style={containerStyle}>
+      <div style={cardStyle}>
+        <h2 style={{ margin: 0, textAlign: "center" }}>
+          Réinitialisation du mot de passe
+        </h2>
 
-      {step === 1 && (
-        <form onSubmit={handleSendCode}>
-          <input
-            type="email"
-            placeholder="Entrez votre email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <button type="submit">Envoyer le code</button>
-        </form>
-      )}
+        {step === 1 && (
+          <form
+            onSubmit={handleSendCode}
+            style={{ display: "flex", flexDirection: "column", gap: "15px" }}
+          >
+            <input
+              type="email"
+              placeholder="Entrez votre email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={inputStyle}
+              required
+            />
+            <button type="submit" style={primaryBtn}>
+              Envoyer le code
+            </button>
+          </form>
+        )}
 
-      {step === 2 && (
-        <form onSubmit={handleResetPassword}>
-          <input
-            type="email"
-            value={email}
-            disabled
-          />
+        {step === 2 && (
+          <form
+            onSubmit={handleResetPassword}
+            style={{ display: "flex", flexDirection: "column", gap: "15px" }}
+          >
+            <input
+              type="email"
+              value={email}
+              disabled
+              style={{ ...inputStyle, background: "#f5f5f5" }}
+            />
 
-          <input
-            type="text"
-            placeholder="Entrez le code de réinitialisation"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            required
-          />
+            <input
+              type="text"
+              placeholder="Entrez le code de réinitialisation"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              style={inputStyle}
+              required
+            />
 
-          <input
-            type="password"
-            placeholder="Nouveau mot de passe"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
+            <input
+              type="password"
+              placeholder="Nouveau mot de passe"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              style={inputStyle}
+              required
+            />
 
-          <button type="submit">Réinitialiser le mot de passe</button>
-        </form>
-      )}
+            <button type="submit" style={primaryBtn}>
+              Réinitialiser le mot de passe
+            </button>
+          </form>
+        )}
 
-      {message && <p>{message}</p>}
+        {message && (
+          <p style={{ textAlign: "center", margin: 0 }}>
+            {message}
+          </p>
+        )}
 
-      <button onClick={goToLogin}>Retour à la connexion</button>
+        <button
+          onClick={goToLogin}
+          style={{ ...secondaryBtn, alignSelf: "center" }}
+        >
+          ← Retour à la connexion
+        </button>
+      </div>
     </div>
   );
 }
