@@ -67,6 +67,7 @@ class AppointmentService:
                     "description": req.description,
                     "status": req.status,
                     "customer_name": customer.name if customer else "Unknown",
+                    "customer_phone": customer.phone if customer else None,
                     "scheduled_start": req.scheduled_start.isoformat() if req.scheduled_start else None,
                     "scheduled_end": req.scheduled_end.isoformat() if req.scheduled_end else None
                     
