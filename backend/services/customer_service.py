@@ -8,10 +8,14 @@ import secrets
 from datetime import datetime, timedelta
 from utils.email_utils import send_email
 from models import Customer, db
-
+import re
 
 
 def register_customer(name, email, password, phone):
+    # Email validation
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_regex, email):
+        return {"error": "Invalid email format"}, 400
 
     if not name or not email or not password or not phone:
         return {"error": "All fields are required"}, 400
@@ -59,11 +63,13 @@ def authenticate_customer(email, password):
     }, 200
 
 def send_reset_code(email):
+    customer = get_customer_by_email(email)
+    
+    if not customer:
+        return {"error": "Email not found"}, 404  
 
     if not email:
         return {"error": "Email is required"}, 400
-
-    customer = get_customer_by_email(email)
 
     # Security best practice: don't reveal if email exists
     if not customer:

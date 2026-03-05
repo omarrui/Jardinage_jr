@@ -169,7 +169,9 @@ function Booking({ goHome }) {
             {appointments.length === 0 ? (
               <p>Aucun rendez-vous pour le moment.</p>
             ) : (
-              appointments.map((appt) => (
+              appointments
+                .filter((appt) => appt.status !== "cancelled")
+                .map((appt) => (
                 <div
                   key={appt.id}
                   style={{

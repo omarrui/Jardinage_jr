@@ -350,6 +350,15 @@ Holberton School
 
 ---
 
+## Source Repository
+
+The full project source code is available on GitHub:
+
+https://github.com/omarrui/Jardinage_jr
+
+The repository contains both the **frontend (React)** and **backend (Flask API)** code.  
+Development was managed using **Git version control** with multiple branches for feature development, improvements, and fixes.
+
 ## License
 
 This project is part of an academic portfolio.

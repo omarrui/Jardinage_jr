@@ -21,12 +21,12 @@ const DnDCalendar = withDragAndDrop(Calendar);
 
 function AdminCalendar() {
   const [events, setEvents] = useState([]);
-  const [allEvents, setAllEvents] = useState([]); // ✅ Store all events
+  const [allEvents, setAllEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedDateToBlock, setSelectedDateToBlock] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
   const [editMode, setEditMode] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(""); // ✅ Search state
+  const [searchQuery, setSearchQuery] = useState(""); 
   const [editData, setEditData] = useState({
     scheduled_start: "",
     scheduled_end: "",
@@ -50,12 +50,12 @@ function AdminCalendar() {
             end: new Date(r.scheduled_end),
           }));
 
-        setAllEvents(formatted); // ✅ Store original
-        setEvents(formatted);    // ✅ Display all initially
+        setAllEvents(formatted); 
+        setEvents(formatted);    //  Display all initially
       });
   };
 
-  // ✅ Filter events when search changes
+  // Filter events when search changes
   useEffect(() => {
     if (!searchQuery.trim()) {
       setEvents(allEvents);

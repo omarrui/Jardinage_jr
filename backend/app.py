@@ -10,6 +10,7 @@ from werkzeug.security import generate_password_hash
 from routes.customer_routes import register_customer_routes
 from routes.appointment_routes import register_appointment_routes
 from routes.admin_routes import register_admin_routes
+from routes.booking_routes import register_booking_routes
 
 
 app = Flask(__name__)
@@ -33,6 +34,7 @@ db.init_app(app)
 register_customer_routes(app)
 register_appointment_routes(app)
 register_admin_routes(app)
+register_booking_routes(app)
 
 
 @app.route("/")

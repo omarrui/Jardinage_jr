@@ -4,9 +4,27 @@ function ChangePassword({ goToLogin, goHome }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    const strongPassword = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    // Validate strength
+    if (!strongPassword.test(password)) {
+      setMessage(
+        "Mot de passe invalide : minimum 8 caractères, 1 majuscule et 1 chiffre"
+      );
+      return;
+    }
+
+    // Validate confirmation
+    if (!confirmPassword) {
+      setMessage("Veuillez confirmer votre mot de passe");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setMessage("Les mots de passe ne correspondent pas");
@@ -87,33 +105,67 @@ function ChangePassword({ goToLogin, goHome }) {
           onSubmit={handleSubmit}
           style={{ display: "flex", flexDirection: "column", gap: "15px" }}
         >
-          <input
-            type="password"
-            placeholder="Nouveau mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-              fontSize: "15px"
-            }}
-          />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Nouveau mot de passe"
+              value={password}
+              minLength={8}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{
+                padding: "12px",
+                borderRadius: "8px",
+                border: "1px solid #ddd",
+                fontSize: "15px",
+                flex: 1
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                border: "1px solid #ddd",
+                background: "#f5f5f5",
+                cursor: "pointer"
+              }}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
 
-          <input
-            type="password"
-            placeholder="Confirmer le mot de passe"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-              fontSize: "15px"
-            }}
-          />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirmer le mot de passe"
+              value={confirmPassword}
+              minLength={8}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              style={{
+                padding: "12px",
+                borderRadius: "8px",
+                border: "1px solid #ddd",
+                fontSize: "15px",
+                flex: 1
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                border: "1px solid #ddd",
+                background: "#f5f5f5",
+                cursor: "pointer"
+              }}
+            >
+              {showConfirmPassword ? "Hide" : "Show"}
+            </button>
+          </div>
 
           <button
             type="submit"

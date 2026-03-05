@@ -203,3 +203,30 @@ def register_customer_routes(app):
         db.session.commit()
         
         return jsonify({"message": "Rendez-vous annulé avec succès"}), 200
+
+    @app.route("/api/change-password", methods=["POST"])
+    def change_password_endpoint():
+        from werkzeug.security import check_password_hash, generate_password_hash
+        from models import Customer, db
+        
+        data = request.get_json()
+        
+        email = data.get("email")
+        old_password = data.get("old_password")
+        new_password = data.get("new_password")
+        
+        if not email or not old_password or not new_password:
+            return jsonify({"error": "Missing fields"}), 400
+        
+        customer = Customer.query.filter_by(email=email).first()
+        
+        if not customer:
+            return jsonify({"error": "Customer not found"}), 404
+        
+        if not check_password_hash(customer.password, old_password):
+            return jsonify({"error": "Incorrect old password"}), 401
+        
+        customer.password = generate_password_hash(new_password)
+        db.session.commit()
+        
+        return jsonify({"message": "Password changed successfully"}), 200

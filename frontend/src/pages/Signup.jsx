@@ -9,10 +9,13 @@ function Signup({ goToLogin, goHome }) {
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     phone: "",
   });
 
   const [message, setMessage] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleChange(e) {
     setFormData({
@@ -23,6 +26,18 @@ function Signup({ goToLogin, goHome }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+  
+    const strongPassword = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    if (!strongPassword.test(formData.password)) {
+      setMessage("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setMessage("Les mots de passe ne correspondent pas");
+      return;
+    }
   
     const response = await signupCustomer(formData);
   
@@ -110,10 +125,27 @@ function Signup({ goToLogin, goHome }) {
             style={inputStyle}
             required
           />
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Mot de passe"
+              onChange={handleChange}
+              style={{ ...inputStyle, flex: 1 }}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{ padding: "8px", cursor: "pointer" }}
+            >
+              {showPassword ? "Masquer" : "Afficher"}
+            </button>
+          </div>
           <input
-            type="password"
-            name="password"
-            placeholder="Mot de passe"
+            type={showPassword ? "text" : "password"}
+            name="confirmPassword"
+            placeholder="Confirmer le mot de passe"
             onChange={handleChange}
             style={inputStyle}
             required

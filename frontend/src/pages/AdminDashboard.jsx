@@ -36,7 +36,13 @@ function AdminDashboard({ goHome }) {
      LOAD CLIENTS
   ============================= */
   const fetchClients = () => {
-    fetch("http://127.0.0.1:5000/api/admin/customers")
+    const token = localStorage.getItem("token");  // ✅ ADD TOKEN
+    
+    fetch("http://127.0.0.1:5000/api/admin/customers", {
+      headers: {
+        "Authorization": `Bearer ${token}`  // ✅ ADD AUTHORIZATION HEADER
+      }
+    })
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -68,12 +74,24 @@ function AdminDashboard({ goHome }) {
       });
   };
 
+  // Load clients when switching to clients section
   useEffect(() => {
     if (adminSection === "clients") {
       fetchClients();
     }
-    fetchAppointmentRequests();
   }, [adminSection]);
+
+  // Always keep appointment requests updated (badge + list)
+  useEffect(() => {
+    // Initial load
+    fetchAppointmentRequests();
+
+    const interval = setInterval(() => {
+      fetchAppointmentRequests();
+    }, 5000); 
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!clientSearchQuery.trim()) {
@@ -136,6 +154,7 @@ function AdminDashboard({ goHome }) {
     fetchClients();
   };
 
+  
   return (
     <div style={{ display: "flex", height: "100vh" }}>
 
@@ -231,7 +250,8 @@ function AdminDashboard({ goHome }) {
                     background: "white"
                   }}
                 >
-                  <strong>Client ID : {req.customer_id}</strong>
+                  <strong>Client : {req.customer_name || `ID ${req.customer_id}`}</strong>
+                  <p>Téléphone : {req.customer_phone || "Non renseigné"}</p>
                   <p>Date demandée : {req.preferred_date}</p>
                   <p>Adresse : {req.address}</p>
                   <p>Description : {req.description || "Aucune description"}</p>
@@ -241,8 +261,9 @@ function AdminDashboard({ goHome }) {
                       setSelectedClientForAppointment({
                         id: req.customer_id,
                         request_id: req.id,
-                        name: "Client"
+                        name: req.customer_name || "Client"
                       });
+                      setAppointmentAddress(req.address || "");
                     }}
                     style={{
                       marginTop: "10px",
@@ -255,6 +276,47 @@ function AdminDashboard({ goHome }) {
                     }}
                   >
                     🗓 Donner un rendez-vous
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const confirmCancel = window.confirm("Refuser cette demande de rendez-vous ?");
+                      if (!confirmCancel) return;
+
+                      try {
+                        const response = await fetch(
+                          `http://127.0.0.1:5000/api/admin/appointment-requests/${req.id}/cancel`,
+                          {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" }
+                          }
+                        );
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                          alert(data.error || "Erreur lors de l'annulation");
+                          return;
+                        }
+
+                        alert(" Demande annulée");
+                        fetchAppointmentRequests();
+                      } catch (error) {
+                        console.error(error);
+                        alert("Erreur serveur");
+                      }
+                    }}
+                    style={{
+                      marginTop: "10px",
+                      marginLeft: "10px",
+                      backgroundColor: "#c62828",
+                      color: "white",
+                      padding: "6px 12px",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer"
+                    }}
+                  >
+                     Refuser
                   </button>
                 </div>
               ))
@@ -656,7 +718,7 @@ function AdminDashboard({ goHome }) {
                     console.error("Error checking conflicts:", error);
                   }
 
-                  // ✅ Proceed with creation
+                  // Proceed with creation
                   const payload = {
                     scheduled_start: scheduledStart,
                     scheduled_end: scheduledEnd,

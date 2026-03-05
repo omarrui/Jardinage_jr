@@ -693,3 +693,42 @@
     font-size: 1rem;
   }
 }
+/* ================= BOTTOM CTA BUTTONS ================= */
+
+.home-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 70px 0 40px 0;
+}
+
+.home-cta-buttons .primary-btn {
+  background: linear-gradient(135deg, #2e7d32, #43a047);
+  padding: 16px 40px;
+  font-size: 1.05rem;
+  border-radius: 40px;
+  box-shadow: 0 10px 25px rgba(46, 125, 50, 0.35);
+  transition: all 0.3s ease;
+}
+
+.home-cta-buttons .primary-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(46, 125, 50, 0.45);
+}
+
+.home-cta-buttons .secondary-btn {
+  background: white;
+  color: #1b5e20;
+  border: 2px solid #1b5e20;
+  padding: 16px 40px;
+  font-size: 1.05rem;
+  border-radius: 40px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.home-cta-buttons .secondary-btn:hover {
+  background: #1b5e20;
+  color: white;
+  transform: translateY(-3px);
+}
