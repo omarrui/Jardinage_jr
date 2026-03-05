@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import PropTypes from "prop-types";
 import "./Home.css";
 import background from "../gallery/background.jpg";
 import beforeImage from "../gallery/before.jpeg";
@@ -79,7 +78,7 @@ function Home({ goToBooking, goToClientAppointments }) {
           </p>
           <div className="hero-buttons">
             <button className="primary-btn" onClick={goToBooking}>
-              Demander un rendez-vous
+              Demander un service
             </button>
 
             {goToClientAppointments && (
@@ -255,14 +254,13 @@ function Home({ goToBooking, goToClientAppointments }) {
               />
             </div>
 
-            <button
-              type="button"
+            <div 
               className="slider-line"
               style={{ left: `${sliderPosition}%` }}
               onMouseDown={handleMouseDown}
             >
               <div className="slider-button">⟷</div>
-            </button>
+            </div>
           </div>
         </div>
       </section>
@@ -306,13 +304,12 @@ function Home({ goToBooking, goToClientAppointments }) {
         </div>
       </section>
 
-      <div className="bottom-cta">
+      <div className="home-cta-buttons">
         <button
           className="primary-btn"
           onClick={goToBooking}
-          style={{ marginRight: "15px" }}
         >
-          Demander un devis
+          Demander un rendez-vous
         </button>
 
         {goToClientAppointments && (
@@ -378,8 +375,6 @@ function Home({ goToBooking, goToClientAppointments }) {
       
       {/* =================== MAP SECTION ================== */}
       <section className="map-section">
-        <h2>Zone d'intervention</h2>
-
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2893.605991073233!2d6.560979315576652!3d43.4606318791274!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12c9f5f9c6bbde83%3A0x7915df94a91f0bce!2sLe%20Muy%2C%20France!5e0!3m2!1fr!2sfr!4v1709019012345"
           width="100%"
@@ -387,7 +382,6 @@ function Home({ goToBooking, goToClientAppointments }) {
           style={{ border: 0 }}
           allowFullScreen=""
           loading="lazy"
-          title="Carte Google - Zone d'intervention JR Jardinage"
         />
       </section>
 
@@ -430,10 +424,5 @@ function Home({ goToBooking, goToClientAppointments }) {
     </div>
   );
 }
-
-Home.propTypes = {
-  goToBooking: PropTypes.func.isRequired,
-  goToClientAppointments: PropTypes.func
-};
 
 export default Home;

@@ -6,6 +6,8 @@ function RequestReset({ goToLogin }) {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
 
   async function handleSendCode(e) {
@@ -33,6 +35,20 @@ function RequestReset({ goToLogin }) {
 
   async function handleResetPassword(e) {
     e.preventDefault();
+
+    const strongPassword = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    if (!strongPassword.test(newPassword)) {
+      setMessage(
+        "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre"
+      );
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setMessage("Les mots de passe ne correspondent pas");
+      return;
+    }
 
     const response = await fetch(
       "http://127.0.0.1:5000/api/customer/reset-password",
@@ -155,11 +171,29 @@ function RequestReset({ goToLogin }) {
               required
             />
 
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Nouveau mot de passe"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={{ ...inputStyle, flex: 1 }}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ padding: "8px", cursor: "pointer" }}
+              >
+                {showPassword ? "Masquer" : "Afficher"}
+              </button>
+            </div>
+
             <input
-              type="password"
-              placeholder="Nouveau mot de passe"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              type={showPassword ? "text" : "password"}
+              placeholder="Confirmer le mot de passe"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               style={inputStyle}
               required
             />

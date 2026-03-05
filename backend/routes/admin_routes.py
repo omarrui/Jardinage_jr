@@ -1,13 +1,25 @@
-from flask import request, jsonify
+from flask import request, jsonify, current_app
 from services import admin_service
-from models import Availability, db
-
+from models import Availability, ServiceRequest, db
+from utils.jwt_utils import verify_token, generate_token
 
 
 def register_admin_routes(app):
 
     @app.route("/api/admin/customers", methods=["GET"])
     def admin_get_all_customers():
+        # ✅ Add authentication
+        auth_header = request.headers.get("Authorization")
+        
+        if not auth_header:
+            return jsonify({"error": "Missing token"}), 401
+        
+        token = auth_header.split(" ")[1] if " " in auth_header else auth_header
+        payload = verify_token(token)
+        
+        if not payload or payload.get("role") != "admin":
+            return jsonify({"error": "Unauthorized"}), 403
+
         response, status = admin_service.get_all_customers()
         return jsonify(response), status
     
@@ -22,13 +34,25 @@ def register_admin_routes(app):
     @app.route("/api/admin/login", methods=["POST"])
     def admin_login():
         data = request.get_json()
+        email = data.get("email")
+        password = data.get("password")
 
-        response, status = admin_service.authenticate_admin(
-            data.get("email"),
-            data.get("password")
-        )
+        # ✅ TEMPORARY FIX - Hardcode credentials
+        admin_email = "admin@gardening.com"
+        admin_password = "password11@"
 
-        return jsonify(response), status
+ 
+
+        if email == admin_email and password == admin_password:
+            token = generate_token(customer_id=0, role="admin")
+            
+            return jsonify({
+                "message": "Admin login successful",
+                "token": token,
+                "role": "admin"
+            }), 200
+
+        return jsonify({"error": "Invalid admin credentials"}), 401
     
 
     @app.route("/api/admin/customers/<int:customer_id>", methods=["DELETE"])
@@ -140,3 +164,16 @@ def register_admin_routes(app):
         db.session.commit()
         
         return jsonify({"message": "Rendez-vous modifié"}), 200
+    
+    @app.route("/api/admin/appointment-requests/<int:request_id>/cancel", methods=["PUT"])
+    def cancel_appointment_request(request_id):
+
+        request_obj = ServiceRequest.query.get(request_id)
+
+        if not request_obj:
+            return jsonify({"error": "Request not found"}), 404
+
+        request_obj.status = "cancelled"
+        db.session.commit()
+
+        return jsonify({"message": "Request cancelled successfully"}), 200

@@ -16,10 +16,12 @@ function Account({ goHome }) {
 
   const [passwordData, setPasswordData] = useState({
     current_password: "",
-    new_password: ""
+    new_password: "",
+    confirm_password: ""
   });
 
   const [editingPassword, setEditingPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
 
   // FETCH PROFILE
   useEffect(() => {
@@ -66,6 +68,18 @@ function Account({ goHome }) {
   async function handlePasswordChange(e) {
     e.preventDefault();
 
+    const strongPassword = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    if (!strongPassword.test(passwordData.new_password)) {
+      setMessage("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre");
+      return;
+    }
+
+    if (passwordData.new_password !== passwordData.confirm_password) {
+      setMessage("Les mots de passe ne correspondent pas");
+      return;
+    }
+
     const response = await fetch(
       "http://127.0.0.1:5000/api/customer/change-password",
       {
@@ -84,7 +98,8 @@ function Account({ goHome }) {
       setEditingPassword(false);
       setPasswordData({
         current_password: "",
-        new_password: ""
+        new_password: "",
+        confirm_password: ""
       });
     }
 
@@ -149,29 +164,55 @@ function Account({ goHome }) {
                 onSubmit={handlePasswordChange}
                 className="password-form"
               >
-                <input
-                  type="password"
-                  placeholder="Mot de passe actuel"
-                  value={passwordData.current_password}
-                  onChange={(e) =>
-                    setPasswordData({
-                      ...passwordData,
-                      current_password: e.target.value
-                    })
-                  }
-                />
+                <div className="password-row">
+                  <input
+                    type={showPasswords ? "text" : "password"}
+                    placeholder="Mot de passe actuel"
+                    value={passwordData.current_password}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        current_password: e.target.value
+                      })
+                    }
+                  />
+                </div>
 
-                <input
-                  type="password"
-                  placeholder="Nouveau mot de passe"
-                  value={passwordData.new_password}
-                  onChange={(e) =>
-                    setPasswordData({
-                      ...passwordData,
-                      new_password: e.target.value
-                    })
-                  }
-                />
+                <div className="password-row">
+                  <input
+                    type={showPasswords ? "text" : "password"}
+                    placeholder="Nouveau mot de passe"
+                    value={passwordData.new_password}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        new_password: e.target.value
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="password-row">
+                  <input
+                    type={showPasswords ? "text" : "password"}
+                    placeholder="Confirmer le mot de passe"
+                    value={passwordData.confirm_password}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        confirm_password: e.target.value
+                      })
+                    }
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  className="toggle-password-btn"
+                  onClick={() => setShowPasswords(!showPasswords)}
+                >
+                  {showPasswords ? "Masquer les mots de passe" : "Afficher les mots de passe"}
+                </button>
 
                 <div className="edit-section">
                   <button type="submit">Enregistrer</button>

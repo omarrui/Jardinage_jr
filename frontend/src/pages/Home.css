@@ -69,6 +69,7 @@
     padding: 80px 40px 60px 40px;
     text-align: center;
     background-color: #f5f8f5;
+    /* Make cards overlap the hero */
     position: relative;
     z-index: 5;
 }
@@ -93,13 +94,6 @@
   .service-card:hover {
     transform: translateY(-5px);
   }
-
-.service-card h3 {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1d4d0f;
-  line-height: 1.4;
-}
   
   /* ===== ABOUT ===== */
   .about-section {
@@ -192,6 +186,7 @@
     object-fit: cover;
   }
   
+  /* CTA Button in About Section */
   .about-cta {
     margin-top: 30px;
   }
@@ -212,6 +207,31 @@
     background-color: #5a8517;
   }
   
+  /* Responsive */
+  @media (max-width: 968px) {
+    .about-section {
+      flex-direction: column;
+      padding: 60px 30px;
+      gap: 40px;
+    }
+    
+    .about-left {
+      max-width: 100%;
+    }
+    
+    .about-left h2 {
+      font-size: 1.75rem;
+    }
+    
+    .about-right {
+      width: 100%;
+    }
+    
+    .about-image {
+      max-width: 100%;
+    }
+  }
+  
   /* ===== MAP ===== */
   .bottom-section {
     padding: 60px 40px;
@@ -219,14 +239,11 @@
     background-color: #f5f8f5;
   }
   
-  .map-section {
-    height: 400px;
-    background-color: #e5e5e5;
-    margin-top: 60px;
-  }
-
   .map-placeholder {
-    height: 100%;
+    height: 300px;
+    margin-top: 30px;
+    background-color: #dfe8df;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -239,7 +256,7 @@
   background-color: #1b4d1b;
   background-image: 
     linear-gradient(rgba(27, 77, 27, 0.95), rgba(27, 77, 27, 0.95)),
-    url('path-to-leaf-pattern.png');
+    url('path-to-leaf-pattern.png'); /* Optional: add subtle leaf pattern */
   color: white;
   padding: 80px 40px;
   text-align: center;
@@ -335,6 +352,7 @@
   display: flex;
   justify-content: center;
   gap: 15px;
+  margin-top: 15px;
 }
 
 .social-icon {
@@ -370,6 +388,38 @@
   margin-top: 15px;
 }
 
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-header h2 {
+    font-size: 2rem;
+  }
+  
+  .contact-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .contact-card {
+    width: 100%;
+    max-width: 350px;
+  }
+}
+
+/* ===== MAP SECTION ===== */
+  
+  .map-section {
+    height: 400px;
+    background-color: #e5e5e5;
+  }
+  
+  .map-placeholder {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  
 /* ================= TOP GREEN BAR ================= */
 .top-bar {
   background-color: #6c9f1c;
@@ -387,6 +437,36 @@
   gap: 6px;
 }
 
+
+/* ================= SERVICES (5 CARDS STYLE) ================= */
+
+/* Removed override grid and image placeholder for clean design */
+
+.service-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d4d0f;
+  line-height: 1.4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .services-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+}
 /* ===== FAQ SECTION ===== */
 
 .faq-section {
@@ -426,6 +506,7 @@
     line-height: 1.6;
   }
 
+
   /* ================= GOOGLE REVIEWS SECTION ================= */
 
 .reviews-section {
@@ -447,6 +528,7 @@
   position: relative;
 }
 
+/* small underline accent */
 .reviews-section h2::after {
   content: "";
   width: 80px;
@@ -456,6 +538,12 @@
   margin: 20px auto 0;
   border-radius: 4px;
 }
+
+/* Space between reviews and map */
+.map-section {
+  margin-top: 60px;
+}
+
 
 /* ================= BEFORE AFTER SECTION ================= */
 
@@ -591,81 +679,8 @@
   margin-bottom: 20px;
 }
 
-/* ================= BOTTOM CTA BUTTONS ================= */
-
-.bottom-cta {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 28px;
-  margin: 80px 0;
-  flex-wrap: wrap;
-}
-
-.bottom-cta .primary-btn {
-  background: linear-gradient(135deg, #1b5e20, #2e7d32);
-  padding: 16px 48px;
-  font-size: 20px;
-  font-weight: 700;
-  border-radius: 50px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
-  transition: all 0.3s ease;
-}
-
-.bottom-cta .primary-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
-}
-
-.bottom-cta .secondary-btn {
-  background: white;
-  color: #1b5e20;
-  padding: 16px 48px;
-  font-size: 20px;
-  font-weight: 700;
-  border-radius: 50px;
-  border: 2px solid #1b5e20;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-}
-
-.bottom-cta .secondary-btn:hover {
-  background: #1b5e20;
-  color: white;
-  transform: translateY(-3px);
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 1200px) {
-  .services-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
+/* Responsive */
 @media (max-width: 968px) {
-  .about-section {
-    flex-direction: column;
-    padding: 60px 30px;
-    gap: 40px;
-  }
-  
-  .about-left {
-    max-width: 100%;
-  }
-  
-  .about-left h2 {
-    font-size: 1.75rem;
-  }
-  
-  .about-right {
-    width: 100%;
-  }
-  
-  .about-image {
-    max-width: 100%;
-  }
-
   .seo-section {
     padding: 80px 30px;
   }
@@ -678,29 +693,42 @@
     font-size: 1rem;
   }
 }
+/* ================= BOTTOM CTA BUTTONS ================= */
 
-@media (max-width: 768px) {
-  .services-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .contact-header h2 {
-    font-size: 2rem;
-  }
-  
-  .contact-cards {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .contact-card {
-    width: 100%;
-    max-width: 350px;
-  }
+.home-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 70px 0 40px 0;
 }
 
-@media (max-width: 500px) {
-  .services-grid {
-    grid-template-columns: 1fr;
-  }
+.home-cta-buttons .primary-btn {
+  background: linear-gradient(135deg, #2e7d32, #43a047);
+  padding: 16px 40px;
+  font-size: 1.05rem;
+  border-radius: 40px;
+  box-shadow: 0 10px 25px rgba(46, 125, 50, 0.35);
+  transition: all 0.3s ease;
+}
+
+.home-cta-buttons .primary-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(46, 125, 50, 0.45);
+}
+
+.home-cta-buttons .secondary-btn {
+  background: white;
+  color: #1b5e20;
+  border: 2px solid #1b5e20;
+  padding: 16px 40px;
+  font-size: 1.05rem;
+  border-radius: 40px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.home-cta-buttons .secondary-btn:hover {
+  background: #1b5e20;
+  color: white;
+  transform: translateY(-3px);
 }

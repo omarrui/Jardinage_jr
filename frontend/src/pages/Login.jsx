@@ -86,6 +86,32 @@ function Login({
     }
   }
 
+  async function handleAdminLogin(e) {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email, password: formData.password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store the admin token
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", "admin");
+        
+        onAdminLogin();
+      } else {
+        setMessage(data.error || "Invalid admin credentials");
+      }
+    } catch (err) {
+      setMessage("Connection error");
+    }
+  }
+
   const containerStyle = {
     minHeight: "100vh",
     display: "flex",

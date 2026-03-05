@@ -7,6 +7,8 @@ function ResetPassword({ goToLogin }) {
   const [token, setToken] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -16,6 +18,14 @@ function ResetPassword({ goToLogin }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    const strongPassword = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    if (!strongPassword.test(newPassword)) {
+      setMessage("Le mot de passe doit contenir 8 caractères, 1 majuscule et 1 chiffre");
+      setIsError(true);
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setMessage("Les mots de passe ne correspondent pas");
@@ -62,21 +72,37 @@ function ResetPassword({ goToLogin }) {
         <h2>Définir un nouveau mot de passe</h2>
 
         <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            placeholder="Nouveau mot de passe"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Nouveau mot de passe"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
 
-          <input
-            type="password"
-            placeholder="Confirmer le mot de passe"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirmer le mot de passe"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? "Hide" : "Show"}
+            </button>
+          </div>
 
           <button type="submit">Mettre à jour le mot de passe</button>
         </form>
@@ -92,4 +118,3 @@ function ResetPassword({ goToLogin }) {
 }
 
 export default ResetPassword;
-

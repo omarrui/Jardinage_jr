@@ -1,6 +1,5 @@
 // Booking.jsx
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 
 function Booking({ goHome }) {
   const [date, setDate] = useState("");
@@ -29,7 +28,7 @@ function Booking({ goHome }) {
   
       setAppointments(data.requests || []);
     } catch (error) {
-      console.error("Failed to fetch appointments:", error);
+      console.error("Failed to fetch appointments");
     }
   };
 
@@ -93,19 +92,8 @@ function Booking({ goHome }) {
       await fetchAppointments();
 
     } catch (error) {
-      console.error("Submit error:", error);
       setMessage("Erreur serveur. Veuillez réessayer.");
     }
-  }
-
-  function getStatusStyle(status) {
-    if (status === "scheduled") {
-      return { bg: "#e8f5e9", color: "#2e7d32" };
-    }
-    if (status === "pending") {
-      return { bg: "#fff8e1", color: "#f57c00" };
-    }
-    return { bg: "#fdecea", color: "#c62828" };
   }
 
   return (
@@ -120,9 +108,8 @@ function Booking({ goHome }) {
         </p>
   
         <form onSubmit={handleSubmit} className="booking-form">
-          <label htmlFor="preferredDate">Date souhaitée</label>
+          <label>Date souhaitée</label>
           <input
-            id="preferredDate"
             type="date"
             value={date}
             min={todayStr}
@@ -130,9 +117,8 @@ function Booking({ goHome }) {
             required
           />
   
-          <label htmlFor="address">Adresse d'intervention</label>
+          <label>Adresse d'intervention</label>
           <input
-            id="address"
             type="text"
             placeholder="Ex: 12 rue des Oliviers, Le Muy"
             value={address}
@@ -140,9 +126,8 @@ function Booking({ goHome }) {
             required
           />
   
-          <label htmlFor="description">Description (optionnel)</label>
+          <label>Description (optionnel)</label>
           <textarea
-            id="description"
             placeholder="Ex: Taille de haie, entretien général..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -181,14 +166,12 @@ function Booking({ goHome }) {
               📅 Mes rendez-vous
             </h3>
 
-            {appointments.filter((appt) => appt.status !== "cancelled").length === 0 ? (
+            {appointments.length === 0 ? (
               <p>Aucun rendez-vous pour le moment.</p>
             ) : (
               appointments
                 .filter((appt) => appt.status !== "cancelled")
-                .map((appt) => {
-                const statusStyle = getStatusStyle(appt.status);
-                return (
+                .map((appt) => (
                 <div
                   key={appt.id}
                   style={{
@@ -211,8 +194,18 @@ function Booking({ goHome }) {
                         borderRadius: "6px",
                         fontSize: "13px",
                         fontWeight: "600",
-                        backgroundColor: statusStyle.bg,
-                        color: statusStyle.color
+                        backgroundColor:
+                          appt.status === "scheduled"
+                            ? "#e8f5e9"
+                            : appt.status === "pending"
+                            ? "#fff8e1"
+                            : "#fdecea",
+                        color:
+                          appt.status === "scheduled"
+                            ? "#2e7d32"
+                            : appt.status === "pending"
+                            ? "#f57c00"
+                            : "#c62828"
                       }}
                     >
                       {appt.status}
@@ -226,7 +219,7 @@ function Booking({ goHome }) {
                     </p>
                   )}
                 </div>
-              )})
+              ))
             )}
           </div>
         )}
@@ -234,7 +227,4 @@ function Booking({ goHome }) {
     </div>
   );
 }
-Booking.propTypes = {
-  goHome: PropTypes.func.isRequired
-};
 export default Booking;
