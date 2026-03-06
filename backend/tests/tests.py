@@ -1,7 +1,7 @@
 import unittest
 import os
-from app import app
-from models import db
+from run import app
+from app.models.models import db
 
 
 class TestAuthenticationEndpoints(unittest.TestCase):

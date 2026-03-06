@@ -1,14 +1,14 @@
 from flask import request, jsonify, current_app
-from services import admin_service
-from models import Availability, ServiceRequest, db
-from utils.jwt_utils import verify_token, generate_token
+from app.services import admin_service
+from app.models.models import Availability, ServiceRequest, db
+from app.utils.jwt_utils import verify_token, generate_token
 
 
 def register_admin_routes(app):
 
     @app.route("/api/admin/customers", methods=["GET"])
     def admin_get_all_customers():
-        # ✅ Add authentication
+        # Add authentication
         auth_header = request.headers.get("Authorization")
         
         if not auth_header:
@@ -134,7 +134,7 @@ def register_admin_routes(app):
 
     @app.route("/api/admin/appointments/<int:appointment_id>", methods=["DELETE"])
     def delete_appointment(appointment_id):
-        from models import ServiceRequest, db
+        from app.models.models import ServiceRequest, db
         
         service_request = ServiceRequest.query.get(appointment_id)
         
@@ -148,7 +148,7 @@ def register_admin_routes(app):
 
     @app.route("/api/admin/appointments/<int:appointment_id>", methods=["PUT"])
     def update_appointment(appointment_id):
-        from models import ServiceRequest, db
+        from app.models.models import ServiceRequest, db
         from datetime import datetime
         
         data = request.get_json()

@@ -1,5 +1,5 @@
-from models import ServiceRequest, Customer, db
-from models import Admin
+from app.models.models import ServiceRequest, Customer, db
+from app.models.models import Admin
 
 
 def delete_customer(customer):

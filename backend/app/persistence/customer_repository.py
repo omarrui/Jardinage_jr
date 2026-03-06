@@ -1,4 +1,4 @@
-from models import db, Customer
+from app.models.models import db, Customer
 
 def get_customer_by_email(email):
     return Customer.query.filter_by(email=email).first()

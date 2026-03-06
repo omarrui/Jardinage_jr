@@ -8,7 +8,6 @@ function ResetPassword({ goToLogin }) {
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -66,43 +65,65 @@ function ResetPassword({ goToLogin }) {
     }
   }
 
+  const passwordContainerStyle = {
+    position: "relative",
+    width: "100%"
+  };
+
+  const eyeButtonStyle = {
+    position: "absolute",
+    right: "12px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "18px",
+    color: "#666",
+    padding: "0",
+    display: "flex",
+    alignItems: "center"
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "12px 40px 12px 12px" // Add right padding for the eye icon
+  };
+
   return (
     <div className="reset-wrapper">
       <div className="reset-card">
         <h2>Définir un nouveau mot de passe</h2>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: "flex", gap: "10px" }}>
+          {/* ✅ New password field with eye toggle */}
+          <div style={passwordContainerStyle}>
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Nouveau mot de passe"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              style={inputStyle}
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
+              style={eyeButtonStyle}
+              aria-label={showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? "👁️" : "👁️‍🗨️"}
             </button>
           </div>
 
-          <div style={{ display: "flex", gap: "10px" }}>
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirmer le mot de passe"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? "Hide" : "Show"}
-            </button>
-          </div>
+          {/* ✅ Confirm password field WITHOUT eye toggle */}
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Confirmer le mot de passe"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
 
           <button type="submit">Mettre à jour le mot de passe</button>
         </form>

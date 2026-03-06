@@ -14,6 +14,7 @@ function Login({
   });
 
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // ✅ Add this
 
   function handleChange(e) {
     setFormData({
@@ -138,7 +139,25 @@ function Login({
     borderRadius: "8px",
     border: "1px solid #ddd",
     fontSize: "14px",
-    outline: "none"
+    outline: "none",
+    width: "100%"
+  };
+
+  const passwordContainerStyle = {
+    position: "relative",
+    width: "100%"
+  };
+
+  const eyeButtonStyle = {
+    position: "absolute",
+    right: "12px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "18px",
+    color: "#666"
   };
 
   const primaryBtn = {
@@ -175,14 +194,25 @@ function Login({
             required
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Mot de passe"
-            onChange={handleChange}
-            style={inputStyle}
-            required
-          />
+          {/* ✅ Password field with toggle */}
+          <div style={passwordContainerStyle}>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Mot de passe"
+              onChange={handleChange}
+              style={inputStyle}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={eyeButtonStyle}
+              aria-label={showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+            >
+              {showPassword ? "👁️" : "👁️‍🗨️"}
+            </button>
+          </div>
 
           <button type="submit" style={primaryBtn}>
             Se connecter

@@ -1,6 +1,6 @@
 # backend/repositories/appointment_repository.py
 
-from models import db, ServiceRequest
+from app.models.models import db, ServiceRequest
 
 
 def create_request(customer_id, preferred_date, description):

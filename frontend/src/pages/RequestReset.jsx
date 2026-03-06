@@ -103,7 +103,25 @@ function RequestReset({ goToLogin }) {
     borderRadius: "8px",
     border: "1px solid #ddd",
     fontSize: "14px",
-    outline: "none"
+    outline: "none",
+    width: "100%"
+  };
+
+  const passwordContainerStyle = {
+    position: "relative",
+    width: "100%"
+  };
+
+  const eyeButtonStyle = {
+    position: "absolute",
+    right: "12px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "18px",
+    color: "#666"
   };
 
   const primaryBtn = {
@@ -171,24 +189,27 @@ function RequestReset({ goToLogin }) {
               required
             />
 
-            <div style={{ display: "flex", gap: "8px" }}>
+            {/* ✅ New password field with eye toggle */}
+            <div style={passwordContainerStyle}>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Nouveau mot de passe"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                style={{ ...inputStyle, flex: 1 }}
+                style={inputStyle}
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{ padding: "8px", cursor: "pointer" }}
+                style={eyeButtonStyle}
+                aria-label={showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
               >
-                {showPassword ? "Masquer" : "Afficher"}
+                {showPassword ? "👁️" : "👁️‍🗨️"}
               </button>
             </div>
 
+            {/* ✅ Confirm password field WITHOUT eye toggle */}
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Confirmer le mot de passe"
@@ -221,8 +242,8 @@ function RequestReset({ goToLogin }) {
   );
 }
 
-export default RequestReset;
-
 RequestReset.propTypes = {
   goToLogin: PropTypes.func.isRequired
 };
+
+export default RequestReset;

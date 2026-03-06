@@ -112,6 +112,19 @@ function AdminDashboard({ goHome }) {
      CREATE CLIENT
   ============================= */
   const handleCreateClient = async () => {
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(newClient.email)) {
+      alert("Veuillez entrer un email valide");
+      return;
+    }
+
+    if (!newClient.name || !newClient.email || !newClient.phone) {
+      alert("Veuillez remplir tous les champs");
+      return;
+    }
+
     const response = await fetch(
       "http://127.0.0.1:5000/api/admin/customers",
       {
@@ -494,6 +507,18 @@ function AdminDashboard({ goHome }) {
 
                       <button
                         onClick={async () => {
+                          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                          if (!emailRegex.test(editData.email)) {
+                            alert("Veuillez entrer un email valide");
+                            return;
+                          }
+
+                          if (!editData.email || !editData.phone) {
+                            alert("Veuillez remplir tous les champs");
+                            return;
+                          }
+
                           await fetch(
                             `http://127.0.0.1:5000/api/admin/customers/${client.id}`,
                             {
@@ -502,6 +527,7 @@ function AdminDashboard({ goHome }) {
                               body: JSON.stringify(editData)
                             }
                           );
+
                           setEditingClient(null);
                           fetchClients();
                         }}

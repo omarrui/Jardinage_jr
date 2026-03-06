@@ -1,13 +1,13 @@
-from utils.jwt_utils import generate_token
+from app.utils.jwt_utils import generate_token
 from werkzeug.security import generate_password_hash, check_password_hash
-from repositories.customer_repository import (
+from app.persistence.customer_repository import (
     get_customer_by_email,
     create_customer
 )
 import secrets
-from datetime import datetime, timedelta
-from utils.email_utils import send_email
-from models import Customer, db
+from datetime import datetime, timedelta, timezone
+from app.utils.email_utils import send_email
+from app.models.models import Customer, db
 import re
 
 
@@ -80,7 +80,7 @@ def send_reset_code(email):
     code = str(random.randint(100000, 999999))
 
     customer.reset_code = code
-    customer.reset_code_expiry = datetime.utcnow() + timedelta(minutes=10)
+    customer.reset_code_expiry = datetime.now(timezone.utc) + timedelta(minutes=10)
 
     db.session.commit()
 

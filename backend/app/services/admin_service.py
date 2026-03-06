@@ -1,15 +1,15 @@
-from repositories.customer_repository import get_customer_by_email
-from repositories import admin_repository
+from app.persistence.customer_repository import get_customer_by_email
+from app.persistence import admin_repository
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
-from utils.jwt_utils import generate_token
-import secrets  # ✅ Use secrets instead of random
+from app.utils.jwt_utils import generate_token
+import secrets 
 import string
-from utils.email_utils import send_email
-from models import Customer
-from models import db 
+from app.utils.email_utils import send_email
+from app.models.models import Customer
+from app.models.models import db 
 
-# ✅ Define constants to avoid duplication
+# define constants to avoid duplication
 ERROR_INVALID_CREDENTIALS = "Invalid email or password"
 ERROR_CUSTOMER_NOT_FOUND = "Customer not found"
 ERROR_NAME_PHONE_REQUIRED = "NAME and PHONE are required"
@@ -26,7 +26,6 @@ def create_customer_by_admin(data):
 
     # INTERNAL RECORD ONLY
     if not has_account:
-        # ✅ Remove unused variable warning
         admin_repository.create_customer(
             name=name,
             email=email,
@@ -203,7 +202,7 @@ def get_all_service_requests():
 
 
 def update_service_request(request_id, data):
-    from models import ServiceRequest, db
+    from app.models.models import ServiceRequest, db
     from datetime import datetime
     
     service_request = ServiceRequest.query.get(request_id)
@@ -311,7 +310,7 @@ def delete_customer(customer_id):
 
 
 def create_appointment(data):
-    from models import ServiceRequest, db
+    from app.models.models import ServiceRequest, db
 
     request_id = data.get("request_id")
     customer_id = data.get("customer_id")

@@ -4,13 +4,16 @@ load_dotenv()
 from flask import Flask
 from flask_cors import CORS
 from config import SECRET_KEY, DATABASE_URL
-from models import db, Admin
+from app.models import db
+from app.models.models import Admin
 from werkzeug.security import generate_password_hash
 
-from routes.customer_routes import register_customer_routes
-from routes.appointment_routes import register_appointment_routes
-from routes.admin_routes import register_admin_routes
-from routes.booking_routes import register_booking_routes
+# Route imports
+from app.api.v1.customer_routes import register_customer_routes
+from app.api.v1.admin_routes import register_admin_routes
+from app.api.v1.booking_routes import register_booking_routes
+from app.api.v1.service_request_routes import register_service_request_routes
+from app.api.v1.appointment_routes import register_appointment_routes
 
 
 app = Flask(__name__)

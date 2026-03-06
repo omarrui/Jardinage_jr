@@ -63,6 +63,13 @@ db.sqlite3
 instance/
 .webassets-cache
 
+# Local databases
+*.db
+*.sqlite3
+
+# macOS files
+.DS_Store
+
 # Scrapy stuff:
 .scrapy
 

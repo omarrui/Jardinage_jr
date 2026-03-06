@@ -12,7 +12,7 @@ const locales = { fr };
 const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfWeek,
+  startOfdWeek,
   getDay,
   locales,
 });

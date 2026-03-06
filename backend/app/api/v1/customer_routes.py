@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from services.customer_service import (
+from app.services.customer_service import (
     register_customer,
     authenticate_customer,
     send_reset_code,
@@ -82,7 +82,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
     # ===============================
     @app.route("/api/customer/force-change-password", methods=["POST"])
     def force_change_password():
-        from models import Customer, db
+        from app.models.models import Customer, db
         from werkzeug.security import generate_password_hash
 
         data = request.get_json()
@@ -93,7 +93,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         if not customer_id or not new_password:
             return jsonify({"error": "Missing data"}), 400
 
-        customer = Customer.query.get(customer_id)
+        customer = db.session.get(Customer, customer_id)
 
         if not customer:
             return jsonify({"error": ERROR_CUSTOMER_NOT_FOUND}), 404
@@ -111,7 +111,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
     # ===============================
     @app.route("/api/customer/change-password", methods=["PUT"])
     def update_password():
-        from models import Customer, db
+        from app.models.models import Customer, db
         from werkzeug.security import check_password_hash, generate_password_hash
 
         data = request.get_json()
@@ -123,7 +123,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         if not customer_id or not current_password or not new_password:
             return jsonify({"error": "Missing fields"}), 400
 
-        customer = Customer.query.get(customer_id)
+        customer = db.session.get(Customer, customer_id)
 
         if not customer:
             return jsonify({"error": ERROR_CUSTOMER_NOT_FOUND}), 404
@@ -143,8 +143,8 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
     # ===============================
     @app.route("/api/customer/update-profile", methods=["PUT"])
     def update_profile():
-        from models import Customer, db
-        from repositories.customer_repository import get_customer_by_email
+        from app.models.models import Customer, db
+        from app.persistence.customer_repository import get_customer_by_email
 
         data = request.get_json()
 
@@ -156,7 +156,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         if not customer_id:
             return jsonify({"error": "Missing customer ID"}), 400
 
-        customer = Customer.query.get(customer_id)
+        customer = db.session.get(Customer, customer_id)
 
         if not customer:
             return jsonify({"error": ERROR_CUSTOMER_NOT_FOUND}), 404
@@ -181,9 +181,9 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
     
     @app.route("/api/customer/get-profile/<int:customer_id>", methods=["GET"])
     def get_profile(customer_id):
-        from models import Customer
+        from app.models.models import Customer
 
-        customer = Customer.query.get(customer_id)
+        customer = db.session.get(Customer, customer_id)
 
         if not customer:
             return jsonify({"error": ERROR_CUSTOMER_NOT_FOUND}), 404
@@ -197,9 +197,9 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
 
     @app.route("/api/customer/cancel-appointment/<int:request_id>", methods=["DELETE"])
     def cancel_customer_appointment(request_id):
-        from models import ServiceRequest, db
+        from app.models.models import ServiceRequest, db
         
-        service_request = ServiceRequest.query.get(request_id)
+        service_request = db.session.get(ServiceRequest, request_id)
         
         if not service_request:
             return jsonify({"error": "Rendez-vous introuvable"}), 404
@@ -213,7 +213,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
     @app.route("/api/change-password", methods=["POST"])
     def change_password_endpoint():
         from werkzeug.security import check_password_hash, generate_password_hash
-        from models import Customer, db
+        from app.models.models import Customer, db
         
         data = request.get_json()
         
