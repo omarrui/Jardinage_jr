@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminCalendar from "./AdminCalendar";
+import CustomAlert from "../components/CustomAlert";
 
 function AdminDashboard({ goHome }) {
   const [adminSection, setAdminSection] = useState("planning");
@@ -8,6 +9,24 @@ function AdminDashboard({ goHome }) {
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [pendingRequests, setPendingRequests] = useState(0);
   const [appointmentRequests, setAppointmentRequests] = useState([]);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showAlertModal, setShowAlertModal] = useState(false);
+
+  const showAlert = (message) => {
+    setAlertMessage(message);
+    setShowAlertModal(true);
+  };
+
+  // Confirmation modal state and helper
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const showConfirm = (message, action) => {
+    setConfirmMessage(message);
+    setConfirmAction(() => action);
+    setShowConfirmModal(true);
+  };
 
   const [showCreateClient, setShowCreateClient] = useState(false);
   const [createLogin, setCreateLogin] = useState(false);
@@ -112,16 +131,15 @@ function AdminDashboard({ goHome }) {
      CREATE CLIENT
   ============================= */
   const handleCreateClient = async () => {
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(newClient.email)) {
-      alert("Veuillez entrer un email valide");
+    // ✅ Only require email if creating a login account
+    if (createLogin && !newClient.email) {
+      alert("L'email est requis pour créer un compte de connexion");
       return;
     }
 
-    if (!newClient.name || !newClient.email || !newClient.phone) {
-      alert("Veuillez remplir tous les champs");
+    // ✅ Basic validation for name and phone (always required)
+    if (!newClient.name || !newClient.phone) {
+      alert("Le nom et le téléphone sont requis");
       return;
     }
 
@@ -132,7 +150,7 @@ function AdminDashboard({ goHome }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: newClient.name,
-          email: newClient.email,
+          email: newClient.email || null, // ✅ Send null if no email
           phone: newClient.phone,
           has_account: createLogin
         })
@@ -163,7 +181,7 @@ function AdminDashboard({ goHome }) {
     );
 
     const data = await response.json();
-    alert(data.message || data.error);
+    showAlert(data.message || data.error);
     fetchClients();
   };
 
@@ -292,31 +310,31 @@ function AdminDashboard({ goHome }) {
                   </button>
                   <button
                     onClick={async () => {
-                      const confirmCancel = window.confirm("Refuser cette demande de rendez-vous ?");
-                      if (!confirmCancel) return;
+                      showConfirm("Refuser cette demande de rendez-vous ?", async () => {
+                        try {
+                          const response = await fetch(
+                            `http://127.0.0.1:5000/api/admin/appointment-requests/${req.id}/cancel`,
+                            {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" }
+                            }
+                          );
 
-                      try {
-                        const response = await fetch(
-                          `http://127.0.0.1:5000/api/admin/appointment-requests/${req.id}/cancel`,
-                          {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" }
+                          const data = await response.json();
+
+                          if (!response.ok) {
+                            showAlert(data.error || "Erreur lors de l'annulation");
+                            return;
                           }
-                        );
 
-                        const data = await response.json();
-
-                        if (!response.ok) {
-                          alert(data.error || "Erreur lors de l'annulation");
-                          return;
+                          showAlert(" Demande annulée");
+                          fetchAppointmentRequests();
+                        } catch (error) {
+                          console.error(error);
+                          showAlert("Erreur serveur");
                         }
-
-                        alert(" Demande annulée");
-                        fetchAppointmentRequests();
-                      } catch (error) {
-                        console.error(error);
-                        alert("Erreur serveur");
-                      }
+                      });
+                      return;
                     }}
                     style={{
                       marginTop: "10px",
@@ -463,15 +481,13 @@ function AdminDashboard({ goHome }) {
                   {client.must_change_password && (
                     <button
                       onClick={() => {
-                        const confirmDelete = window.confirm(
-                          "⚠️ Êtes-vous sûr de vouloir supprimer ce client ?"
-                        );
-                        if (!confirmDelete) return;
-
-                        fetch(
-                          `http://127.0.0.1:5000/api/admin/customers/${client.id}`,
-                          { method: "DELETE" }
-                        ).then(() => fetchClients());
+                        showConfirm("⚠️ Êtes-vous sûr de vouloir supprimer ce client ?", () => {
+                          fetch(
+                            `http://127.0.0.1:5000/api/admin/customers/${client.id}`,
+                            { method: "DELETE" }
+                          ).then(() => fetchClients());
+                        });
+                        return;
                       }}
                       style={{
                         backgroundColor: "#c62828",
@@ -510,12 +526,12 @@ function AdminDashboard({ goHome }) {
                           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
                           if (!emailRegex.test(editData.email)) {
-                            alert("Veuillez entrer un email valide");
+                            showAlert("Veuillez entrer un email valide");
                             return;
                           }
 
                           if (!editData.email || !editData.phone) {
-                            alert("Veuillez remplir tous les champs");
+                            showAlert("Veuillez remplir tous les champs");
                             return;
                           }
 
@@ -582,7 +598,13 @@ function AdminDashboard({ goHome }) {
                 onChange={(e) =>
                   setNewClient({ ...newClient, email: e.target.value })
                 }
-                style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                required={createLogin} // ✅ Only required if creating login
+                style={{
+                  padding: "10px",
+                  borderRadius: "6px",
+                  border: "1px solid #ddd",
+                  fontSize: "14px"
+                }}
               />
 
               <input
@@ -698,7 +720,7 @@ function AdminDashboard({ goHome }) {
               <button
                 onClick={async () => {
                   if (!appointmentStart || !appointmentEnd || !appointmentAddress) {
-                    alert("Veuillez remplir tous les champs");
+                    showAlert("Veuillez remplir tous les champs");
                     return;
                   }
 
@@ -731,13 +753,55 @@ function AdminDashboard({ goHome }) {
 
                       if (conflicts.length > 0) {
                         const conflictNames = conflicts.map(c => c.customer_name).join(", ");
-                        const confirmCreate = window.confirm(
-                          `⚠️ Cette date contient déjà ${conflicts.length} rendez-vous avec : ${conflictNames}.\n\nVoulez-vous créer un autre rendez-vous ce jour-là ?`
+                        showConfirm(
+                          `⚠️ Cette date contient déjà ${conflicts.length} rendez-vous avec : ${conflictNames}. Voulez-vous créer un autre rendez-vous ce jour-là ?`,
+                          async () => {
+                        
+                            const payload = {
+                              scheduled_start: scheduledStart,
+                              scheduled_end: scheduledEnd,
+                              address: appointmentAddress
+                            };
+                        
+                            if (selectedClientForAppointment.request_id) {
+                              payload.request_id = selectedClientForAppointment.request_id;
+                            } else {
+                              payload.customer_id = selectedClientForAppointment.id;
+                            }
+                        
+                            const response = await fetch(
+                              "http://127.0.0.1:5000/api/admin/appointments",
+                              {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify(payload)
+                              }
+                            );
+                        
+                            const data = await response.json();
+                        
+                            if (!response.ok) {
+                              showAlert(data.error || "Erreur lors de la création");
+                              return;
+                            }
+                        
+                            showAlert("✅ Rendez-vous créé avec succès!");
+                        
+                            fetchAppointmentRequests();
+                            if (adminSection === "clients") {
+                              fetchClients();
+                            }
+                        
+                            setSelectedClientForAppointment(null);
+                            setAppointmentStart("");
+                            setAppointmentEnd("");
+                            setAppointmentStartTime("09:00");
+                            setAppointmentEndTime("17:00");
+                            setAppointmentAddress("");
+                          }
                         );
-
-                        if (!confirmCreate) {
-                          return;
-                        }
+                        
+                        return;
                       }
                     }
                   } catch (error) {
@@ -769,11 +833,11 @@ function AdminDashboard({ goHome }) {
                   const data = await response.json();
 
                   if (!response.ok) {
-                    alert(data.error || "Erreur lors de la création");
+                    showAlert(data.error || "Erreur lors de la création");
                     return;
                   }
 
-                  alert("✅ Rendez-vous créé avec succès!");
+                  showAlert("✅ Rendez-vous créé avec succès!");
 
                   fetchAppointmentRequests();
                   if (adminSection === "clients") {
@@ -814,6 +878,50 @@ function AdminDashboard({ goHome }) {
             </div>
           </div>
         )}
+      
+      {showConfirmModal && (
+        <div style={overlayStyle}>
+          <div style={modalStyle}>
+            <p style={{ marginBottom: "20px" }}>{confirmMessage}</p>
+
+            <button
+              onClick={() => {
+                if (confirmAction) confirmAction();
+                setShowConfirmModal(false);
+              }}
+              style={{
+                backgroundColor: "#1b5e20",
+                color: "white",
+                padding: "8px 14px",
+                border: "none",
+                borderRadius: "8px",
+                marginRight: "10px",
+                cursor: "pointer"
+              }}
+            >
+              Confirmer
+            </button>
+
+            <button
+              onClick={() => setShowConfirmModal(false)}
+              style={{
+                padding: "8px 14px",
+                borderRadius: "8px",
+                border: "1px solid #ccc",
+                cursor: "pointer"
+              }}
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
+
+      <CustomAlert
+        isOpen={showAlertModal}
+        message={alertMessage}
+        onClose={() => setShowAlertModal(false)}
+      />
 
       </div>
     </div>

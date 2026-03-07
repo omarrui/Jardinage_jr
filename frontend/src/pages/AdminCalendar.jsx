@@ -6,13 +6,14 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import fr from "date-fns/locale/fr";
+import CustomAlert from "../components/CustomAlert";
 
 const locales = { fr };
 
 const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfdWeek,
+  startOfWeek,
   getDay,
   locales,
 });
@@ -33,6 +34,14 @@ function AdminCalendar() {
     address: ""
   });
 
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showAlertModal, setShowAlertModal] = useState(false);
+
+  const showAlert = (message) => {
+    setAlertMessage(message);
+    setShowAlertModal(true);
+  };
+
   const fetchEvents = () => {
     fetch("http://127.0.0.1:5000/api/admin/appointment-requests")
       .then(res => res.json())
@@ -44,18 +53,20 @@ function AdminCalendar() {
           .map(r => ({
             id: r.id,
             title: r.customer_name,
-            customer_name: r.customer_name, // ✅ Keep for searching
+            customer_name: r.customer_name,
             address: r.address,
             start: new Date(r.scheduled_start),
             end: new Date(r.scheduled_end),
           }));
 
         setAllEvents(formatted); 
-        setEvents(formatted);    //  Display all initially
+        setEvents(formatted);
+      })
+      .catch((error) => {
+        showAlert("Erreur de connexion");
       });
   };
 
-  // Filter events when search changes
   useEffect(() => {
     if (!searchQuery.trim()) {
       setEvents(allEvents);
@@ -78,11 +89,13 @@ function AdminCalendar() {
       .then(data => {
         if (!Array.isArray(data)) return;
         setBlockedDates(data.map(d => d.date));
+      })
+      .catch((error) => {
+        showAlert("Erreur de connexion");
       });
   }, []);
 
   const moveEvent = async ({ event, start, end }) => {
-    // Check for conflicts
     const conflictingEvents = events.filter(e => 
       e.id !== event.id && 
       ((start >= e.start && start < e.end) || 
@@ -92,18 +105,11 @@ function AdminCalendar() {
 
     if (conflictingEvents.length > 0) {
       const conflictNames = conflictingEvents.map(e => e.customer_name).join(", ");
-      const confirmMove = window.confirm(
-        `⚠️ Cette date contient déjà ${conflictingEvents.length} rendez-vous avec : ${conflictNames}.\n\nVoulez-vous ajouter un autre rendez-vous ce jour-là ?`
-      );
-      
-      if (!confirmMove) {
-        // Refresh to reset the event position
-        fetchEvents();
-        return;
-      }
+      showAlert(`⚠️ Cette date contient déjà ${conflictingEvents.length} rendez-vous avec : ${conflictNames}. Déplacement annulé.`);
+      fetchEvents();
+      return;
     }
 
-    // Update local state optimistically
     const updatedEvent = { ...event, start, end };
     setAllEvents(prev => prev.map(e => e.id === event.id ? updatedEvent : e));
     setEvents(prev => prev.map(e => e.id === event.id ? updatedEvent : e));
@@ -123,18 +129,18 @@ function AdminCalendar() {
       );
 
       const data = await response.json();
-
+ 
       if (!response.ok) {
-        alert(data.error || "Erreur lors de la mise à jour");
-        fetchEvents(); // Revert on error
+        showAlert(data.error || "Erreur lors de la mise à jour");
+        fetchEvents();
         return;
       }
 
-      alert("✅ Rendez-vous déplacé avec succès!");
+      showAlert("✅ Rendez-vous déplacé avec succès!");
     } catch (error) {
       console.error("Failed to update appointment", error);
-      alert("❌ Erreur de connexion");
-      fetchEvents(); // Revert on error
+      showAlert("❌ Erreur de connexion");
+      fetchEvents();
     }
   };
 
@@ -145,44 +151,8 @@ function AdminCalendar() {
     const isoDate = clickedDate.toISOString().split("T")[0];
 
     if (blockedDates.includes(isoDate)) {
-      const confirmUnblock = window.confirm(
-        "Cette date est bloquée. Voulez-vous la débloquer ?"
-      );
-
-      if (!confirmUnblock) return;
-
-      try {
-        await fetch(
-          `http://127.0.0.1:5000/api/admin/availability/${isoDate}`,
-          { method: "DELETE" }
-        );
-
-        setBlockedDates(prev => prev.filter(d => d !== isoDate));
-      } catch (error) {
-        console.error("Failed to unblock date", error);
-      }
-
+      showAlert("⚠️ Cette date est actuellement bloquée pour les rendez‑vous. Supprimez-la manuellement si vous voulez la débloquer.");
       return;
-    }
-
-    const overlappingEvents = events.filter(e => {
-      const eventStart = new Date(e.start);
-      const eventEnd = new Date(e.end);
-
-      eventStart.setHours(0, 0, 0, 0);
-      eventEnd.setHours(0, 0, 0, 0);
-
-      return clickedDate >= eventStart && clickedDate <= eventEnd;
-    });
-
-    if (overlappingEvents.length > 0) {
-      const names = overlappingEvents.map(e => e.title).join(", ");
-
-      const confirmAdd = window.confirm(
-        `⚠️ Cette date contient déjà un rendez-vous avec : ${names}.\n\nVoulez-vous ajouter un autre rendez-vous ce jour-là ?`
-      );
-
-      if (!confirmAdd) return;
     }
 
     setSelectedDateToBlock(clickedDate);
@@ -199,12 +169,6 @@ function AdminCalendar() {
   };
 
   const handleDeleteAppointment = async () => {
-    const confirmDelete = window.confirm(
-      "Êtes-vous sûr de vouloir annuler ce rendez-vous ?"
-    );
-    
-    if (!confirmDelete) return;
-
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/api/admin/appointments/${selectedEvent.id}`,
@@ -212,16 +176,16 @@ function AdminCalendar() {
       );
 
       if (!response.ok) {
-        alert("Erreur lors de la suppression");
+        showAlert("Erreur lors de la suppression");
         return;
       }
 
-      alert("Rendez-vous annulé avec succès!");
+      showAlert("Rendez-vous annulé avec succès!");
       setSelectedEvent(null);
-      fetchEvents(); // Refresh calendar
+      fetchEvents();
     } catch (error) {
       console.error("Error:", error);
-      alert("Erreur de connexion");
+      showAlert("Erreur de connexion");
     }
   };
 
@@ -241,17 +205,17 @@ function AdminCalendar() {
       );
 
       if (!response.ok) {
-        alert("Erreur lors de la modification");
+        showAlert("Erreur lors de la modification");
         return;
       }
 
-      alert("Rendez-vous modifié avec succès!");
+      showAlert("Rendez-vous modifié avec succès!");
       setSelectedEvent(null);
       setEditMode(false);
       fetchEvents();
     } catch (error) {
       console.error("Error:", error);
-      alert("Erreur de connexion");
+      showAlert("Erreur de connexion");
     }
   };
 
@@ -292,7 +256,6 @@ function AdminCalendar() {
           📅 Planning des rendez-vous
         </h2>
 
-        {/* ✅ Search Bar */}
         <div style={{ position: "relative", width: "300px" }}>
           <input
             type="text"
@@ -332,7 +295,6 @@ function AdminCalendar() {
         </div>
       </div>
 
-      {/* ✅ Results counter */}
       {searchQuery && (
         <p style={{ 
           marginBottom: "15px", 
@@ -495,6 +457,11 @@ function AdminCalendar() {
           </div>
         </div>
       )}
+      <CustomAlert
+        isOpen={showAlertModal}
+        message={alertMessage}
+        onClose={() => setShowAlertModal(false)}
+      />
     </div>
   );
 }
