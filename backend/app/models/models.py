@@ -1,5 +1,5 @@
 from app.models import db
-from datetime import datetime
+from datetime import datetime, UTC
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Define all your models here
@@ -9,7 +9,7 @@ class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
 
 
 class Customer(db.Model):
@@ -37,7 +37,7 @@ class ServiceRequest(db.Model):
     description = db.Column(db.Text)
     address = db.Column(db.String(200))
     status = db.Column(db.String(50), default='pending')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     
     # ADMIN SCHEDULING
     scheduled_start = db.Column(db.DateTime, nullable=True)
@@ -68,5 +68,3 @@ class ContactRequest(db.Model):
     name = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(150), nullable=False)
     message = db.Column(db.String(500), nullable=False)
-
-
