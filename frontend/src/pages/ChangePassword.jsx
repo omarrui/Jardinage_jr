@@ -6,7 +6,6 @@ function ChangePassword({ goToLogin, goHome }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -140,7 +139,7 @@ function ChangePassword({ goToLogin, goHome }) {
 
           <div style={{ display: "flex", gap: "10px" }}>
             <input
-              type={showConfirmPassword ? "text" : "password"}
+              type={showPassword ? "text" : "password"}
               placeholder="Confirmer le mot de passe"
               value={confirmPassword}
               minLength={8}
@@ -154,19 +153,6 @@ function ChangePassword({ goToLogin, goHome }) {
                 flex: 1
               }}
             />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              style={{
-                padding: "10px",
-                borderRadius: "8px",
-                border: "1px solid #ddd",
-                background: "#f5f5f5",
-                cursor: "pointer"
-              }}
-            >
-              {showConfirmPassword ? "Hide" : "Show"}
-            </button>
           </div>
 
           <button
@@ -457,4 +443,5 @@ RequestReset.propTypes = {
   goToLogin: PropTypes.func.isRequired
 };
 
-export default RequestReset;
+export { RequestReset };
+export default ChangePassword;

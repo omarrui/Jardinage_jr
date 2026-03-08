@@ -181,7 +181,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
     
     @app.route("/api/customer/get-profile/<int:customer_id>", methods=["GET"])
     def get_profile(customer_id):
-        from app.models.models import Customer
+        from app.models.models import db, Customer
 
         customer = db.session.get(Customer, customer_id)
 
