@@ -84,15 +84,26 @@ function AdminCalendar() {
   useEffect(() => {
     fetchEvents();
 
-    fetch("http://127.0.0.1:5000/api/admin/availability")
-      .then(res => res.json())
-      .then(data => {
-        if (!Array.isArray(data)) return;
-        setBlockedDates(data.map(d => d.date));
-      })
-      .catch((error) => {
-        showAlert("Erreur de connexion");
-      });
+    const fetchAvailability = () => {
+      fetch("http://127.0.0.1:5000/api/admin/availability")
+        .then(res => res.json())
+        .then(data => {
+          if (!Array.isArray(data)) return;
+          setBlockedDates(data.map(d => d.date));
+        })
+        .catch(() => {
+          showAlert("Erreur de connexion");
+        });
+    };
+
+    fetchAvailability();
+
+    const interval = setInterval(() => {
+      fetchEvents();
+      fetchAvailability();
+    }, 10000); // refresh every 10 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const moveEvent = async ({ event, start, end }) => {
@@ -171,8 +182,12 @@ function AdminCalendar() {
   const handleDeleteAppointment = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/admin/appointments/${selectedEvent.id}`,
-        { method: "DELETE" }
+        `http://127.0.0.1:5000/api/admin/service-requests/${selectedEvent.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "cancelled" })
+        }
       );
 
       if (!response.ok) {
@@ -192,7 +207,7 @@ function AdminCalendar() {
   const handleUpdateAppointment = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/admin/appointments/${selectedEvent.id}`,
+        `http://127.0.0.1:5000/api/admin/service-requests/${selectedEvent.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

@@ -598,12 +598,11 @@ function AdminDashboard({ goHome }) {
                 onChange={(e) =>
                   setNewClient({ ...newClient, email: e.target.value })
                 }
-                required={createLogin} // ✅ Only required if creating login
+                required={createLogin}
                 style={{
-                  padding: "10px",
-                  borderRadius: "6px",
-                  border: "1px solid #ddd",
-                  fontSize: "14px"
+                  display: "block",
+                  marginBottom: "10px",
+                  width: "100%"
                 }}
               />
 

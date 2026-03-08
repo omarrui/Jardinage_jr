@@ -86,15 +86,15 @@ def send_reset_code(email):
 
     send_email(
         email,
-        "JR Jardinage Password Reset",
+        "Réinitialisation du mot de passe - JR Jardinage",
         f"""
-Hello {customer.name},
+Bonjour {customer.name},
 
-Your reset code is:
+Voici votre code de réinitialisation :
 
 {code}
 
-This code expires in 10 minutes.
+Ce code expire dans 10 minutes.
 
 JR Jardinage
 """

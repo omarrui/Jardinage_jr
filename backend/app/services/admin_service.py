@@ -45,7 +45,7 @@ def create_customer_by_admin(data):
         return {"error": "Email already exists"}, 400
 
     # Generate SECURE random password
-    alphabet = string.ascii_letters + string.digits + string.punctuation
+    alphabet = string.ascii_letters + string.digits
     temp_password = ''.join(secrets.choice(alphabet) for _ in range(12))
     
     hashed_password = generate_password_hash(temp_password)
@@ -62,17 +62,17 @@ def create_customer_by_admin(data):
     # Send email
     send_email(
         email,
-        "Your JR Jardinage Account",
+        "Votre compte JR Jardinage",
         f"""
-Hello {name},
+Bonjour {name},
 
-Your account has been created.
+Votre compte JR Jardinage a été créé.
 
-Temporary password: {temp_password}
+Mot de passe temporaire : {temp_password}
 
-⚠️ This password will expire after first login. Please change it immediately.
+⚠️ Ce mot de passe est temporaire. Veuillez le modifier lors de votre première connexion.
 
-Regards,
+Cordialement,
 JR Jardinage
 """
     )
@@ -93,7 +93,7 @@ def resend_temp_password(customer_id):
         return {"error": "Customer has no email"}, 400
 
     # Generate SECURE random password
-    alphabet = string.ascii_letters + string.digits + string.punctuation
+    alphabet = string.ascii_letters + string.digits
     temp_password = ''.join(secrets.choice(alphabet) for _ in range(12))
 
     hashed_password = generate_password_hash(temp_password)
@@ -105,15 +105,15 @@ def resend_temp_password(customer_id):
 
     send_email(
         customer.email,
-        "Your New Temporary Password - JR Jardinage",
+        "Nouveau mot de passe temporaire - JR Jardinage",
         f"""
-Hello {customer.name},
+Bonjour {customer.name},
 
-Your temporary password has been reset.
+Votre mot de passe temporaire a été réinitialisé.
 
-Temporary password: {temp_password}
+Mot de passe temporaire : {temp_password}
 
-⚠️ Please log in and change it immediately for security.
+⚠️ Veuillez vous connecter et le modifier immédiatement pour des raisons de sécurité.
 
 JR Jardinage
 """
@@ -248,7 +248,41 @@ def update_service_request(request_id, data):
         service_request.status = status
 
     db.session.commit()
-    
+
+    # Send notification email if customer has an email
+    customer = Customer.query.get(service_request.customer_id)
+
+    if customer and customer.email:
+        if service_request.status == "cancelled":
+            send_email(
+                customer.email,
+                "Rendez-vous annulé - JR Jardinage",
+                f"""
+Bonjour {customer.name},
+
+Votre rendez-vous a été annulé.
+
+Si vous souhaitez planifier une nouvelle intervention, merci de contacter JR Jardinage.
+
+JR Jardinage
+"""
+            )
+        else:
+            send_email(
+                customer.email,
+                "Rendez-vous modifié - JR Jardinage",
+                f"""
+Bonjour {customer.name},
+
+Votre rendez-vous a été modifié.
+
+Nouvelle date : {service_request.scheduled_start}
+Adresse : {service_request.address}
+
+JR Jardinage
+"""
+            )
+
     return {"message": "Appointment updated successfully"}, 200
 
 
@@ -350,6 +384,26 @@ def create_appointment(data):
             service_request.address = address
 
         db.session.commit()
+
+        # Send appointment confirmation email
+        customer = Customer.query.get(service_request.customer_id)
+
+        if customer and customer.email:
+            send_email(
+                customer.email,
+                "Rendez-vous confirmé - JR Jardinage",
+                f"""
+Bonjour {customer.name},
+
+Votre rendez-vous a été confirmé.
+
+Date : {service_request.scheduled_start}
+Adresse : {service_request.address}
+
+JR Jardinage
+"""
+            )
+
         return {"message": "Appointment scheduled successfully"}, 200
 
     # CASE 2: Create new appointment directly
@@ -366,6 +420,26 @@ def create_appointment(data):
         
         db.session.add(new_request)
         db.session.commit()
+
+        # Send appointment confirmation email
+        customer = Customer.query.get(customer_id)
+
+        if customer and customer.email:
+            send_email(
+                customer.email,
+                "Rendez-vous confirmé - JR Jardinage",
+                f"""
+Bonjour {customer.name},
+
+Votre rendez-vous a été confirmé.
+
+Date : {start_dt}
+Adresse : {address}
+
+JR Jardinage
+"""
+            )
+
         return {"message": "Appointment created successfully"}, 201
 
     else:
