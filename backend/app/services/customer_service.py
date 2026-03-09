@@ -71,7 +71,6 @@ def send_reset_code(email):
     if not email:
         return {"error": "Email is required"}, 400
 
-    # Security best practice: don't reveal if email exists
     if not customer:
         return {"message": "If this email exists, a reset code was sent."}, 200
 

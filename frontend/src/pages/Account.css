@@ -1,4 +1,4 @@
-/* 🌿 Background */
+/* Background */
 .account-container {
     min-height: 100vh;
     display: flex;
@@ -10,7 +10,7 @@
     font-family: "Segoe UI", sans-serif;
   }
   
-  /* 🌿 Main Card */
+  /* Main Card */
   .account-card {
     background: #ffffff;
     width: 700px;
@@ -27,7 +27,7 @@
     font-weight: 600;
   }
   
-  /* 🌱 Row layout */
+  /* Row layout */
   .account-row {
     display: flex;
     justify-content: space-between;
@@ -50,7 +50,7 @@
     flex: 1;
   }
   
-  /* ✏ Edit Button */
+  /*  Edit Button */
   .edit-btn {
     background: #66bb6a;
     border: none;
@@ -68,7 +68,7 @@
     color: white;
   }
   
-  /* ✨ Edit Mode Section */
+  /* Edit Mode Section */
   .edit-section {
     display: flex;
     gap: 10px;
@@ -101,7 +101,7 @@
     background: #1b5e20;
   }
   
-  /* 🔐 Password Section */
+  /*  Password Section */
   .password-form {
     display: flex;
     flex-direction: column;
@@ -134,14 +134,14 @@
     background: #1b5e20;
   }
   
-  /* 🌱 Message */
+  /*  Message */
   .message {
     margin-top: 15px;
     color: #2e7d32;
     font-weight: 500;
   }
   
-  /* 🔙 Back Button */
+  /* Back Button */
   .back-btn {
     margin-top: 30px;
     background: transparent;

@@ -101,7 +101,7 @@ function AdminCalendar() {
     const interval = setInterval(() => {
       fetchEvents();
       fetchAvailability();
-    }, 10000); // refresh every 10 seconds
+    }, 10000); // 10 seconds
 
     return () => clearInterval(interval);
   }, []);

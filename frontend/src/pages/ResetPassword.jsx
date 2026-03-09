@@ -87,7 +87,7 @@ function ResetPassword({ goToLogin }) {
 
   const inputStyle = {
     width: "100%",
-    padding: "12px 40px 12px 12px" // Add right padding for the eye icon
+    padding: "12px 40px 12px 12px" 
   };
 
   return (
@@ -96,7 +96,7 @@ function ResetPassword({ goToLogin }) {
         <h2>Définir un nouveau mot de passe</h2>
 
         <form onSubmit={handleSubmit}>
-          {/* ✅ New password field with eye toggle */}
+          {/* New password field with eye toggle */}
           <div style={passwordContainerStyle}>
             <input
               type={showPassword ? "text" : "password"}
@@ -116,7 +116,7 @@ function ResetPassword({ goToLogin }) {
             </button>
           </div>
 
-          {/* ✅ Confirm password field WITHOUT eye toggle */}
+          {/* Confirm password field WITHOUT eye toggle */}
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Confirmer le mot de passe"

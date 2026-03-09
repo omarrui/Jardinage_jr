@@ -1,5 +1,3 @@
-// Signup.jsx
-// Permet à un client de créer un compte
 
 import React, { useState } from "react";
 import { signupCustomer } from "../api/api";
@@ -142,7 +140,7 @@ function Signup({ goToLogin, goHome }) {
             required
           />
 
-          {/* ✅ Password field with eye toggle */}
+          {/* Password field with eye toggle */}
           <div style={passwordContainerStyle}>
             <input
               type={showPassword ? "text" : "password"}
@@ -162,7 +160,7 @@ function Signup({ goToLogin, goHome }) {
             </button>
           </div>
 
-          {/* ✅ Confirm password field WITHOUT eye toggle */}
+          {/* Confirm password field WITHOUT eye toggle */}
           <input
             type={showPassword ? "text" : "password"}
             name="confirmPassword"

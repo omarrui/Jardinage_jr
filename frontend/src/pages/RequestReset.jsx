@@ -189,7 +189,7 @@ function RequestReset({ goToLogin }) {
               required
             />
 
-            {/* ✅ New password field with eye toggle */}
+            {/* new password field with eye toggle */}
             <div style={passwordContainerStyle}>
               <input
                 type={showPassword ? "text" : "password"}
@@ -209,7 +209,7 @@ function RequestReset({ goToLogin }) {
               </button>
             </div>
 
-            {/* ✅ Confirm password field WITHOUT eye toggle */}
+            {/* cnfirm password field WITHOUT eye toggle */}
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Confirmer le mot de passe"

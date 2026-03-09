@@ -1,5 +1,3 @@
-# backend/repositories/appointment_repository.py
-
 from app.models.models import db, ServiceRequest
 
 

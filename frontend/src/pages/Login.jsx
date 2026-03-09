@@ -14,7 +14,7 @@ function Login({
   });
 
   const [message, setMessage] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // ✅ Add this
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleChange(e) {
     setFormData({
@@ -194,7 +194,7 @@ function Login({
             required
           />
 
-          {/* ✅ Password field with toggle */}
+          {/* Password field with toggle */}
           <div style={passwordContainerStyle}>
             <input
               type={showPassword ? "text" : "password"}

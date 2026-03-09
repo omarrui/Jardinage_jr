@@ -86,7 +86,7 @@ function App() {
     }
   };
 
-  // ✅ FIX: Make this a proper conditional function
+  // Make this a proper conditional function
   const handleGoToAppointments = () => {
     if (isLoggedIn && !isAdmin) {
       setCurrentPage("appointments");

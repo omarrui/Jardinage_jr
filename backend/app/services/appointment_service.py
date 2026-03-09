@@ -9,7 +9,7 @@ def create_service_request(data):
         print("Received data:", data)
         
         customer_id = data.get("customer_id")
-        # ✅ Change "date" to "preferred_date" to match frontend
+        # change "date" to "preferred_date" to match frontend
         date = data.get("preferred_date") or data.get("date")
         time = data.get("time")
         description = data.get("description", "Service request")
@@ -22,7 +22,7 @@ def create_service_request(data):
             return {"error": "Missing required fields"}, 400
         
         # Check customer exists
-        customer = db.session.get(Customer, int(customer_id))  # ✅ Convert to int
+        customer = db.session.get(Customer, int(customer_id))
         if not customer:
             return {"error": "Customer not found"}, 404
         
@@ -104,7 +104,7 @@ def get_all_requests():
             "created_at": req.created_at.isoformat() if req.created_at else None
         } for req in requests]
         
-        return result, 200  # Return tuple: (data, status_code)
+        return result, 200  
     except Exception as e:
         print(f"Error in get_all_requests: {str(e)}")  
         return {"error": str(e)}, 500

@@ -51,15 +51,15 @@ function AdminDashboard({ goHome }) {
 
   const todayStr = new Date().toISOString().split("T")[0];
 
-  /* =============================
+  /* 
      LOAD CLIENTS
-  ============================= */
+   */
   const fetchClients = () => {
-    const token = localStorage.getItem("token");  // ✅ ADD TOKEN
+    const token = localStorage.getItem("token");
     
     fetch("http://127.0.0.1:5000/api/admin/customers", {
       headers: {
-        "Authorization": `Bearer ${token}`  // ✅ ADD AUTHORIZATION HEADER
+        "Authorization": `Bearer ${token}`  
       }
     })
       .then(res => res.json())
@@ -71,9 +71,9 @@ function AdminDashboard({ goHome }) {
       });
   };
 
-  /* =============================
+  /* 
      LOAD APPOINTMENT REQUESTS
-  ============================= */
+   */
   const fetchAppointmentRequests = () => {
     fetch("http://127.0.0.1:5000/api/admin/appointment-requests")
       .then(res => res.json())
@@ -127,17 +127,17 @@ function AdminDashboard({ goHome }) {
     setClients(filtered);
   }, [clientSearchQuery, allClients]);
 
-  /* =============================
+  /* 
      CREATE CLIENT
-  ============================= */
+   */
   const handleCreateClient = async () => {
-    // ✅ Only require email if creating a login account
+    // only require email if creating a login account
     if (createLogin && !newClient.email) {
       alert("L'email est requis pour créer un compte de connexion");
       return;
     }
 
-    // ✅ Basic validation for name and phone (always required)
+    // basic validation for name and phone (always required)
     if (!newClient.name || !newClient.phone) {
       alert("Le nom et le téléphone sont requis");
       return;
@@ -150,7 +150,7 @@ function AdminDashboard({ goHome }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: newClient.name,
-          email: newClient.email || null, // ✅ Send null if no email
+          email: newClient.email || null, 
           phone: newClient.phone,
           has_account: createLogin
         })
@@ -171,9 +171,9 @@ function AdminDashboard({ goHome }) {
     fetchClients();
   };
 
-  /* =============================
+  /* 
      RESEND TEMP PASSWORD
-  ============================= */
+   */
   const resendTempPassword = async (customerId) => {
     const response = await fetch(
       `http://127.0.0.1:5000/api/admin/resend-temp-password/${customerId}`,
@@ -726,7 +726,7 @@ function AdminDashboard({ goHome }) {
                   const scheduledStart = `${appointmentStart}T${appointmentStartTime}:00`;
                   const scheduledEnd = `${appointmentEnd}T${appointmentEndTime}:00`;
 
-                  // ✅ Check for conflicts before creating
+                  // Check for conflicts before creating
                   try {
                     const checkResponse = await fetch(
                       "http://127.0.0.1:5000/api/admin/appointment-requests"

@@ -2,7 +2,6 @@ from app.models import db
 from datetime import datetime, UTC
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Define all your models here
 class Admin(db.Model):
     __tablename__ = 'admins'
     

@@ -26,28 +26,50 @@ This system models real-world service business logic instead of simple slot book
 
 ## Architecture
 
-The application follows a structured layered architecture.
+The application follows a layered architecture that separates responsibilities between the API layer, business logic, and data access.
 
 ### Backend (Flask)
 
-- **Routes (Controllers)** – Handle HTTP requests and responses
-- **Services (Business Logic)** – Core validation, workflow, scheduling rules
-- **Repositories (Data Access Layer)** – Database communication via SQLAlchemy
-- **Models** – SQLAlchemy ORM models
+The backend is organized into structured layers inside the `backend/app` directory:
+
+- **API Layer (`api/v1`)** – Handles HTTP requests and responses. These route files expose the REST API endpoints used by the frontend.
+- **Service Layer (`services`)** – Contains the core business logic such as authentication, appointment scheduling, validation rules, and email notifications.
+- **Models (`models`)** – SQLAlchemy ORM models representing database entities such as customers, appointments, and service requests.
+- **Utilities (`utils`)** – Helper utilities including JWT token generation, password handling, and email sending.
+- **Persistence / Repository Layer (`persistence`)** – Responsible for database interactions and abstraction of data access.
+
+This layered design keeps the application maintainable and prevents business logic from being mixed with route handlers.
 
 ### Frontend (React + Vite)
 
-- Component-based architecture
-- Admin dashboard
-- Interactive drag-and-drop calendar (React Big Calendar)
-- State-driven workflow
-- Centralized API communication layer
+The frontend is structured using a component‑based architecture:
 
-This separation of concerns improves maintainability, scalability, and readability.
+- **Pages (`src/pages`)** – Main application screens such as Login, AdminDashboard, Calendar, and Booking.
+- **Components (`src/components`)** – Reusable UI elements such as alerts and shared interface components.
+- **Gallery (`src/gallery`)** – Static media assets used in the interface.
+- **Styles (`src/styles`)** – CSS styling separated from React components.
+
+The frontend communicates with the backend through REST API calls and manages application state to control navigation and workflow.
+
+This separation between frontend UI and backend services improves scalability and code readability.
+
+### Architecture Diagram
+
+```mermaid
+flowchart TD
+    A[React Frontend<br/>Vite] -->|REST API| B[Flask API Layer]
+    B --> C[Service Layer]
+    C --> D[Repository / Persistence Layer]
+    D --> E[(SQLite Database)]
+
+    C --> F[Email Service]
+    C --> G[JWT Authentication]
+```
 
 ---
 
 ## Technologies Used
+
 
 ### Backend
 
@@ -69,6 +91,45 @@ This separation of concerns improves maintainability, scalability, and readabili
 ### Database
 
 - SQLite
+
+### Database Diagram
+
+```mermaid
+erDiagram
+    CUSTOMER {
+        int id
+        string name
+        string email
+        string phone
+        string password_hash
+        boolean force_password_change
+    }
+
+    SERVICE_REQUEST {
+        int id
+        int customer_id
+        string description
+        string address
+        date preferred_date
+        string status
+    }
+
+    APPOINTMENT {
+        int id
+        int request_id
+        datetime scheduled_start
+        datetime scheduled_end
+        string status
+    }
+
+    BLOCKED_DATE {
+        int id
+        date blocked_date
+    }
+
+    CUSTOMER ||--o{ SERVICE_REQUEST : creates
+    SERVICE_REQUEST ||--o| APPOINTMENT : becomes
+```
 
 ---
 
@@ -284,7 +345,7 @@ Password hashing and JWT authentication implemented early
 
 ## Future Improvements
 
-- Email notification on appointment confirmation
+- Automatic 24‑hour appointment reminder emails
 - SMS reminders
 - Invoice generation system
 - Completed status tracking
@@ -294,7 +355,7 @@ Password hashing and JWT authentication implemented early
 - Smart time-overlap conflict detection
 - Advanced mobile UI optimization
 - Payment integration
-- Customer reviews and ratings
+- Customer admin communication 
 
 ---
 
@@ -358,6 +419,42 @@ https://github.com/omarrui/Jardinage_jr
 
 The repository contains both the **frontend (React)** and **backend (Flask API)** code.  
 Development was managed using **Git version control** with multiple branches for feature development, improvements, and fixes.
+
+---
+
+## Project Deliverables
+
+Sprint Reviews  
+doc/sprint_review.md
+
+Retrospective  
+doc/retrospective.md
+
+Bug Tracking  
+doc/bug-tracking.md
+
+Testing Evidence and Results  
+doc/results.md  
+doc/results_postman/
+
+Sprint Planning  
+Project planning and sprint management were tracked using Trello:  
+https://trello.com/invite/b/69787ac1c6b8b3f2e1919544/ATTI0c9de3400fc3577a98f7831a04f52cfeB03268D6/my-trello-board
+
+Source Repository  
+https://github.com/omarrui/Jardinage_jr
+
+Production Environment
+
+The system currently runs in a local development environment:
+
+Backend (Flask API)  
+http://127.0.0.1:5000
+
+Frontend (React + Vite)  
+http://localhost:5173
+
+---
 
 ## License
 

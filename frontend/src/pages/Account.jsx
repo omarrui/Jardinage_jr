@@ -106,7 +106,7 @@ function Account({ goHome }) {
     setMessage(data.message || data.error);
   }
 
-  // 🔥 RENDER PROFILE FIELD
+  // RENDER PROFILE FIELD
   function renderField(label, field) {
     return (
       <div className="account-row">

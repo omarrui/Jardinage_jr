@@ -9,7 +9,7 @@ from app.utils.email_utils import send_email
 from app.models.models import Customer
 from app.models.models import db 
 
-# define constants to avoid duplication
+# constants to avoid duplication
 ERROR_INVALID_CREDENTIALS = "Invalid email or password"
 ERROR_CUSTOMER_NOT_FOUND = "Customer not found"
 ERROR_NAME_PHONE_REQUIRED = "NAME and PHONE are required"
@@ -215,22 +215,19 @@ def update_service_request(request_id, data):
     address = data.get("address")
     
     if scheduled_start:
-        # Parse the datetime string and make it timezone-naive
         start_dt = datetime.fromisoformat(scheduled_start.replace('Z', '+00:00'))
         if start_dt.tzinfo is not None:
-            start_dt = start_dt.replace(tzinfo=None)  # Remove timezone
+            start_dt = start_dt.replace(tzinfo=None) 
         
-        # Compare with timezone-naive datetime.now()
         if start_dt < datetime.now():
             return {"error": "Cannot schedule in the past"}, 400
         
         service_request.scheduled_start = start_dt
     
     if scheduled_end:
-        # Parse and make timezone-naive
         end_dt = datetime.fromisoformat(scheduled_end.replace('Z', '+00:00'))
         if end_dt.tzinfo is not None:
-            end_dt = end_dt.replace(tzinfo=None)  # Remove timezone
+            end_dt = end_dt.replace(tzinfo=None)  
         
         service_request.scheduled_end = end_dt
     
@@ -242,7 +239,7 @@ def update_service_request(request_id, data):
         if service_request.scheduled_start >= service_request.scheduled_end:
             return {"error": "Start time must be before end time"}, 400
     
-    # Update status if provided (e.g., cancelled)
+    # Update status if provided 
     status = data.get("status")
     if status:
         service_request.status = status
@@ -356,7 +353,7 @@ def create_appointment(data):
     if not scheduled_start:
         return {"error": "Start time required"}, 400
 
-    # Validaite datetime format
+    # validaite datetime format
     try:
         start_dt = datetime.fromisoformat(scheduled_start)
         end_dt = datetime.fromisoformat(scheduled_end) if scheduled_end else None
@@ -370,7 +367,7 @@ def create_appointment(data):
     except ValueError:
         return {"error": "Invalid datetime format. Use ISO format (YYYY-MM-DDTHH:MM:SS)"}, 400
 
-    # CASE 1: Confirm existing request
+    # case1: confirm existing request
     if request_id:
         service_request = ServiceRequest.query.get(request_id)
         

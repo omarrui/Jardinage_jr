@@ -36,9 +36,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         except OSError:
             pass
 
-    # =====================================================
     # SIGNUP TESTS
-    # =====================================================
 
     def test_signup_valid_data(self):
         """Test signup with valid data"""
@@ -91,9 +89,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         self.assertIn("error", data)
 
 
-    # =====================================================
     # LOGIN TESTS
-    # =====================================================
 
     def test_login_valid_credentials(self):
         """Login with correct email and password"""
@@ -144,10 +140,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    # =====================================================
     # APPOINTMENT TESTS
-    # =====================================================
-
     def _create_user_and_login(self, email="booking@example.com"):
         """Helper function to create a user and return customer_id"""
 
@@ -206,9 +199,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         self.assertIn(response.status_code, [400, 404])
 
 
-    # =====================================================
     # PASSWORD CHANGE TESTS
-    # =====================================================
 
     def test_change_password_valid(self):
         """User can change password with correct current password"""
@@ -261,9 +252,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    # =====================================================
     # PASSWORD RESET TESTS
-    # =====================================================
 
     def test_forgot_password_valid_email(self):
         """User can request password reset with valid email"""
@@ -317,9 +306,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         pass
 
 
-    # =====================================================
     # INPUT VALIDATION TESTS
-    # =====================================================
 
     def test_signup_invalid_email_format(self):
         """Signup should fail with invalid email format"""
@@ -371,9 +358,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         self.assertIn(response.status_code, [400, 201])
 
 
-    # =====================================================
     # ADMIN AUTHENTICATION TESTS
-    # =====================================================
 
     def test_admin_login_valid(self):
         """Admin can login with correct credentials"""
@@ -405,9 +390,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         self.assertIn(response.status_code, [401, 403])
 
 
-    # =====================================================
     # APPOINTMENT MANAGEMENT TESTS
-    # =====================================================
 
     def test_get_customer_appointments(self):
         """Customer can retrieve their appointments"""
@@ -418,8 +401,8 @@ class TestAuthenticationEndpoints(unittest.TestCase):
             "customer_id": customer_id,
             "date": "2026-05-10",
             "time": "10:00",
-            "description": "Gardening",    # ✅ ADD
-            "address": "789 Garden Rd"     # ✅ ADD
+            "description": "Gardening",
+            "address": "789 Garden Rd"
         })
 
         # Get appointments
@@ -462,9 +445,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         pass
 
 
-    # =====================================================
     # FORCE PASSWORD CHANGE TESTS
-    # =====================================================
 
     def test_force_password_change_on_first_login(self):
         """Admin-created user must change password on first login"""
@@ -483,9 +464,7 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         self.assertIn(response.status_code, [200, 400, 404])
 
 
-    # =====================================================
     # EDGE CASES & SECURITY TESTS
-    # =====================================================
 
     def test_login_rate_limiting(self):
         """Too many failed login attempts should be rate limited"""

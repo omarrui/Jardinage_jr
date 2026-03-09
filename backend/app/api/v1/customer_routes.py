@@ -12,9 +12,8 @@ ERROR_CUSTOMER_NOT_FOUND = "Customer not found"
 
 def register_customer_routes(app):  # NOSONAR - Flask route registration pattern requires nested functions
 
-    # ===============================
+
     # SIGNUP
-    # ===============================
     @app.route("/api/signup", methods=["POST"])
     def customer_signup():
         data = request.get_json()
@@ -29,9 +28,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         return jsonify(response), status
 
 
-    # ===============================
     # LOGIN
-    # ===============================
     @app.route("/api/login", methods=["POST"])
     def customer_login():
         data = request.get_json()
@@ -44,9 +41,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         return jsonify(response), status
 
 
-    # ===============================
     # FORGOT PASSWORD (SEND RESET CODE)
-    # ===============================
     @app.route("/api/customer/forgot-password", methods=["POST"])
     def forgot_password():
         data = request.get_json()
@@ -57,9 +52,8 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         return jsonify(response), status
 
 
-    # ===============================
     # RESET PASSWORD WITH CODE
-    # ===============================
+    
     @app.route("/api/customer/reset-password", methods=["POST"])
     def reset_password():
         data = request.get_json()
@@ -77,9 +71,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         return jsonify(response), status
 
 
-    # ===============================
     # FORCE CHANGE PASSWORD (First Login)
-    # ===============================
     @app.route("/api/customer/force-change-password", methods=["POST"])
     def force_change_password():
         from app.models.models import Customer, db
@@ -106,9 +98,8 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         return jsonify({"message": "Password updated successfully"}), 200
 
 
-    # ===============================
     # NORMAL PASSWORD CHANGE (Logged In)
-    # ===============================
+
     @app.route("/api/customer/change-password", methods=["PUT"])
     def update_password():
         from app.models.models import Customer, db
@@ -138,9 +129,7 @@ def register_customer_routes(app):  # NOSONAR - Flask route registration pattern
         return jsonify({"message": "Password updated successfully"}), 200
 
 
-    # ===============================
     # UPDATE PROFILE
-    # ===============================
     @app.route("/api/customer/update-profile", methods=["PUT"])
     def update_profile():
         from app.models.models import Customer, db

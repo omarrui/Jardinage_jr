@@ -8,7 +8,7 @@ def register_admin_routes(app):
 
     @app.route("/api/admin/customers", methods=["GET"])
     def admin_get_all_customers():
-        # Add authentication
+        # authentication
         auth_header = request.headers.get("Authorization")
         
         if not auth_header:
@@ -37,7 +37,7 @@ def register_admin_routes(app):
         email = data.get("email")
         password = data.get("password")
 
-        # ✅ TEMPORARY FIX - Hardcode credentials
+        
         admin_email = "admin@gardening.com"
         admin_password = "password11@"
 

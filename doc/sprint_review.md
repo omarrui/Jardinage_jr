@@ -1,28 +1,35 @@
+# Sprint Planning and Review
 
 
-## Sprint Planning and Review
+To manage the development process, a Trello board was used to organize tasks and track progress throughout the project. The board contained three main columns: **Sprint Planning**, **Doing**, and **Done**. This structure made it easy to visualize the status of tasks and maintain a clear workflow during development.
 
-To organize the project, we used a Trello board to structure the development process and keep track of progress. The board had columns labeled Sprint Planning, Doing, and Done. This setup made it easy to see the status of each task and helped us maintain a clear workflow throughout development.
+Trello Board used for sprint planning and task tracking:
 
-Each sprint focused on a set of technical objectives. These included:
+https://trello.com/invite/b/69787ac1c6b8b3f2e1919544/ATTI0c9de3400fc3577a98f7831a04f52cfeB03268D6/my-trello-board
 
-* Backend API development using Flask
-* Database schema design and updates using SQLAlchemy
-* Frontend interface implementation using React
-* Appointment request and scheduling features
-* Admin management tools
-* Security improvements and testing
+At the beginning of each sprint, tasks were planned and placed in the **Sprint Planning** column. As development progressed, tasks were moved to **Doing**, and once they were completed and tested, they were moved to **Done**. This approach helped maintain organization and provided a clear overview of the project's progress.
 
-At the start of each sprint, we planned out our tasks and added them to the Sprint Planning column. As we worked on them, we moved tasks to Doing, and once something was finished and tested, it went into Done. This approach kept us organized and made it easy to spot what was complete and what still needed attention.
+## Sprint Objectives
 
-### Reflection on Sprint Progress
+Each sprint focused on a group of technical objectives, including:
 
-Overall, the sprint plan provided a useful structure for development, but some tasks required more time than initially expected. because several features—particularly the appointment scheduling logic, backend validation, and frontend-backend integration—required debugging and iterative improvements before they worked correctly and that was unexpected by me.
+- Backend API development using Flask
+- Database schema design and updates using SQLAlchemy
+- Frontend interface implementation using React
+- Appointment request and scheduling features
+- Admin management tools
+- Security improvements and testing
 
-During the final stages of development, additional time was also required to redo some recent changes after attempting to use a code safety checking tool intended to verify that the project dependencies and code were secure. While the tool was useful for identifying potential issues, an incorrect configuration during its use caused some parts of the project to break, which required reverting and carefully reapplying the latest updates. Although this slowed progress briefly, it provided a valuable lesson about integrating security checks carefully and verifying changes before applying them across the project.
+## Reflection on Sprint Progress
 
-As a result, not every task was completed exactly on the originally estimated timeline. Some work had to be adjusted between sprints as new issues were discovered or when improvements to the system design were made. However, the Trello board made it easy to reorganize priorities and continue progressing toward the final goal.
+Overall, the sprint planning process provided a helpful structure for managing development. However, some tasks required more time than originally expected. Features such as the appointment scheduling logic, backend validation, and frontend–backend integration required additional debugging and iterative improvements before functioning correctly.
 
-Despite these adjustments, the overall development stayed on track. The majority of planned features were completed by the end of the sprints, and the application evolved into a more robust and realistic system, particularly after redesigning the appointment system to better reflect real-world gardening service workflows.
+During the later stages of development, additional time was required to recover from issues caused by an incorrectly configured code security checking tool. Although the tool was intended to verify dependency and code safety, its configuration temporarily broke parts of the project. This required reverting changes and carefully restoring the latest working updates. While this slowed development briefly, it provided a useful lesson about integrating security tools carefully and verifying configuration before applying them.
 
-Using a sprint-based workflow ultimately helped maintain steady progress and provided a clear overview of development throughout the project.
+Because of these challenges, some tasks needed to be moved between sprints or reprioritized. The Trello board made it easy to reorganize work and continue progressing toward the final project goals.
+
+Despite these adjustments, the overall development remained on track. Most planned features were completed by the end of the development cycle, and the system evolved into a more robust and realistic application. In particular, redesigning the appointment system to use a request-based workflow significantly improved how the platform reflects real-world gardening service operations.
+
+## Conclusion
+
+Using a sprint-based workflow helped maintain steady progress, encouraged organized development, and provided a clear overview of the project's evolution from initial planning to final implementation.

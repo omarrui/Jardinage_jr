@@ -1,7 +1,6 @@
 
 
-# Bug & Issues Documentation
-
+# Bug Tracking & Issue Resolution
 This document tracks the major technical issues encountered during development of the **Jardinage Jr** project, including their causes, fixes, and lessons learned.
 
 ---
@@ -125,7 +124,7 @@ Security mechanisms such as password hashing should be implemented as early as p
 
 **Problem**
 
-Teacher feedback indicated that routes should only handle requests and responses.
+feedback indicated that routes should only handle requests and responses.
 
 **Cause**
 
@@ -391,7 +390,7 @@ Most services require inspection and estimation.
 
 ## Proposed Solution: Request-Based Scheduling
 
-Customers now submit **service requests** instead of directly booking appointments.
+Customers now submit **service requests** instead of directly booking appointmentsand the admin get to chose if he gives one appointment per day or moe.
 
 ### Customer Side
 
@@ -648,3 +647,28 @@ Aligned route names exactly.
 **Lesson Learned**
 
 Full-stack applications are extremely sensitive to naming inconsistencies.
+# Sprint 8 – Email Notifications & System Stability
+
+## Issue 24 – Appointment Emails Not Sent From Admin Calendar
+
+Problem
+
+Editing or deleting appointments from the admin calendar did not trigger email notifications to customers.
+
+Cause
+
+The frontend calendar was calling the endpoint:
+
+PUT /api/admin/appointments/<id>
+
+However, the email notification logic was implemented in:
+
+PUT /api/admin/service-requests/<id>
+
+Fix
+
+The AdminCalendar frontend was updated to call the correct endpoint so that the backend service logic would trigger email notifications.
+
+Lesson Learned
+
+Frontend components must always call the same service layer endpoints that contain business logic.
