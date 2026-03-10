@@ -47,8 +47,9 @@ def home():
 
 # Admin seeding (runs once)
 def seed_admin():
-    admin_email = "admin@gardening.com"
-    admin_password = "password11@"
+    import os
+    admin_email = os.getenv("ADMIN_EMAIL")
+    admin_password = os.getenv("ADMIN_PASSWORD")
 
     existing_admin = Admin.query.filter_by(email=admin_email).first()
     if not existing_admin:
