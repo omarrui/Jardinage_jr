@@ -2,6 +2,7 @@ from flask import request, jsonify, current_app
 from app.services import admin_service
 from app.models.models import Availability, ServiceRequest, db
 from app.utils.jwt_utils import verify_token, generate_token
+import os
 
 
 def register_admin_routes(app):
@@ -37,10 +38,11 @@ def register_admin_routes(app):
         email = data.get("email")
         password = data.get("password")
 
-        
-        admin_email = "admin@gardening.com"
-        admin_password = "password11@"
+        admin_email = os.getenv("ADMIN_EMAIL")
+        admin_password = os.getenv("ADMIN_PASSWORD")
 
+        
+   
  
 
         if email == admin_email and password == admin_password:
