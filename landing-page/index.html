@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>JR Jardinage</title>
+  <link rel="icon" type="image/png" href="images/logojr2.webp">
+  <link rel="stylesheet" href="style.css">
+</head>
+<script>
+const cards = document.querySelectorAll(".feature-card");
+
+window.addEventListener("scroll", () => {
+  cards.forEach(card => {
+    const top = card.getBoundingClientRect().top;
+    if (top < window.innerHeight - 100) {
+      card.classList.add("visible");
+    }
+  });
+});
+</script>
+<body>
+
+<!-- HEADER / NAVBAR -->
+<header>
+
+  <nav class="navbar">
+
+    <div class="logo">
+      <img src="images/logojr.webp" alt="JR Jardinage Logo" height="40">
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+
+    <a href="https://github.com/omarrui/Jardinage_jr" class="btn" target="_blank">
+        View the Project
+        </a>
+  </nav>
+
+</header>
+
+<!-- HERO SECTION -->
+<section id="home" class="hero">
+
+  <div class="hero-content">
+
+    <h1>JR Jardinage</h1>
+
+    <p>
+      A simple platform that connects clients with gardening services
+      and allows easy appointment management.
+    </p>
+
+    <a href="https://github.com/omarrui/Jardinage_jr" class="btn" target="_blank">
+        View the Project
+      </a>
+
+  </div>
+
+</section>
+
+<!-- FEATURES SECTION -->
+<section id="features" class="features">
+
+  <h2>Key Features</h2>
+
+  <div class="features-container">
+
+    <div class="feature-card">
+
+      <img src="images/feature1.png" alt="Booking feature">
+
+      <h3>Service Request</h3>
+
+      <p>
+        Customers can submit gardening service requests through
+        a simple form.
+      </p>
+
+    </div>
+
+    <div class="feature-card">
+
+      <img src="images/feature2.png" alt="Admin calendar">
+
+      <h3>Admin Calendar</h3>
+
+      <p>
+        The administrator manages all appointments
+        using an interactive calendar.
+      </p>
+
+    </div>
+
+    <div class="feature-card">
+
+      <img src="images/feature3.png" alt="Authentication">
+
+      <h3>Secure Authentication</h3>
+
+      <p>
+        The system uses authentication and role-based
+        access control for security.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ABOUT SECTION -->
+<section id="about" class="about">
+
+  <h2>About the Project</h2>
+
+  <p>
+    JR Jardinage was inspired by the need to simplify how customers
+    schedule gardening services. Many small service providers still
+    manage appointments manually, which can create confusion.
+  </p>
+
+  <p>
+    This project was built as a Portfolio Project for
+    <a href="https://www.holbertonschool.com" target="_blank">Holberton School</a>.
+    It allowed the development of a full-stack application using
+    React, Flask, REST APIs, and database relationships.
+  </p>
+
+  <h3>Project Links</h3>
+
+  <p>
+    GitHub Repository:
+    <a href="https://github.com/omarrui/Jardinage_jr" target="_blank">
+      View Project
+    </a>
+  </p>
+
+  <h3>Author</h3>
+
+  <p>Omar Rouigui</p>
+
+  <p>
+    <a href="https://linkedin.com/" target="_blank">LinkedIn</a> |
+    <a href="https://github.com/omarrui" target="_blank">GitHub</a>
+  </p>
+
+</section>
+
+<footer class="footer">
+  <p>© 2026 JR Jardinage – Portfolio Project</p>
+  <p>
+    <a href="https://github.com/omarrui/Jardinage_jr" target="_blank">GitHub</a> |
+    <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+  </p>
+</footer>
+
+</body>
+</html>
