@@ -204,6 +204,15 @@
     background: #ffffff;
   }
   
+  .features-note {
+    margin-top: 50px;
+    color: #444;
+    font-size: 24px;
+    font-weight: 600;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
   
   
   /* ABOUT */
@@ -253,6 +262,19 @@
       flex-direction: column;
       gap: 10px;
     }
+
+    .nav-links {
+      flex-direction: row;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      font-size: 22px;
+      display: block;
+      padding: 6px 0;
+    }
   
     .features-container {
       flex-direction: column;
@@ -277,4 +299,3 @@
       transform: translateY(0);
     }
   }
-  
