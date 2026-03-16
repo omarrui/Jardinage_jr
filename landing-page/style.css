@@ -17,6 +17,12 @@ body {
   background-color: #ffffff;
 }
 
+/* IMAGE SAFETY FOR RESPONSIVE */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 
 /* NAVBAR */
 
@@ -102,15 +108,12 @@ header {
 
 .hero {
   position: relative;
-  height: 100vh;
-  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.55)), url("images/garden.jpg");
-  background-size: 100%;
-  background-position: center;
-  animation: heroZoom 25s ease-in-out infinite alternate;
+  height: 70vh;
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.55)), url("images/garden.jpg") center / cover no-repeat;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding-top: 60px;
+  padding-top: 40px;
   text-align: center;
   color: white;
 }
@@ -123,14 +126,14 @@ header {
   left: 0;
   bottom: 0;
   width: 100%;
-  height: 150px;
+  height: 80px;
   background: linear-gradient(to bottom, rgba(255,255,255,0), #ffffff);
   pointer-events: none;
 }
 
 .hero-content {
   background: rgba(0,0,0,0.45);
-  padding: 50px;
+  padding: 35px;
   border-radius: 12px;
   max-width: 700px;
   margin: auto;
@@ -139,7 +142,7 @@ header {
 }
 
 .hero h1 {
-  font-size: 64px;
+  font-size: 52px;
   margin-bottom: 15px;
   letter-spacing: 1px;
   font-weight: 700;
@@ -167,7 +170,7 @@ header {
   display: flex;
   justify-content: center;
   gap: 40px;
-  margin-top: -230px;
+  margin-top: -160px;
   flex-wrap: wrap;
   position: relative;
   z-index: 10;
@@ -252,7 +255,24 @@ header {
 
   .navbar {
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
+    padding: 10px 15px;
+  }
+
+  .logo img {
+    height: 50px;
+  }
+
+  .nav-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .btn {
+    margin-top: 4px;
+    padding: 8px 14px;
   }
 
   .features-container {
@@ -261,9 +281,34 @@ header {
   }
 
   .hero h1 {
-    font-size: 36px;
+    font-size: 32px;
+    line-height: 1.2;
   }
 
+  .hero {
+    padding-top: 40px;
+    min-height: 60vh;
+    background-size: cover;
+    background-attachment: scroll;
+  }
+
+  .hero-content {
+    padding: 20px;
+    max-width: 90%;
+  }
+
+  .hero p {
+    font-size: 15px;
+  }
+
+  .features-container {
+    margin-top: 20px;
+    gap: 25px;
+  }
+
+  .feature-card {
+    width: 90%;
+  }
 }
 
 /* HERO LOAD ANIMATION */
@@ -276,16 +321,5 @@ header {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* HERO BACKGROUND ZOOM EFFECT */
-
-@keyframes heroZoom {
-  from {
-    background-size: 100%;
-  }
-  to {
-    background-size: 110%;
   }
 }

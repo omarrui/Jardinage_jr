@@ -3,22 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JR Jardinage</title>
   <link rel="icon" type="image/png" href="images/logojr2.webp">
   <link rel="stylesheet" href="style.css">
 </head>
-<script>
-const cards = document.querySelectorAll(".feature-card");
-
-window.addEventListener("scroll", () => {
-  cards.forEach(card => {
-    const top = card.getBoundingClientRect().top;
-    if (top < window.innerHeight - 100) {
-      card.classList.add("visible");
-    }
-  });
-});
-</script>
 <body>
 
 <!-- HEADER / NAVBAR -->
@@ -159,5 +148,19 @@ window.addEventListener("scroll", () => {
   </p>
 </footer>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const cards = document.querySelectorAll(".feature-card");
+
+  window.addEventListener("scroll", () => {
+    cards.forEach(card => {
+      const top = card.getBoundingClientRect().top;
+      if (top < window.innerHeight - 100) {
+        card.classList.add("visible");
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
