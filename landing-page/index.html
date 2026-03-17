@@ -7,18 +7,6 @@
   <link rel="icon" type="image/png" href="images/logojr2.webp">
   <link rel="stylesheet" href="style.css">
 </head>
-<script>
-const cards = document.querySelectorAll(".feature-card");
-
-window.addEventListener("scroll", () => {
-  cards.forEach(card => {
-    const top = card.getBoundingClientRect().top;
-    if (top < window.innerHeight - 100) {
-      card.classList.add("visible");
-    }
-  });
-});
-</script>
 <body>
 
 <!-- HEADER / NAVBAR -->
@@ -31,14 +19,34 @@ window.addEventListener("scroll", () => {
     </div>
 
     <ul class="nav-links">
-      <li><a href="#home">Home</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#about">About</a></li>
+      <li>
+        <a href="#home">
+          <span class="lang-en">Home</span>
+          <span class="lang-fr" style="display:none;">Accueil</span>
+        </a>
+      </li>
+      <li>
+        <a href="#features">
+          <span class="lang-en">Features</span>
+          <span class="lang-fr" style="display:none;">Fonctionnalités</span>
+        </a>
+      </li>
+      <li>
+        <a href="#about">
+          <span class="lang-en">About</span>
+          <span class="lang-fr" style="display:none;">À propos</span>
+        </a>
+      </li>
     </ul>
 
-    <a href="https://github.com/omarrui/Jardinage_jr" class="btn" target="_blank">
-        View the Project
-        </a>
+
+    <div class="lang-dropdown">
+      <button class="btn">Language ▾</button>
+      <div class="dropdown-content">
+        <a href="#" onclick="setLanguage('en')">English</a>
+        <a href="#" onclick="setLanguage('fr')">Français</a>
+      </div>
+    </div>
   </nav>
 
 </header>
@@ -51,8 +59,8 @@ window.addEventListener("scroll", () => {
     <h1>JR Jardinage</h1>
 
     <p>
-      A simple platform that connects clients with gardening services
-      and allows easy appointment management.
+      <span class="lang-en">A simple platform that connects clients with gardening services and allows easy appointment management.</span>
+      <span class="lang-fr" style="display:none;">Une plateforme simple qui connecte les clients avec des services de jardinage et facilite la gestion des rendez-vous.</span>
     </p>
 
     <a href="https://github.com/omarrui/Jardinage_jr" class="btn" target="_blank">
@@ -66,7 +74,10 @@ window.addEventListener("scroll", () => {
 <!-- FEATURES SECTION -->
 <section id="features" class="features">
 
-  <h2>Key Features</h2>
+  <h2>
+    <span class="lang-en">Key Features</span>
+    <span class="lang-fr" style="display:none;">Fonctionnalités principales</span>
+  </h2>
 
   <div class="features-container">
 
@@ -74,11 +85,14 @@ window.addEventListener("scroll", () => {
 
       <img src="images/feature1.png" alt="Booking feature">
 
-      <h3>Service Request</h3>
+      <h3>
+        <span class="lang-en">Service Request</span>
+        <span class="lang-fr" style="display:none;">Demande de service</span>
+      </h3>
 
       <p>
-        Customers can submit gardening service requests through
-        a simple form.
+        <span class="lang-en">Customers can submit gardening service requests through a simple form.</span>
+        <span class="lang-fr" style="display:none;">Les clients peuvent envoyer des demandes de service de jardinage via un formulaire simple.</span>
       </p>
 
     </div>
@@ -87,11 +101,14 @@ window.addEventListener("scroll", () => {
 
       <img src="images/feature2.png" alt="Admin calendar">
 
-      <h3>Admin Calendar</h3>
+      <h3>
+        <span class="lang-en">Admin Calendar</span>
+        <span class="lang-fr" style="display:none;">Calendrier Admin</span>
+      </h3>
 
       <p>
-        The administrator manages all appointments
-        using an interactive calendar.
+        <span class="lang-en">The administrator manages all appointments using an interactive calendar.</span>
+        <span class="lang-fr" style="display:none;">L'administrateur gère tous les rendez-vous à l'aide d'un calendrier interactif.</span>
       </p>
 
     </div>
@@ -100,18 +117,47 @@ window.addEventListener("scroll", () => {
 
       <img src="images/feature3.png" alt="Authentication">
 
-      <h3>Secure Authentication</h3>
+      <h3>
+        <span class="lang-en">Secure Authentication</span>
+        <span class="lang-fr" style="display:none;">Authentification Sécurisée</span>
+      </h3>
 
       <p>
-        The system uses authentication and role-based
-        access control for security.
+        <span class="lang-en">The system uses authentication and role-based access control for security.</span>
+        <span class="lang-fr" style="display:none;">Le système utilise l'authentification et le contrôle d'accès basé sur les rôles pour la sécurité.</span>
       </p>
 
     </div>
-    <p class="features-note">
-        Manage appointments and requests easily through the JR Jardinage platform.
-        </p>
+  </div>
 
+  <p class="features-note">
+    <span class="lang-en">Manage appointments and requests easily through the JR Jardinage platform.</span>
+    <span class="lang-fr" style="display:none;">Gérez facilement les rendez-vous et les demandes via la plateforme JR Jardinage.</span>
+  </p>
+
+</section>
+
+<!-- DEMO SECTION -->
+<section id="demo" class="demo">
+
+  <h2>
+    <span class="lang-en">Demo</span>
+    <span class="lang-fr" style="display:none;">Démonstration</span>
+  </h2>
+
+  <div class="demo-container">
+    <iframe 
+      width="100%" 
+      height="400" 
+      src="https://www.youtube.com/embed/XwNAwRnaqG4" 
+      title="JR Jardinage Demo"
+      frameborder="0"
+      allowfullscreen>
+    </iframe>
+
+    <a href="https://www.youtube.com/watch?v=XwNAwRnaqG4" class="btn" target="_blank">
+      Watch Full Video
+    </a>
   </div>
 
 </section>
@@ -119,20 +165,82 @@ window.addEventListener("scroll", () => {
 <!-- ABOUT SECTION -->
 <section id="about" class="about">
 
-  <h2>About the Project</h2>
+  <h2>
+    <span class="lang-en">About the Project</span>
+    <span class="lang-fr" style="display:none;">À propos du projet</span>
+  </h2>
 
-  <p>
-    JR Jardinage was inspired by the need to simplify how customers
-    schedule gardening services. Many small service providers still
-    manage appointments manually, which can create confusion.
-  </p>
+  <div class="about-content">
 
-  <p>
-    This project was built as a Portfolio Project for
-    <a href="https://www.holbertonschool.com" target="_blank">Holberton School</a>.
-    It allowed the development of a full-stack application using
-    React, Flask, REST APIs, and database relationships.
-  </p>
+  <div class="about-text">
+
+    <div class="about-block">
+      <h3>
+        <span class="lang-en">The Idea</span>
+        <span class="lang-fr" style="display:none;">L'idée</span>
+      </h3>
+      <p>
+        <span class="lang-en">This project was inspired by the need to simplify how customers schedule gardening services. Many small service providers still manage appointments manually, which creates confusion and inefficiency.</span>
+        <span class="lang-fr" style="display:none;">Ce projet est né du besoin de simplifier la prise de rendez-vous pour les services de jardinage. De nombreux prestataires gèrent encore cela manuellement, ce qui crée confusion et inefficacité.</span>
+      </p>
+    </div>
+
+    <div class="about-block">
+      <h3>
+        <span class="lang-en">Building JR Jardinage</span>
+        <span class="lang-fr" style="display:none;">Création de JR Jardinage</span>
+      </h3>
+      <p>
+        <span class="lang-en">This project was developed as a Portfolio Project for
+        <a href="https://www.holbertonschool.com" target="_blank">Holberton School</a>.
+        It focuses on creating a clean, simple, and efficient system for managing appointments.</span>
+        <span class="lang-fr" style="display:none;">Ce projet a été développé comme projet de portfolio pour
+        <a href="https://www.holbertonschool.com" target="_blank">Holberton School</a>.
+        Il vise à créer un système propre, simple et efficace pour gérer les rendez-vous.</span>
+      </p>
+    </div>
+
+    <div class="about-block">
+      <h3>
+        <span class="lang-en">Technologies Used</span>
+        <span class="lang-fr" style="display:none;">Technologies utilisées</span>
+      </h3>
+      <p>
+        <span class="lang-en">React • Flask • REST API • SQLite</span>
+        <span class="lang-fr" style="display:none;">React • Flask • API REST • SQLite</span>
+      </p>
+    </div>
+
+    <div class="about-block">
+      <h3>
+        <span class="lang-en">Languages</span>
+        <span class="lang-fr" style="display:none;">Langues</span>
+      </h3>
+      <p>
+        <span class="lang-en">English / French support (multi-language interface)</span>
+        <span class="lang-fr" style="display:none;">Support anglais / français (interface multilingue)</span>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="about-stats">
+    <div class="stat-card">
+      <h3>3+</h3>
+      <p>Core Features</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Full</h3>
+      <p>Stack Application</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>2</h3>
+      <p>Languages Supported</p>
+    </div>
+  </div>
+  </div>
 
   <h3>Project Links</h3>
 
@@ -148,19 +256,70 @@ window.addEventListener("scroll", () => {
   <p>Omar Rouigui</p>
 
   <p>
-    <a href="https://linkedin.com/" target="_blank">LinkedIn</a> |
+    <a href="https://www.linkedin.com/in/rouigui-omar-96514631b/" target="_blank">LinkedIn</a> |
     <a href="https://github.com/omarrui" target="_blank">GitHub</a>
   </p>
 
 </section>
 
 <footer class="footer">
-  <p>© 2026 JR Jardinage – Portfolio Project</p>
+  <p>
+    <span class="lang-en">© 2026 JR Jardinage – Portfolio Project</span>
+    <span class="lang-fr" style="display:none;">© 2026 JR Jardinage – Projet de portfolio</span>
+  </p>
   <p>
     <a href="https://github.com/omarrui/Jardinage_jr" target="_blank">GitHub</a> |
-    <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
+    <a href="https://www.linkedin.com/in/rouigui-omar-96514631b/" target="_blank">LinkedIn</a>
   </p>
 </footer>
 
+<script>
+const cards = document.querySelectorAll(".feature-card");
+
+window.addEventListener("scroll", () => {
+  cards.forEach(card => {
+    const top = card.getBoundingClientRect().top;
+    if (top < window.innerHeight - 100) {
+      card.classList.add("visible");
+    }
+  });
+});
+</script>
+
+<script>
+function setLanguage(lang) {
+  const en = document.querySelectorAll(".lang-en");
+  const fr = document.querySelectorAll(".lang-fr");
+
+  if (lang === "fr") {
+    en.forEach(el => el.style.display = "none");
+    fr.forEach(el => el.style.display = "inline");
+  } else {
+    en.forEach(el => el.style.display = "inline");
+    fr.forEach(el => el.style.display = "none");
+  }
+}
+</script>
+<script>
+const aboutBlocks = document.querySelectorAll(".about-block");
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const index = Array.from(aboutBlocks).indexOf(entry.target);
+
+      setTimeout(() => {
+        entry.target.classList.add("visible");
+      }, index * 200);
+
+      observer.unobserve(entry.target);
+    }
+  });
+}, {
+  threshold: 0.2
+});
+
+aboutBlocks.forEach(block => observer.observe(block));
+    </script>
 </body>
 </html>
