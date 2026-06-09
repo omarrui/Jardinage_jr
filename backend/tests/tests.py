@@ -17,9 +17,15 @@ class TestAuthenticationEndpoints(unittest.TestCase):
 
     def setUp(self):
         """Initialize test app and database"""
+        test_database_url = os.getenv("TEST_DATABASE_URL")
+        if not test_database_url:
+            raise RuntimeError("TEST_DATABASE_URL is required for tests. Use a separate MySQL test database.")
+        if not test_database_url.startswith("mysql"):
+            raise RuntimeError("TEST_DATABASE_URL must use MySQL.")
+
         self.app = app
         self.app.config["TESTING"] = True
-        self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test_auth.db"
+        self.app.config["SQLALCHEMY_DATABASE_URI"] = test_database_url
         self.client = self.app.test_client()
 
         with self.app.app_context():
@@ -30,11 +36,6 @@ class TestAuthenticationEndpoints(unittest.TestCase):
         with self.app.app_context():
             db.session.remove()
             db.drop_all()
-
-        try:
-            os.remove("test_auth.db")
-        except OSError:
-            pass
 
     # SIGNUP TESTS
 

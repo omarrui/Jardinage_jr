@@ -60,7 +60,7 @@ flowchart TD
     A[React Frontend<br/>Vite] -->|REST API| B[Flask API Layer]
     B --> C[Service Layer]
     C --> D[Repository / Persistence Layer]
-    D --> E[(SQLite Database)]
+    D --> E[(MySQL Database)]
 
     C --> F[Email Service]
     C --> G[JWT Authentication]
@@ -75,7 +75,7 @@ flowchart TD
 
 - Flask (Python)
 - SQLAlchemy
-- SQLite
+- MySQL
 - Flask-CORS
 - JWT Authentication
 - Werkzeug (password hashing)
@@ -90,7 +90,7 @@ flowchart TD
 
 ### Database
 
-- SQLite
+- MySQL
 
 ### Database Diagram
 
@@ -129,6 +129,49 @@ erDiagram
 
     CUSTOMER ||--o{ SERVICE_REQUEST : creates
     SERVICE_REQUEST ||--o| APPOINTMENT : becomes
+```
+
+---
+
+## Run With Docker
+
+You can run the full stack with Docker Compose:
+
+```bash
+cp .env.docker.example .env
+docker compose up --build
+```
+
+Then open:
+
+```text
+Frontend: http://localhost:5173
+Backend:  http://localhost:5000
+MySQL:    localhost:3307
+```
+
+The Docker setup starts:
+
+- `db` - MySQL 8.4 with a persistent `mysql_data` volume
+- `backend` - Flask API on port `5000`
+- `frontend` - Vite React app on port `5173`
+
+For local Docker development, the backend uses this internal database URL:
+
+```text
+mysql+pymysql://jardinage:password123@db:3306/jardinage_db
+```
+
+To stop the stack:
+
+```bash
+docker compose down
+```
+
+To also delete the MySQL Docker volume and reset the database:
+
+```bash
+docker compose down -v
 ```
 
 ---

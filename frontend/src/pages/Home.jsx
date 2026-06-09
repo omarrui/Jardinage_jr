@@ -67,18 +67,15 @@ function Home({ goToBooking, goToClientAppointments }) {
         style={{ backgroundImage: `url(${background})` }}
       >
         <div className="hero-overlay">
+          <span className="hero-kicker">
+            Jardinier au Muy | Spécialiste dans l'entretien de votre jardin
+          </span>
           <h1>
-            Jardinier au Muy (83) – Entretien, Élagage & Aménagement Paysager
+            Jardinage, élagage et création sur mesure
           </h1>
-          <p>
-            JR Jardinage est votre jardinier professionnel au Muy dans le Var (83).
-            Nous réalisons l'entretien de jardin, l'élagage d'arbres,
-            le débroussaillage et l'aménagement paysager sur mesure.
-            Intervention rapide et devis gratuit.
-          </p>
           <div className="hero-buttons">
             <button className="primary-btn" onClick={goToBooking}>
-              Demander un service
+              Demander plus
             </button>
 
             {goToClientAppointments && (
@@ -96,7 +93,7 @@ function Home({ goToBooking, goToClientAppointments }) {
                 document.querySelector(".services-section")?.scrollIntoView({ behavior: "smooth" });
               }}
             >
-              Nos services
+              06 13 03 55 59
             </button>
           </div>
         </div>
@@ -149,7 +146,7 @@ function Home({ goToBooking, goToClientAppointments }) {
       </section>
 
       {/* ================= LOCAL SEO BLOCK ================= */}
-      <section className="seo-section">
+      <section className="seo-section local-seo-section">
         <div className="seo-content">
           <h2>Jardinier professionnel au Muy et dans le Var (83)</h2>
           <p>

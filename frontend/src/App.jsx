@@ -93,6 +93,13 @@ function App() {
     // Do nothing if not logged in or is admin
   };
 
+  const goToHomeSection = (selector) => {
+    setCurrentPage("home");
+    window.setTimeout(() => {
+      document.querySelector(selector)?.scrollIntoView({ behavior: "smooth" });
+    }, 0);
+  };
+
   const renderAuthButtons = () => {
     if (isAdmin) {
       return (
@@ -146,88 +153,52 @@ function App() {
   return (
     <div>
       {/* NAVBAR */}
-      <nav
-        style={{
-          background: "linear-gradient(90deg, #1b5e20, #2e7d32)",
-          padding: "15px 40px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          color: "white",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.15)"
-        }}
-      >
-        <div className="nav-left">
+      <header className="site-header">
+        <div className="site-topbar">
+          <span>Le Muy et alentours</span>
+          <a href="tel:+33613035559">06 13 03 55 59</a>
+        </div>
+
+        <nav className="site-navbar">
           <button
             onClick={handleLogoClick}
-            onKeyDown={(e) => e.key === 'Enter' && handleLogoClick()}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              cursor: "pointer",
-              background: "none",
-              border: "none",
-              color: "inherit",
-              padding: 0
-            }}
+            onKeyDown={(e) => e.key === "Enter" && handleLogoClick()}
+            className="site-logo-button"
             aria-label="Go to home page"
           >
-            <img
-              src={logo}
-              alt="JR Jardinage Logo"
-              style={{
-                height: "56px",
-                width: "56px",
-                objectFit: "contain"
-              }}
-            />
-            <span
-              style={{
-                fontWeight: 600,
-                fontSize: "18px",
-                letterSpacing: "0.5px"
-              }}
-            >
-              JR Jardinage
-            </span>
+            <img src={logo} alt="JR Jardinage Logo" />
           </button>
-        </div>
-  
-        <div
-          className="nav-right"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "16px"
-          }}
-        >
-          {!isLoggedIn ? (
-            <>
-              <button
-                onClick={() => setCurrentPage("login")}
-                className="primary-btn"
-              >
-                Connexion
-              </button>
-                <button
-                onClick={() => setCurrentPage("signup")}
-                className="primary-btn"
-              >
-                Inscription
-              </button>
-            </>
-          ) : renderAuthButtons()
-          }
-        </div>
-      </nav>
+
+          <div className="site-nav-links">
+            <button onClick={() => goToHomeSection(".about-section")}>A PROPOS</button>
+            <button onClick={() => goToHomeSection(".services-section")}>NOS SERVICES</button>
+            <button onClick={() => goToHomeSection(".before-after-section")}>NOS REALISATIONS</button>
+            <button onClick={() => goToHomeSection(".contact-section")}>CONTACT</button>
+
+            {!isLoggedIn ? (
+              <>
+                <button onClick={handleGoToBooking} className="quote-btn">
+                  DEMANDER UN DEVIS
+                </button>
+                <button onClick={() => setCurrentPage("login")} className="round-nav-btn" aria-label="Connexion">
+                  ↗
+                </button>
+                <button onClick={() => setCurrentPage("signup")} className="round-nav-btn" aria-label="Inscription">
+                  +
+                </button>
+              </>
+            ) : renderAuthButtons()
+            }
+          </div>
+        </nav>
+      </header>
   
       {/* PAGE CONTENT */}
       <div className="page-container">
       {currentPage === "home" && (
         <Home
           goToBooking={handleGoToBooking}
-          goToClientAppointments={handleGoToAppointments} 
+          goToClientAppointments={isLoggedIn && !isAdmin ? handleGoToAppointments : null} 
         />
       )}  
         {currentPage === "signup" && (
@@ -274,6 +245,35 @@ function App() {
           <RequestReset goToLogin={() => setCurrentPage("login")} />
         )}
       </div>
+      {currentPage !== "admin" && (
+        <footer className="app-footer">
+          <div className="footer-main">
+            <div className="footer-brand">
+              <img src={logo} alt="JR Jardinage Logo" />
+              <div>
+                <strong>JR Jardinage</strong>
+                <span>Entretien, élagage et création paysagère au Muy.</span>
+              </div>
+            </div>
+
+            <div className="footer-links">
+              <button onClick={() => goToHomeSection(".services-section")}>Services</button>
+              <button onClick={() => goToHomeSection(".contact-section")}>Contact</button>
+              <a href="tel:+33613035559">06 13 03 55 59</a>
+              <a href="mailto:contact@jrjardinage.fr">contact@jrjardinage.fr</a>
+            </div>
+          </div>
+
+          <div className="footer-credit">
+            <span>Site réalisé par Omar Rouigui</span>
+            <a
+              href="mailto:rouiguio919@gmail.com"
+            >
+              rouiguio919@gmail.com
+            </a>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

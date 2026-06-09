@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import os
 from flask import Flask
 from flask_cors import CORS
 from config import SECRET_KEY, DATABASE_URL
@@ -19,10 +20,18 @@ from app.api.v1.appointment_routes import register_appointment_routes
 app = Flask(__name__)
 
 # CORS FIX
+frontend_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "FRONTEND_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(",")
+]
+
 CORS(
     app,
     supports_credentials=True,
-    resources={r"/api/*": {"origins": "http://localhost:5173"}}
+    resources={r"/api/*": {"origins": frontend_origins}}
 )
 
 # App configuration
@@ -66,4 +75,8 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         seed_admin()
-    app.run(debug=True)
+    app.run(
+        host=os.getenv("FLASK_RUN_HOST", "0.0.0.0"),
+        port=int(os.getenv("FLASK_RUN_PORT", "5000")),
+        debug=os.getenv("FLASK_DEBUG", "1") == "1"
+    )

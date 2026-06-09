@@ -7,6 +7,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import fr from "date-fns/locale/fr";
 import CustomAlert from "../components/CustomAlert";
+import "./AdminDashboard.css";
 
 const locales = { fr };
 
@@ -238,12 +239,25 @@ function AdminCalendar() {
     const normalized = new Date(date);
     normalized.setHours(0, 0, 0, 0);
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const isoDate = normalized.toISOString().split("T")[0];
 
     if (blockedDates.includes(isoDate)) {
       return {
         style: {
-          backgroundColor: "#ffcdd2"
+          backgroundColor: "#ffcdd2",
+          color: "#7f1d1d"
+        }
+      };
+    }
+
+    if (normalized < today) {
+      return {
+        style: {
+          backgroundColor: "#eef0ed",
+          color: "#8a9388"
         }
       };
     }
@@ -252,59 +266,23 @@ function AdminCalendar() {
   };
 
   return (
-    <div
-      style={{
-        background: "white",
-        padding: "30px",
-        borderRadius: "18px",
-        boxShadow: "0 15px 40px rgba(0,0,0,0.08)",
-        minHeight: "600px"
-      }}
-    >
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center",
-        marginBottom: "30px" 
-      }}>
-        <h2 style={{ fontWeight: 600, margin: 0 }}>
-          📅 Planning des rendez-vous
-        </h2>
+    <div className="admin-calendar-card">
+      <div className="admin-calendar-toolbar">
+        <h2>Planning des rendez-vous</h2>
 
-        <div style={{ position: "relative", width: "300px" }}>
+        <div className="admin-search">
           <input
             type="text"
-            placeholder="🔍 Rechercher un client..."
+            placeholder="Rechercher un client..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px 15px",
-              border: "2px solid #e0e0e0",
-              borderRadius: "8px",
-              fontSize: "14px",
-              outline: "none",
-              transition: "border-color 0.3s"
-            }}
-            onFocus={(e) => e.target.style.borderColor = "#1b5e20"}
-            onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              style={{
-                position: "absolute",
-                right: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "18px",
-                color: "#999"
-              }}
+              className="admin-clear-search"
             >
-              ✕
+              x
             </button>
           )}
         </div>
@@ -337,27 +315,10 @@ function AdminCalendar() {
         style={{ minHeight: "600px" }}
       />
       {selectedEvent && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 999
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            padding: "30px",
-            borderRadius: "15px",
-            minWidth: "320px",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
-          }}>
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
             <h3 style={{ marginBottom: "15px" }}>
-              📅 {selectedEvent.customer_name}
+              {selectedEvent.customer_name}
             </h3>
 
             {!editMode ? (
@@ -366,43 +327,24 @@ function AdminCalendar() {
                 <p><strong>Date fin:</strong> {new Date(selectedEvent.end).toLocaleString('fr-FR')}</p>
                 <p><strong>Adresse:</strong> {selectedEvent.address || "Non spécifiée"}</p>
 
-                <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+                <div className="admin-modal-actions">
                   <button
                     onClick={() => setEditMode(true)}
-                    style={{
-                      backgroundColor: "#1b5e20",
-                      color: "white",
-                      padding: "8px 16px",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer"
-                    }}
+                    className="admin-btn primary"
                   >
-                    ✏️ Modifier
+                    Modifier
                   </button>
 
                   <button
                     onClick={handleDeleteAppointment}
-                    style={{
-                      backgroundColor: "#c62828",
-                      color: "white",
-                      padding: "8px 16px",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer"
-                    }}
+                    className="admin-btn danger"
                   >
-                    🗑️ Annuler le rendez-vous
+                    Annuler le rendez-vous
                   </button>
 
                   <button
                     onClick={() => setSelectedEvent(null)}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "6px",
-                      border: "1px solid #ccc",
-                      cursor: "pointer"
-                    }}
+                    className="admin-btn"
                   >
                     Fermer
                   </button>
@@ -417,7 +359,8 @@ function AdminCalendar() {
                   type="datetime-local"
                   value={editData.scheduled_start}
                   onChange={(e) => setEditData({ ...editData, scheduled_start: e.target.value })}
-                  style={{ display: "block", marginBottom: "15px", width: "100%" }}
+                  className="admin-input"
+                  style={{ marginBottom: "15px" }}
                 />
 
                 <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
@@ -427,7 +370,8 @@ function AdminCalendar() {
                   type="datetime-local"
                   value={editData.scheduled_end}
                   onChange={(e) => setEditData({ ...editData, scheduled_end: e.target.value })}
-                  style={{ display: "block", marginBottom: "15px", width: "100%" }}
+                  className="admin-input"
+                  style={{ marginBottom: "15px" }}
                 />
 
                 <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
@@ -437,32 +381,21 @@ function AdminCalendar() {
                   type="text"
                   value={editData.address}
                   onChange={(e) => setEditData({ ...editData, address: e.target.value })}
-                  style={{ display: "block", marginBottom: "15px", width: "100%" }}
+                  className="admin-input"
+                  style={{ marginBottom: "15px" }}
                 />
 
-                <div style={{ display: "flex", gap: "10px" }}>
+                <div className="admin-modal-actions">
                   <button
                     onClick={handleUpdateAppointment}
-                    style={{
-                      backgroundColor: "#1b5e20",
-                      color: "white",
-                      padding: "8px 16px",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer"
-                    }}
+                    className="admin-btn primary"
                   >
-                    💾 Enregistrer
+                    Enregistrer
                   </button>
 
                   <button
                     onClick={() => setEditMode(false)}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "6px",
-                      border: "1px solid #ccc",
-                      cursor: "pointer"
-                    }}
+                    className="admin-btn"
                   >
                     Annuler
                   </button>

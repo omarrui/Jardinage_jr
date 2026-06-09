@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminCalendar from "./AdminCalendar";
 import CustomAlert from "../components/CustomAlert";
+import "./AdminDashboard.css";
 
 function AdminDashboard({ goHome }) {
   const [adminSection, setAdminSection] = useState("planning");
@@ -187,56 +188,34 @@ function AdminDashboard({ goHome }) {
 
   
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div className="admin-shell">
 
       {/* SIDEBAR */}
-      <div
-        style={{
-          width: window.innerWidth < 768 ? "70px" : "250px",
-          backgroundColor: "#1b5e20",
-          color: "white",
-          padding: "30px 20px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between"
-        }}
-      >
+      <aside className="admin-sidebar">
         <div>
-          <h2 style={{ marginBottom: "40px" }}>Admin</h2>
+          <h2 className="admin-sidebar-title">Admin <span>JR Jardinage</span></h2>
 
           <button
             onClick={() => setAdminSection("planning")}
-            style={sidebarBtn}
+            className={`admin-nav-button ${adminSection === "planning" ? "is-active" : ""}`}
           >
-            📅 Planning
+            <span>Planning</span>
           </button>
 
           <button
             onClick={() => setAdminSection("clients")}
-            style={sidebarBtn}
+            className={`admin-nav-button ${adminSection === "clients" ? "is-active" : ""}`}
           >
-            👥 Clients
+            <span>Clients</span>
           </button>
 
           <button
             onClick={() => setAdminSection("appointments")}
-            style={{ ...sidebarBtn, position: "relative" }}
+            className={`admin-nav-button ${adminSection === "appointments" ? "is-active" : ""}`}
           >
-            📨 Rendez-vous
+            <span>Rendez-vous</span>
             {pendingRequests > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "6px",
-                  right: "10px",
-                  backgroundColor: "#c62828",
-                  color: "white",
-                  borderRadius: "50%",
-                  padding: "2px 8px",
-                  fontSize: "12px",
-                  fontWeight: "bold"
-                }}
-              >
+              <span className="admin-badge">
                 {pendingRequests}
               </span>
             )}
@@ -245,39 +224,45 @@ function AdminDashboard({ goHome }) {
 
         <button
           onClick={goHome}
-          style={{ ...sidebarBtn, backgroundColor: "#c62828", color: "white" }}
+          className="admin-nav-button is-danger"
         >
-          🚪 Déconnexion
+          <span>Déconnexion</span>
         </button>
-      </div>
+      </aside>
 
       {/* MAIN CONTENT */}
-      <div
-        style={{
-          flex: 1,
-          backgroundColor: "#f5f7f6",
-          padding: "40px",
-          overflowY: "auto"
-        }}
-      >
+      <main className="admin-main">
+        <div className="admin-top">
+          <div className="admin-title-card">
+            <p>Espace de gestion</p>
+            <h1>{adminSection === "planning" ? "Planning" : adminSection === "clients" ? "Clients" : "Demandes"}</h1>
+          </div>
+          <div className="admin-stat-card">
+            <span>Demandes en attente</span>
+            <strong>{pendingRequests}</strong>
+          </div>
+          <div className="admin-stat-card">
+            <span>Clients chargés</span>
+            <strong>{allClients.length}</strong>
+          </div>
+        </div>
 
         {adminSection === "planning" && <AdminCalendar />}
 
         {adminSection === "appointments" && (
-          <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-            <h3>Demandes de rendez-vous</h3>
+          <section className="admin-panel">
+            <div className="admin-panel-header">
+              <h2>Demandes de rendez-vous</h2>
+            </div>
 
             {appointmentRequests.length === 0 ? (
-              <p>Aucune demande pour le moment.</p>
+              <p className="admin-empty">Aucune demande pour le moment.</p>
             ) : (
               appointmentRequests.map((req) => (
                 <div
                   key={req.id}
+                  className="admin-card"
                   style={{
-                    border: "1px solid #ddd",
-                    padding: "15px",
-                    marginBottom: "15px",
-                    borderRadius: "8px",
                     background: "white"
                   }}
                 >
@@ -287,119 +272,78 @@ function AdminDashboard({ goHome }) {
                   <p>Adresse : {req.address}</p>
                   <p>Description : {req.description || "Aucune description"}</p>
 
-                  <button
-                    onClick={() => {
-                      setSelectedClientForAppointment({
-                        id: req.customer_id,
-                        request_id: req.id,
-                        name: req.customer_name || "Client"
-                      });
-                      setAppointmentAddress(req.address || "");
-                    }}
-                    style={{
-                      marginTop: "10px",
-                      backgroundColor: "#1b5e20",
-                      color: "white",
-                      padding: "6px 12px",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer"
-                    }}
-                  >
-                    🗓 Donner un rendez-vous
-                  </button>
-                  <button
-                    onClick={async () => {
-                      showConfirm("Refuser cette demande de rendez-vous ?", async () => {
-                        try {
-                          const response = await fetch(
-                            `http://127.0.0.1:5000/api/admin/appointment-requests/${req.id}/cancel`,
-                            {
-                              method: "PUT",
-                              headers: { "Content-Type": "application/json" }
+                  <div className="admin-actions">
+                    <button
+                      className="admin-btn primary"
+                      onClick={() => {
+                        setSelectedClientForAppointment({
+                          id: req.customer_id,
+                          request_id: req.id,
+                          name: req.customer_name || "Client"
+                        });
+                        setAppointmentAddress(req.address || "");
+                      }}
+                    >
+                      Donner un rendez-vous
+                    </button>
+                    <button
+                      className="admin-btn danger"
+                      onClick={async () => {
+                        showConfirm("Refuser cette demande de rendez-vous ?", async () => {
+                          try {
+                            const response = await fetch(
+                              `http://127.0.0.1:5000/api/admin/appointment-requests/${req.id}/cancel`,
+                              {
+                                method: "PUT",
+                                headers: { "Content-Type": "application/json" }
+                              }
+                            );
+
+                            const data = await response.json();
+
+                            if (!response.ok) {
+                              showAlert(data.error || "Erreur lors de l'annulation");
+                              return;
                             }
-                          );
 
-                          const data = await response.json();
-
-                          if (!response.ok) {
-                            showAlert(data.error || "Erreur lors de l'annulation");
-                            return;
+                            showAlert("Demande annulée");
+                            fetchAppointmentRequests();
+                          } catch (error) {
+                            console.error(error);
+                            showAlert("Erreur serveur");
                           }
-
-                          showAlert(" Demande annulée");
-                          fetchAppointmentRequests();
-                        } catch (error) {
-                          console.error(error);
-                          showAlert("Erreur serveur");
-                        }
-                      });
-                      return;
-                    }}
-                    style={{
-                      marginTop: "10px",
-                      marginLeft: "10px",
-                      backgroundColor: "#c62828",
-                      color: "white",
-                      padding: "6px 12px",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer"
-                    }}
-                  >
-                     Refuser
-                  </button>
+                        });
+                        return;
+                      }}
+                    >
+                      Refuser
+                    </button>
+                  </div>
                 </div>
               ))
             )}
-          </div>
+          </section>
         )}
 
         {adminSection === "clients" && (
-          <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+          <section className="admin-panel">
 
-            <div style={{ 
-              display: "flex", 
-              justifyContent: "space-between", 
-              alignItems: "center",
-              marginBottom: "20px" 
-            }}>
-              <h3 style={{ margin: 0 }}>Clients</h3>
+            <div className="admin-panel-header">
+              <h2>Clients</h2>
 
-              <div style={{ position: "relative", width: "300px" }}>
+              <div className="admin-search">
                 <input
                   type="text"
-                  placeholder="🔍 Rechercher un client..."
+                  placeholder="Rechercher un client..."
                   value={clientSearchQuery}
                   onChange={(e) => setClientSearchQuery(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 15px",
-                    border: "2px solid #e0e0e0",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                    transition: "border-color 0.3s"
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = "#1b5e20"}
-                  onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
                 />
                 {clientSearchQuery && (
                   <button
                     onClick={() => setClientSearchQuery("")}
-                    style={{
-                      position: "absolute",
-                      right: "10px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      fontSize: "18px",
-                      color: "#999"
-                    }}
+                    className="admin-clear-search"
                   >
-                    ✕
+                    x
                   </button>
                 )}
               </div>
@@ -407,9 +351,10 @@ function AdminDashboard({ goHome }) {
 
             <button
               onClick={() => setShowCreateClient(true)}
-              style={{ fontSize: "18px", marginBottom: "15px" }}
+              className="admin-btn primary"
+              style={{ marginBottom: "15px" }}
             >
-              ➕ Ajouter un client
+              Ajouter un client
             </button>
 
             {clientSearchQuery && (
@@ -423,16 +368,13 @@ function AdminDashboard({ goHome }) {
             )}
 
             {clients.length === 0 ? (
-              <p>{clientSearchQuery ? "Aucun client trouvé." : "Aucun client."}</p>
+              <p className="admin-empty">{clientSearchQuery ? "Aucun client trouvé." : "Aucun client."}</p>
             ) : (
               clients.map(client => (
                 <div
                   key={client.id}
+                  className="admin-card"
                   style={{
-                    border: "1px solid #ddd",
-                    padding: "15px",
-                    marginBottom: "15px",
-                    borderRadius: "8px",
                     background: "white"
                   }}
                 >
@@ -449,58 +391,53 @@ function AdminDashboard({ goHome }) {
                     )}
                   </p>
 
-                  <button
-                    onClick={() => setSelectedClientForAppointment(client)}
-                    style={{ marginRight: "8px" }}
-                  >
-                    🗓 Donner un rendez-vous
-                  </button>
-
-                  {client.has_account && client.must_change_password && (
+                  <div className="admin-actions">
                     <button
-                      onClick={() => resendTempPassword(client.id)}
-                      style={{ marginRight: "8px" }}
+                      className="admin-btn primary"
+                      onClick={() => setSelectedClientForAppointment(client)}
                     >
-                      🔁 Renvoyer mot de passe
+                      Donner un rendez-vous
                     </button>
-                  )}
 
-                  <button
-                    onClick={() => {
-                      setEditingClient(client);
-                      setEditData({
-                        email: client.email,
-                        phone: client.phone
-                      });
-                    }}
-                    style={{ marginRight: "8px" }}
-                  >
-                    ✏ Modifier
-                  </button>
+                    {client.has_account && client.must_change_password && (
+                      <button
+                        className="admin-btn"
+                        onClick={() => resendTempPassword(client.id)}
+                      >
+                        Renvoyer mot de passe
+                      </button>
+                    )}
 
-                  {client.must_change_password && (
                     <button
+                      className="admin-btn"
                       onClick={() => {
-                        showConfirm("⚠️ Êtes-vous sûr de vouloir supprimer ce client ?", () => {
-                          fetch(
-                            `http://127.0.0.1:5000/api/admin/customers/${client.id}`,
-                            { method: "DELETE" }
-                          ).then(() => fetchClients());
+                        setEditingClient(client);
+                        setEditData({
+                          email: client.email,
+                          phone: client.phone
                         });
-                        return;
-                      }}
-                      style={{
-                        backgroundColor: "#c62828",
-                        color: "white",
-                        border: "none",
-                        padding: "6px 12px",
-                        borderRadius: "6px",
-                        cursor: "pointer"
                       }}
                     >
-                      🗑 Supprimer
+                      Modifier
                     </button>
-                  )}
+
+                    {client.must_change_password && (
+                      <button
+                        className="admin-btn danger"
+                        onClick={() => {
+                          showConfirm("Êtes-vous sûr de vouloir supprimer ce client ?", () => {
+                            fetch(
+                              `http://127.0.0.1:5000/api/admin/customers/${client.id}`,
+                              { method: "DELETE" }
+                            ).then(() => fetchClients());
+                          });
+                          return;
+                        }}
+                      >
+                        Supprimer
+                      </button>
+                    )}
+                  </div>
                   {editingClient?.id === client.id && (
                     <div style={{ marginTop: "15px" }}>
                       <input
@@ -509,7 +446,8 @@ function AdminDashboard({ goHome }) {
                         onChange={(e) =>
                           setEditData({ ...editData, email: e.target.value })
                         }
-                        style={{ display: "block", marginBottom: "8px", width: "100%" }}
+                        className="admin-input"
+                        style={{ marginBottom: "8px" }}
                       />
 
                       <input
@@ -518,7 +456,8 @@ function AdminDashboard({ goHome }) {
                         onChange={(e) =>
                           setEditData({ ...editData, phone: e.target.value })
                         }
-                        style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                        className="admin-input"
+                        style={{ marginBottom: "10px" }}
                       />
 
                       <button
@@ -547,22 +486,15 @@ function AdminDashboard({ goHome }) {
                           setEditingClient(null);
                           fetchClients();
                         }}
-                        style={{
-                          backgroundColor: "#1b5e20",
-                          color: "white",
-                          padding: "6px 12px",
-                          border: "none",
-                          borderRadius: "6px",
-                          marginRight: "8px",
-                          cursor: "pointer"
-                        }}
+                        className="admin-btn primary"
                       >
-                        💾 Enregistrer
+                        Enregistrer
                       </button>
 
                       <button
                         onClick={() => setEditingClient(null)}
-                        style={{ padding: "6px 12px", borderRadius: "6px" }}
+                        className="admin-btn"
+                        style={{ marginLeft: "8px" }}
                       >
                         Annuler
                       </button>
@@ -572,13 +504,13 @@ function AdminDashboard({ goHome }) {
               ))
             )}
 
-          </div>
+          </section>
         )}
 
         {/* CREATE CLIENT MODAL */}
         {showCreateClient && (
-          <div style={overlayStyle}>
-            <div style={modalStyle}>
+          <div className="admin-modal-overlay">
+            <div className="admin-modal">
               <h3 style={{ marginBottom: "15px" }}>Créer un client</h3>
 
               <input
@@ -588,7 +520,8 @@ function AdminDashboard({ goHome }) {
                 onChange={(e) =>
                   setNewClient({ ...newClient, name: e.target.value })
                 }
-                style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                className="admin-input"
+                style={{ marginBottom: "10px" }}
               />
 
               <input
@@ -599,11 +532,8 @@ function AdminDashboard({ goHome }) {
                   setNewClient({ ...newClient, email: e.target.value })
                 }
                 required={createLogin}
-                style={{
-                  display: "block",
-                  marginBottom: "10px",
-                  width: "100%"
-                }}
+                className="admin-input"
+                style={{ marginBottom: "10px" }}
               />
 
               <input
@@ -613,7 +543,8 @@ function AdminDashboard({ goHome }) {
                 onChange={(e) =>
                   setNewClient({ ...newClient, phone: e.target.value })
                 }
-                style={{ display: "block", marginBottom: "15px", width: "100%" }}
+                className="admin-input"
+                style={{ marginBottom: "15px" }}
               />
 
               <label style={{ display: "block", marginBottom: "15px" }}>
@@ -627,27 +558,15 @@ function AdminDashboard({ goHome }) {
 
               <button
                 onClick={handleCreateClient}
-                style={{
-                  backgroundColor: "#1b5e20",
-                  color: "white",
-                  padding: "8px 14px",
-                  border: "none",
-                  borderRadius: "8px",
-                  marginRight: "10px",
-                  cursor: "pointer"
-                }}
+                className="admin-btn primary"
               >
                 Créer
               </button>
 
               <button
                 onClick={() => setShowCreateClient(false)}
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  cursor: "pointer"
-                }}
+                className="admin-btn"
+                style={{ marginLeft: "10px" }}
               >
                 Annuler
               </button>
@@ -657,8 +576,8 @@ function AdminDashboard({ goHome }) {
 
         {/* APPOINTMENT MODAL */}
         {selectedClientForAppointment && (
-          <div style={overlayStyle}>
-            <div style={modalStyle}>
+          <div className="admin-modal-overlay">
+            <div className="admin-modal">
               <h3 style={{ marginBottom: "15px" }}>
                 Rendez-vous pour {selectedClientForAppointment.name}
               </h3>
@@ -671,7 +590,8 @@ function AdminDashboard({ goHome }) {
                 min={todayStr}
                 value={appointmentStart}
                 onChange={(e) => setAppointmentStart(e.target.value)}
-                style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                className="admin-input"
+                style={{ marginBottom: "10px" }}
               />
 
               <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
@@ -681,7 +601,8 @@ function AdminDashboard({ goHome }) {
                 type="time"
                 value={appointmentStartTime}
                 onChange={(e) => setAppointmentStartTime(e.target.value)}
-                style={{ display: "block", marginBottom: "15px", width: "100%" }}
+                className="admin-input"
+                style={{ marginBottom: "15px" }}
               />
 
               <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
@@ -692,7 +613,8 @@ function AdminDashboard({ goHome }) {
                 min={appointmentStart || todayStr}
                 value={appointmentEnd}
                 onChange={(e) => setAppointmentEnd(e.target.value)}
-                style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                className="admin-input"
+                style={{ marginBottom: "10px" }}
               />
 
               <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
@@ -702,7 +624,8 @@ function AdminDashboard({ goHome }) {
                 type="time"
                 value={appointmentEndTime}
                 onChange={(e) => setAppointmentEndTime(e.target.value)}
-                style={{ display: "block", marginBottom: "15px", width: "100%" }}
+                className="admin-input"
+                style={{ marginBottom: "15px" }}
               />
               
               <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
@@ -713,7 +636,8 @@ function AdminDashboard({ goHome }) {
                 placeholder="Adresse d'intervention"
                 value={appointmentAddress}
                 onChange={(e) => setAppointmentAddress(e.target.value)}
-                style={{ display: "block", marginBottom: "15px", width: "100%" }}
+                className="admin-input"
+                style={{ marginBottom: "15px" }}
               />
 
               <button
@@ -850,27 +774,15 @@ function AdminDashboard({ goHome }) {
                   setAppointmentEndTime("17:00");
                   setAppointmentAddress("");
                 }}
-                style={{
-                  backgroundColor: "#1b5e20",
-                  color: "white",
-                  padding: "8px 14px",
-                  border: "none",
-                  borderRadius: "8px",
-                  marginRight: "10px",
-                  cursor: "pointer"
-                }}
+                className="admin-btn primary"
               >
                 Confirmer
               </button>
 
               <button
                 onClick={() => setSelectedClientForAppointment(null)}
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  cursor: "pointer"
-                }}
+                className="admin-btn"
+                style={{ marginLeft: "10px" }}
               >
                 Annuler
               </button>
@@ -879,8 +791,8 @@ function AdminDashboard({ goHome }) {
         )}
       
       {showConfirmModal && (
-        <div style={overlayStyle}>
-          <div style={modalStyle}>
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
             <p style={{ marginBottom: "20px" }}>{confirmMessage}</p>
 
             <button
@@ -888,27 +800,15 @@ function AdminDashboard({ goHome }) {
                 if (confirmAction) confirmAction();
                 setShowConfirmModal(false);
               }}
-              style={{
-                backgroundColor: "#1b5e20",
-                color: "white",
-                padding: "8px 14px",
-                border: "none",
-                borderRadius: "8px",
-                marginRight: "10px",
-                cursor: "pointer"
-              }}
+              className="admin-btn primary"
             >
               Confirmer
             </button>
 
             <button
               onClick={() => setShowConfirmModal(false)}
-              style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-                cursor: "pointer"
-              }}
+              className="admin-btn"
+              style={{ marginLeft: "10px" }}
             >
               Annuler
             </button>
@@ -922,42 +822,9 @@ function AdminDashboard({ goHome }) {
         onClose={() => setShowAlertModal(false)}
       />
 
-      </div>
+      </main>
     </div>
   );
 }
-
-const sidebarBtn = {
-  background: "rgba(255,255,255,0.08)",
-  border: "none",
-  color: "white",
-  padding: "12px 15px",
-  textAlign: "left",
-  cursor: "pointer",
-  fontSize: "15px",
-  borderRadius: "8px",
-  marginBottom: "12px",
-  width: "100%",
-  transition: "all 0.2s ease"
-};
-
-const overlayStyle = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100vw",
-  height: "100vh",
-  backgroundColor: "rgba(0,0,0,0.5)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center"
-};
-
-const modalStyle = {
-  backgroundColor: "white",
-  padding: "20px",
-  borderRadius: "10px",
-  minWidth: "300px"
-};
 
 export default AdminDashboard;
