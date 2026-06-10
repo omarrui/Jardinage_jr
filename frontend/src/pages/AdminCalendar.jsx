@@ -3,6 +3,7 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { apiUrl } from "../api/apiConfig";
 
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import fr from "date-fns/locale/fr";
@@ -44,7 +45,7 @@ function AdminCalendar() {
   };
 
   const fetchEvents = () => {
-    fetch("http://127.0.0.1:5000/api/admin/appointment-requests")
+    fetch(apiUrl("/api/admin/appointment-requests"))
       .then(res => res.json())
       .then(data => {
         if (!Array.isArray(data.requests)) return;
@@ -86,7 +87,7 @@ function AdminCalendar() {
     fetchEvents();
 
     const fetchAvailability = () => {
-      fetch("http://127.0.0.1:5000/api/admin/availability")
+      fetch(apiUrl("/api/admin/availability"))
         .then(res => res.json())
         .then(data => {
           if (!Array.isArray(data)) return;
@@ -128,7 +129,7 @@ function AdminCalendar() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/admin/service-requests/${event.id}`,
+        apiUrl(`/api/admin/service-requests/${event.id}`),
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -183,7 +184,7 @@ function AdminCalendar() {
   const handleDeleteAppointment = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/admin/service-requests/${selectedEvent.id}`,
+        apiUrl(`/api/admin/service-requests/${selectedEvent.id}`),
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -208,7 +209,7 @@ function AdminCalendar() {
   const handleUpdateAppointment = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/admin/service-requests/${selectedEvent.id}`,
+        apiUrl(`/api/admin/service-requests/${selectedEvent.id}`),
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { apiUrl } from "../api/apiConfig";
 
 function ChangePassword({ goToLogin, goHome }) {
   const [password, setPassword] = useState("");
@@ -35,7 +36,7 @@ function ChangePassword({ goToLogin, goHome }) {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/api/customer/force-change-password",
+        apiUrl("/api/customer/force-change-password"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -211,7 +212,7 @@ function RequestReset({ goToLogin }) {
     e.preventDefault();
 
     const response = await fetch(
-      "http://127.0.0.1:5000/api/customer/forgot-password",
+      apiUrl("/api/customer/forgot-password"),
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -248,7 +249,7 @@ function RequestReset({ goToLogin }) {
     }
 
     const response = await fetch(
-      "http://127.0.0.1:5000/api/customer/reset-password",
+      apiUrl("/api/customer/reset-password"),
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

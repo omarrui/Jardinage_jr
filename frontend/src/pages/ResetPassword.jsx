@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ResetPassword.css";
+import { apiUrl } from "../api/apiConfig";
 
 function ResetPassword({ goToLogin }) {
   const [newPassword, setNewPassword] = useState("");
@@ -34,7 +35,7 @@ function ResetPassword({ goToLogin }) {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/api/customer/reset-password",
+        apiUrl("/api/customer/reset-password"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

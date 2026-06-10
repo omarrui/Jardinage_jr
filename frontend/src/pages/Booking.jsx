@@ -1,5 +1,6 @@
 // Booking.jsx
 import React, { useState, useEffect } from "react";
+import { apiUrl } from "../api/apiConfig";
 
 function Booking({ goHome }) {
   const [date, setDate] = useState("");
@@ -21,7 +22,7 @@ function Booking({ goHome }) {
   
     try {
       const res = await fetch(
-        `http://127.0.0.1:5000/api/customer/service-requests?customer_id=${customerId}`
+        apiUrl(`/api/customer/service-requests?customer_id=${customerId}`)
       );
   
       const data = await res.json();
@@ -64,7 +65,7 @@ function Booking({ goHome }) {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/api/service-requests",
+        apiUrl("/api/service-requests"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

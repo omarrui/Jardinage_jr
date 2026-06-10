@@ -1,10 +1,10 @@
 // This file handles all communication with the backend API
 
-const API_URL = "http://127.0.0.1:5000";
+import { apiUrl } from "./apiConfig";
 
 // CUSTOMER SIGNUP
 export async function signupCustomer(data) {
-  const response = await fetch(`${API_URL}/api/signup`, {
+  const response = await fetch(apiUrl("/api/signup"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -17,7 +17,7 @@ export async function signupCustomer(data) {
 
 // CUSTOMER LOGIN
 export async function loginCustomer(data) {
-  const response = await fetch(`${API_URL}/api/login`, {
+  const response = await fetch(apiUrl("/api/login"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -30,7 +30,7 @@ export async function loginCustomer(data) {
 
 // ADMIN LOGIN
 export async function adminLogin(data) {
-  const response = await fetch(`${API_URL}/api/admin/login`, {
+  const response = await fetch(apiUrl("/api/admin/login"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export async function adminLogin(data) {
 
 // BOOKIN ui
 export async function createAppointment(data) {
-    const response = await fetch(`${API_URL}/api/appointments`, {
+    const response = await fetch(apiUrl("/api/appointments"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

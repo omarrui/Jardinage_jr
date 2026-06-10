@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { apiUrl } from "../api/apiConfig";
 
 function Login({
   onCustomerLogin,
@@ -32,7 +33,7 @@ function Login({
 
       if (formData.email === "admin@gardening.com") {
 
-        response = await fetch("http://127.0.0.1:5000/api/admin/login", {
+        response = await fetch(apiUrl("/api/admin/login"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -52,7 +53,7 @@ function Login({
 
       } else {
 
-        response = await fetch("http://127.0.0.1:5000/api/login", {
+        response = await fetch(apiUrl("/api/login"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -91,7 +92,7 @@ function Login({
     e.preventDefault();
     
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/admin/login", {
+      const response = await fetch(apiUrl("/api/admin/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email, password: formData.password })

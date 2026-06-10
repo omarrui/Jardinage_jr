@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminCalendar from "./AdminCalendar";
 import CustomAlert from "../components/CustomAlert";
 import "./AdminDashboard.css";
+import { apiUrl } from "../api/apiConfig";
 
 function AdminDashboard({ goHome }) {
   const [adminSection, setAdminSection] = useState("planning");
@@ -58,7 +59,7 @@ function AdminDashboard({ goHome }) {
   const fetchClients = () => {
     const token = localStorage.getItem("token");
     
-    fetch("http://127.0.0.1:5000/api/admin/customers", {
+    fetch(apiUrl("/api/admin/customers"), {
       headers: {
         "Authorization": `Bearer ${token}`  
       }
@@ -76,7 +77,7 @@ function AdminDashboard({ goHome }) {
      LOAD APPOINTMENT REQUESTS
    */
   const fetchAppointmentRequests = () => {
-    fetch("http://127.0.0.1:5000/api/admin/appointment-requests")
+    fetch(apiUrl("/api/admin/appointment-requests"))
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data.requests)) {
@@ -145,7 +146,7 @@ function AdminDashboard({ goHome }) {
     }
 
     const response = await fetch(
-      "http://127.0.0.1:5000/api/admin/customers",
+      apiUrl("/api/admin/customers"),
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -177,7 +178,7 @@ function AdminDashboard({ goHome }) {
    */
   const resendTempPassword = async (customerId) => {
     const response = await fetch(
-      `http://127.0.0.1:5000/api/admin/resend-temp-password/${customerId}`,
+      apiUrl(`/api/admin/resend-temp-password/${customerId}`),
       { method: "POST" }
     );
 
@@ -292,7 +293,7 @@ function AdminDashboard({ goHome }) {
                         showConfirm("Refuser cette demande de rendez-vous ?", async () => {
                           try {
                             const response = await fetch(
-                              `http://127.0.0.1:5000/api/admin/appointment-requests/${req.id}/cancel`,
+                              apiUrl(`/api/admin/appointment-requests/${req.id}/cancel`),
                               {
                                 method: "PUT",
                                 headers: { "Content-Type": "application/json" }
@@ -427,7 +428,7 @@ function AdminDashboard({ goHome }) {
                         onClick={() => {
                           showConfirm("Êtes-vous sûr de vouloir supprimer ce client ?", () => {
                             fetch(
-                              `http://127.0.0.1:5000/api/admin/customers/${client.id}`,
+                              apiUrl(`/api/admin/customers/${client.id}`),
                               { method: "DELETE" }
                             ).then(() => fetchClients());
                           });
@@ -475,7 +476,7 @@ function AdminDashboard({ goHome }) {
                           }
 
                           await fetch(
-                            `http://127.0.0.1:5000/api/admin/customers/${client.id}`,
+                            apiUrl(`/api/admin/customers/${client.id}`),
                             {
                               method: "PUT",
                               headers: { "Content-Type": "application/json" },
@@ -653,7 +654,7 @@ function AdminDashboard({ goHome }) {
                   // Check for conflicts before creating
                   try {
                     const checkResponse = await fetch(
-                      "http://127.0.0.1:5000/api/admin/appointment-requests"
+                      apiUrl("/api/admin/appointment-requests")
                     );
                     const checkData = await checkResponse.json();
 
@@ -693,7 +694,7 @@ function AdminDashboard({ goHome }) {
                             }
                         
                             const response = await fetch(
-                              "http://127.0.0.1:5000/api/admin/appointments",
+                              apiUrl("/api/admin/appointments"),
                               {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -745,7 +746,7 @@ function AdminDashboard({ goHome }) {
                   }
 
                   const response = await fetch(
-                    "http://127.0.0.1:5000/api/admin/appointments",
+                    apiUrl("/api/admin/appointments"),
                     {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },

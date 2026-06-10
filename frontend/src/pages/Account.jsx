@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Account.css";
+import { apiUrl } from "../api/apiConfig";
 
 function Account({ goHome }) {
   const customerId = localStorage.getItem("customer_id");
@@ -27,7 +28,7 @@ function Account({ goHome }) {
   useEffect(() => {
     async function fetchProfile() {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/customer/get-profile/${customerId}`
+        apiUrl(`/api/customer/get-profile/${customerId}`)
       );
 
       const data = await response.json();
@@ -43,7 +44,7 @@ function Account({ goHome }) {
   // SAVE PROFILE FIELD
   async function handleSave(field) {
     const response = await fetch(
-      "http://127.0.0.1:5000/api/customer/update-profile",
+      apiUrl("/api/customer/update-profile"),
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -81,7 +82,7 @@ function Account({ goHome }) {
     }
 
     const response = await fetch(
-      "http://127.0.0.1:5000/api/customer/change-password",
+      apiUrl("/api/customer/change-password"),
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

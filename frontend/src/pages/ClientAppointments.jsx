@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CustomAlert from "../components/CustomAlert.jsx";
+import { apiUrl } from "../api/apiConfig";
 
 function ClientAppointments({ goHome }) {
   const [appointments, setAppointments] = useState([]);
@@ -18,7 +19,7 @@ function ClientAppointments({ goHome }) {
 
     try {
       const res = await fetch(
-        `http://127.0.0.1:5000/api/customer/service-requests?customer_id=${customerId}`
+        apiUrl(`/api/customer/service-requests?customer_id=${customerId}`)
       );
       const data = await res.json();
 
@@ -53,7 +54,7 @@ function ClientAppointments({ goHome }) {
   
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/customer/cancel-appointment/${requestId}`,
+        apiUrl(`/api/customer/cancel-appointment/${requestId}`),
         {
           method: "DELETE",
           headers: {
