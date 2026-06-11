@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-from flask import Flask
+from flask import Flask, make_response, request
 from flask_cors import CORS
 from config import SECRET_KEY, DATABASE_URL
 from app.models import db
@@ -19,20 +19,34 @@ from app.api.v1.appointment_routes import register_appointment_routes
 
 app = Flask(__name__)
 
-# CORS FIX
-frontend_origins = [
-    origin.strip()
-    for origin in os.getenv(
-        "FRONTEND_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173"
-    ).split(",")
-]
+def parse_allowed_origins():
+    origins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
+    for env_name in ("FRONTEND_URL", "FRONTEND_ORIGINS"):
+        env_value = os.getenv(env_name, "")
+        origins.extend(origin.strip() for origin in env_value.split(",") if origin.strip())
+
+    return sorted({origin.rstrip("/") for origin in origins})
+
+
+frontend_origins = parse_allowed_origins()
 
 CORS(
     app,
     supports_credentials=True,
-    resources={r"/api/*": {"origins": frontend_origins}}
+    resources={r"/api/*": {"origins": frontend_origins}},
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
+
+
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
 
 # App configuration
 app.config["SECRET_KEY"] = SECRET_KEY
