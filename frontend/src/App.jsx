@@ -87,6 +87,11 @@ function App() {
   };
 
   const handleGoToQuoteForm = () => {
+    if (isLoggedIn && !isAdmin) {
+      setCurrentPage("booking");
+      return;
+    }
+
     setCurrentPage("home");
     window.setTimeout(() => {
       document.getElementById("demande-sans-compte")?.scrollIntoView({ behavior: "smooth" });

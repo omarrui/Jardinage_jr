@@ -385,7 +385,9 @@ function AdminDashboard({ goHome }) {
 
                   <p>
                     Statut :{" "}
-                    {client.must_change_password ? (
+                    {!client.has_account ? (
+                      <span>⚪ Client sans compte</span>
+                    ) : client.must_change_password ? (
                       <span>🟠 Compte non activé</span>
                     ) : (
                       <span>🟢 Actif</span>

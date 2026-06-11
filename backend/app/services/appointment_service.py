@@ -79,8 +79,16 @@ def create_public_service_request(data):
             db.session.add(customer)
             db.session.flush()
         else:
+            if customer.has_account or customer.password:
+                return {
+                    "error": "Un compte existe déjà avec cet email. Connectez-vous pour demander un devis."
+                }, 400
+
             customer.name = customer.name or name
             customer.phone = customer.phone or phone
+            customer.has_account = False
+            customer.password = None
+            customer.must_change_password = True
 
         service_request = ServiceRequest(
             customer_id=customer.id,
