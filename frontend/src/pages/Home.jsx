@@ -75,26 +75,23 @@ function Home({ goToBooking, goToClientAppointments }) {
           </h1>
           <div className="hero-buttons">
             <button className="primary-btn" onClick={goToBooking}>
-              Demander plus
+              Demander un devis
             </button>
-
-            {goToClientAppointments && (
-              <button
-                className="secondary-btn"
-                onClick={goToClientAppointments}
-              >
-                Mes rendez-vous
-              </button>
-            )}
 
             <button
               className="secondary-btn"
               onClick={() => {
-                document.querySelector(".services-section")?.scrollIntoView({ behavior: "smooth" });
+                const contractsSection = document.getElementById("contrats-entretien");
+                const fallbackSection = document.querySelector(".services-section");
+                (contractsSection || fallbackSection)?.scrollIntoView({ behavior: "smooth" });
               }}
             >
-              06 13 03 55 59
+              Découvrez nos contrats d'entretien
             </button>
+
+            <a className="secondary-btn" href="tel:+33613035559">
+              06 13 03 55 59
+            </a>
           </div>
         </div>
       </section>
@@ -103,33 +100,33 @@ function Home({ goToBooking, goToClientAppointments }) {
       <section className="services-section">
         <div className="services-grid">
           <div className="service-card">
-            <img src={debroussaillageImg} alt="Débroussaillage et nettoyage" className="service-img" />
-            <h3>Débroussaillage et nettoyage</h3>
-            <p>Nettoyage complet de terrain et mise en sécurité.</p>
+            <img src={debroussaillageImg} alt="Débroussaillage" className="service-img" />
+            <h3>Débroussaillage</h3>
+            <p>Nettoyage de terrain, coupe des herbes hautes et remise au propre.</p>
           </div>
 
           <div className="service-card">
-            <img src={tailleBuissonImg} alt="Taille de haies et de buissons" className="service-img" />
-            <h3>Taille de haies et de buissons</h3>
-            <p>Taille soignée pour un jardin structuré et harmonieux.</p>
+            <img src={tailleBuissonImg} alt="Taille de haie" className="service-img" />
+            <h3>Taille de haie</h3>
+            <p>Taille soignée pour garder des haies nettes, denses et harmonieuses.</p>
           </div>
 
           <div className="service-card">
-            <img src={entretienImg} alt="Entretien complet des arbustes" className="service-img" />
-            <h3>Entretien complet des arbustes</h3>
-            <p>Entretien régulier et adapté à chaque type d'arbuste.</p>
+            <img src={entretienImg} alt="Taille et entretien phytosanitaire des arbustes" className="service-img" />
+            <h3>Taille et entretien phytosanitaire de vos arbustes</h3>
+            <p>Soins adaptés pour préserver la forme, la vigueur et la santé des arbustes.</p>
           </div>
 
           <div className="service-card">
-            <img src={decoupeImg} alt="Découpe approfondie des branches" className="service-img" />
-            <h3>Découpe approfondie des branches</h3>
-            <p>Interventions précises pour préserver la santé des arbres.</p>
+            <img src={decoupeImg} alt="Création paysagère" className="service-img" />
+            <h3>Création paysagère</h3>
+            <p>Aménagement et mise en valeur de vos espaces extérieurs.</p>
           </div>
 
           <div className="service-card">
-            <img src={elagageImg} alt="Élagage mineur jusqu'à 5 mètres" className="service-img" />
-            <h3>Élagage mineur jusqu'à 5 mètres</h3>
-            <p>Élagage professionnel sécurisé jusqu'à 5 mètres de hauteur.</p>
+            <img src={elagageImg} alt="Élagage mineur" className="service-img" />
+            <h3>Élagage mineur</h3>
+            <p>Élagage léger et sécurisé pour entretenir les arbres de petite hauteur.</p>
           </div>
         </div>
 
@@ -157,9 +154,9 @@ function Home({ goToBooking, goToClientAppointments }) {
           </p>
 
           <p>
-            Nous proposons des services complets : entretien régulier,
-            taille de haies, élagage jusqu'à 5 mètres, débroussaillage
-            de terrain et création paysagère.
+            Nous proposons des services complets : débroussaillage,
+            taille de haie, taille et entretien phytosanitaire de vos arbustes,
+            création paysagère et élagage mineur.
             Chaque intervention est réalisée avec soin et professionnalisme.
           </p>
 
@@ -279,9 +276,8 @@ function Home({ goToBooking, goToClientAppointments }) {
           </p>
 
           <p>
-            Les prestations concernées incluent notamment : tonte de pelouse,
-            taille de haies, entretien des arbustes, débroussaillage et entretien
-            général du jardin.
+            Les prestations concernées incluent notamment : débroussaillage,
+            taille de haie, entretien des arbustes et entretien général du jardin.
           </p>
 
           <p>
@@ -411,7 +407,7 @@ function Home({ goToBooking, goToClientAppointments }) {
                 name: "Quels types de services proposez-vous ?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Entretien complet de jardin, taille, élagage, débroussaillage et création paysagère."
+                  text: "Débroussaillage, taille de haie, taille et entretien phytosanitaire des arbustes, création paysagère et élagage mineur."
                 }
               }
             ]

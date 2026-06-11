@@ -129,7 +129,7 @@ function Booking({ goHome }) {
   
           <label>Description (optionnel)</label>
           <textarea
-            placeholder="Ex: Taille de haie, entretien général..."
+            placeholder="Ex: Débroussaillage, taille de haie, élagage mineur..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows="4"
