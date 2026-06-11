@@ -33,6 +33,7 @@ def parse_allowed_origins():
 
 
 frontend_origins = parse_allowed_origins()
+allowed_origins = set(frontend_origins)
 
 CORS(
     app,
@@ -43,10 +44,29 @@ CORS(
 )
 
 
+def get_allowed_origin():
+    origin = request.headers.get("Origin", "").rstrip("/")
+    if origin in allowed_origins:
+        return origin
+    return None
+
+
 @app.before_request
 def handle_preflight():
     if request.method == "OPTIONS":
         return make_response("", 204)
+
+
+@app.after_request
+def add_cors_headers(response):
+    origin = get_allowed_origin()
+    if origin:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Vary"] = "Origin"
+    return response
 
 # App configuration
 app.config["SECRET_KEY"] = SECRET_KEY
