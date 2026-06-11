@@ -86,6 +86,13 @@ function App() {
     }
   };
 
+  const handleGoToQuoteForm = () => {
+    setCurrentPage("home");
+    window.setTimeout(() => {
+      document.getElementById("demande-sans-compte")?.scrollIntoView({ behavior: "smooth" });
+    }, 0);
+  };
+
   const handleGoToAppointments = () => {
     if (isLoggedIn && !isAdmin) {
       setCurrentPage("appointments");
@@ -177,7 +184,7 @@ function App() {
 
             {!isLoggedIn ? (
               <>
-                <button onClick={handleGoToBooking} className="quote-btn">
+                <button onClick={handleGoToQuoteForm} className="quote-btn">
                   DEMANDER UN DEVIS
                 </button>
                 <button onClick={() => setCurrentPage("login")} className="round-nav-btn" aria-label="Connexion">
@@ -197,7 +204,8 @@ function App() {
       <div className="page-container">
       {currentPage === "home" && (
         <Home
-          goToBooking={handleGoToBooking}
+          goToQuoteForm={handleGoToQuoteForm}
+          goToSignup={() => setCurrentPage("signup")}
           goToClientAppointments={isLoggedIn && !isAdmin ? handleGoToAppointments : null} 
         />
       )}  

@@ -1,6 +1,9 @@
 from app.models import db
 from app.models.models import ServiceRequest, Customer
 from datetime import datetime
+from app.persistence.customer_repository import get_customer_by_email
+from app.utils.email_utils import send_email
+import os
 
 def create_service_request(data):
     """Create a new service request from customer"""
@@ -46,6 +49,82 @@ def create_service_request(data):
     except Exception as e:
         db.session.rollback()
         print(f"Error creating service request: {str(e)}")
+        return {"error": str(e)}, 500
+
+
+def create_public_service_request(data):
+    """Create a request from a visitor who does not want a login account."""
+    try:
+        name = (data.get("name") or "").strip()
+        email = (data.get("email") or "").strip() or None
+        phone = (data.get("phone") or "").strip()
+        address = (data.get("address") or "").strip()
+        preferred_date = (data.get("preferred_date") or data.get("date") or "").strip()
+        description = (data.get("description") or "").strip()
+
+        if not name or not phone or not address or not preferred_date:
+            return {"error": "Name, phone, address and preferred date are required"}, 400
+
+        customer = get_customer_by_email(email) if email else None
+
+        if not customer:
+            customer = Customer(
+                name=name,
+                email=email,
+                phone=phone,
+                password=None,
+                has_account=False,
+                must_change_password=True
+            )
+            db.session.add(customer)
+            db.session.flush()
+        else:
+            customer.name = customer.name or name
+            customer.phone = customer.phone or phone
+
+        service_request = ServiceRequest(
+            customer_id=customer.id,
+            preferred_date=preferred_date,
+            description=description or "Demande sans compte",
+            address=address,
+            status="pending"
+        )
+
+        db.session.add(service_request)
+        db.session.commit()
+
+        admin_email = os.getenv("ADMIN_NOTIFICATION_EMAIL") or os.getenv("ADMIN_EMAIL")
+        if admin_email:
+            email_sent = send_email(
+                admin_email,
+                "Nouvelle demande sans compte - JR Jardinage",
+                f"""
+Nouvelle demande reçue depuis le formulaire public.
+
+Nom : {name}
+Email : {email or "Non renseigné"}
+Téléphone : {phone}
+Adresse : {address}
+Date souhaitée : {preferred_date}
+
+Description :
+{description or "Non renseignée"}
+
+Client enregistré comme compte non actif dans l'administration.
+"""
+            )
+            if not email_sent:
+                print("Admin notification email could not be sent")
+
+        return {
+            "message": "Request sent successfully",
+            "customer_id": customer.id,
+            "request_id": service_request.id
+        }, 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating public service request: {str(e)}")
         return {"error": str(e)}, 500
 
 

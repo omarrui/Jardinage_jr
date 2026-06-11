@@ -22,6 +22,15 @@ def register_customer(name, email, password, phone):
 
     existing = get_customer_by_email(email)
     if existing:
+        if not existing.password:
+            existing.name = name
+            existing.phone = phone
+            existing.password = generate_password_hash(password)
+            existing.has_account = True
+            existing.must_change_password = False
+            db.session.commit()
+            return {"message": "Customer registered successfully"}, 201
+
         return {"error": "Email already registered"}, 400
 
     hashed_password = generate_password_hash(password)
@@ -39,6 +48,9 @@ def authenticate_customer(email, password):
     customer = get_customer_by_email(email)
 
     if not customer:
+        return {"error": "Invalid email or password"}, 401
+
+    if not customer.password:
         return {"error": "Invalid email or password"}, 401
 
     if not check_password_hash(customer.password, password):

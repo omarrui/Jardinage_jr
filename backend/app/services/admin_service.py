@@ -131,6 +131,9 @@ def authenticate_customer(email, password):
     if not customer:
         return {"error": ERROR_INVALID_CREDENTIALS}, 401
 
+    if not customer.password:
+        return {"error": ERROR_INVALID_CREDENTIALS}, 401
+
     if not check_password_hash(customer.password, password):
         return {"error": ERROR_INVALID_CREDENTIALS}, 401
 

@@ -11,11 +11,23 @@ import elagageImg from "../gallery/elagage.webp";
 import votreJardinImg from "../gallery/votrejardain.jpg";
 import instaLogo from "../gallery/insta.webp";
 import jardiniersSapLogo from "../gallery/jardiniersap.png";
+import { apiUrl } from "../api/apiConfig";
 
-function Home({ goToBooking, goToClientAppointments }) {
+function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
+  const [quickRequest, setQuickRequest] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    preferred_date: "",
+    description: ""
+  });
+  const [quickRequestMessage, setQuickRequestMessage] = useState("");
+  const [quickRequestStatus, setQuickRequestStatus] = useState("");
   const wrapperRef = useRef(null);
+  const todayStr = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -58,6 +70,53 @@ function Home({ goToBooking, goToClientAppointments }) {
     };
   }, [isDragging]);
 
+  const updateQuickRequest = (field, value) => {
+    setQuickRequest((current) => ({
+      ...current,
+      [field]: value
+    }));
+  };
+
+  const submitQuickRequest = async (event) => {
+    event.preventDefault();
+    setQuickRequestMessage("");
+    setQuickRequestStatus("");
+
+    try {
+      const response = await fetch(apiUrl("/api/public/service-requests"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(quickRequest)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        setQuickRequestStatus("error");
+        setQuickRequestMessage(data.error || "Impossible d'envoyer la demande.");
+        return;
+      }
+
+      setQuickRequestStatus("success");
+      setQuickRequestMessage("Votre demande a bien été envoyée. JR Jardinage vous recontactera rapidement.");
+      setQuickRequest({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        preferred_date: "",
+        description: ""
+      });
+    } catch (error) {
+      setQuickRequestStatus("error");
+      setQuickRequestMessage("Erreur serveur. Veuillez réessayer.");
+    }
+  };
+
+  const scrollToQuickRequest = () => {
+    document.getElementById("demande-sans-compte")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="home-container">
 
@@ -74,7 +133,7 @@ function Home({ goToBooking, goToClientAppointments }) {
             Jardinage, élagage et création sur mesure
           </h1>
           <div className="hero-buttons">
-            <button className="primary-btn" onClick={goToBooking}>
+            <button className="primary-btn" onClick={goToQuoteForm}>
               Demander un devis
             </button>
 
@@ -259,6 +318,51 @@ function Home({ goToBooking, goToClientAppointments }) {
         </div>
       </section>
 
+      {/* ================= CONTRATS D'ENTRETIEN SECTION ================= */}
+      <section id="contrats-entretien" className="contracts-section">
+        <div className="contracts-header">
+          <span className="about-badge">Contrats d'entretien</span>
+          <h2>
+            <span>Nos contrats</span>
+            <span>d'entretien</span>
+          </h2>
+          <p>
+            Des passages réguliers pour garder votre jardin propre, structuré
+            et agréable toute l'année, avec un prix forfaitaire adapté à vos besoins.
+          </p>
+        </div>
+
+        <div className="contracts-grid">
+          <article className="contract-card">
+            <span className="contract-period">Mensuel</span>
+            <h3>Contrat mensuel</h3>
+            <p className="contract-passage">1 à 4 passages</p>
+            <p>Entretien suivi pour garder vos extérieurs propres au fil des semaines.</p>
+            <strong>Prix forfaitaire sur mesure</strong>
+          </article>
+
+          <article className="contract-card featured">
+            <span className="contract-period">3 mois</span>
+            <h3>Contrat trimestriel</h3>
+            <p className="contract-passage">1 à 8 passages</p>
+            <p>Un rythme flexible pour accompagner les saisons et les besoins du jardin.</p>
+            <strong>Prix forfaitaire sur mesure</strong>
+          </article>
+
+          <article className="contract-card">
+            <span className="contract-period">6 mois</span>
+            <h3>Contrat semestriel</h3>
+            <p className="contract-passage">Grand passage tous les 6 mois</p>
+            <p>Une intervention complète pour remettre le jardin au propre durablement.</p>
+            <strong>Prix forfaitaire sur mesure</strong>
+          </article>
+        </div>
+
+        <button className="primary-btn" onClick={goToQuoteForm}>
+          Demander un devis
+        </button>
+      </section>
+
       {/* ================= CREDIT IMPÔT SECTION ================= */}
       <section id="credit-impot" className="seo-section">
         <div className="seo-content">
@@ -300,9 +404,16 @@ function Home({ goToBooking, goToClientAppointments }) {
       <div className="home-cta-buttons">
         <button
           className="primary-btn"
-          onClick={goToBooking}
+          onClick={goToSignup}
         >
-          Demander un rendez-vous
+          Créer un compte client
+        </button>
+
+        <button
+          className="secondary-btn"
+          onClick={scrollToQuickRequest}
+        >
+          Demande sans compte
         </button>
 
         {goToClientAppointments && (
@@ -314,6 +425,94 @@ function Home({ goToBooking, goToClientAppointments }) {
           </button>
         )}
       </div>
+
+      {/* ================= QUICK REQUEST SECTION ================= */}
+      <section id="demande-sans-compte" className="quick-request-section">
+        <div className="quick-request-copy">
+          <span className="about-badge">Demande sans compte</span>
+          <h2>Un devis rapide sans créer de compte</h2>
+          <p>
+            Vous pouvez aussi envoyer vos coordonnées directement. Votre demande
+            sera transmise à l'administrateur et enregistrée comme client non actif.
+          </p>
+        </div>
+
+        <form className="quick-request-form" onSubmit={submitQuickRequest}>
+          <div className="quick-request-row">
+            <label>
+              Nom complet
+              <input
+                type="text"
+                value={quickRequest.name}
+                onChange={(event) => updateQuickRequest("name", event.target.value)}
+                required
+              />
+            </label>
+
+            <label>
+              Téléphone
+              <input
+                type="tel"
+                value={quickRequest.phone}
+                onChange={(event) => updateQuickRequest("phone", event.target.value)}
+                required
+              />
+            </label>
+          </div>
+
+          <label>
+            Email
+            <input
+              type="email"
+              value={quickRequest.email}
+              onChange={(event) => updateQuickRequest("email", event.target.value)}
+              placeholder="Optionnel"
+            />
+          </label>
+
+          <label>
+            Adresse d'intervention
+            <input
+              type="text"
+              value={quickRequest.address}
+              onChange={(event) => updateQuickRequest("address", event.target.value)}
+              placeholder="Ex: 12 rue des Oliviers, Le Muy"
+              required
+            />
+          </label>
+
+          <label>
+            Date souhaitée
+            <input
+              type="date"
+              min={todayStr}
+              value={quickRequest.preferred_date}
+              onChange={(event) => updateQuickRequest("preferred_date", event.target.value)}
+              required
+            />
+          </label>
+
+          <label>
+            Votre besoin
+            <textarea
+              value={quickRequest.description}
+              onChange={(event) => updateQuickRequest("description", event.target.value)}
+              placeholder="Ex: Débroussaillage, taille de haie, création paysagère..."
+              rows="4"
+            />
+          </label>
+
+          <button type="submit" className="primary-btn">
+            Envoyer ma demande
+          </button>
+
+          {quickRequestMessage && (
+            <p className={`quick-request-message ${quickRequestStatus}`}>
+              {quickRequestMessage}
+            </p>
+          )}
+        </form>
+      </section>
 
       {/* ================= CONTACT SECTION ================= */}
       <section className="contact-section">

@@ -3,10 +3,15 @@ from app.services import appointment_service
 from app.utils.jwt_utils import verify_token
 
 def register_service_request_routes(app):
+    @app.route("/api/public/service-requests", methods=["POST"])
+    def create_public_service_request():
+        data = request.get_json(silent=True) or {}
+        response, status = appointment_service.create_public_service_request(data)
+        return jsonify(response), status
     
     @app.route("/api/service-requests", methods=["POST"])
     def create_service_request():
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         # Call the correct function name from appointment_service
         response, status = appointment_service.create_service_request(data)
         return jsonify(response), status

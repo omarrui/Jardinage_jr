@@ -8,11 +8,24 @@
   
   /* ===== HERO ===== */
   .hero {
-    height: clamp(320px, 35vw, 430px);
+    height: clamp(360px, 38vw, 480px);
     background-size: cover;
     background-position: center 44%;
     background-repeat: no-repeat;
     position: relative;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 92px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.78) 100%);
+    pointer-events: none;
+    z-index: 1;
   }
   
   
@@ -31,7 +44,9 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 46px 20px 68px;
+    padding: 46px 20px 92px;
+    position: relative;
+    z-index: 2;
   }
 
   .hero-kicker {
@@ -43,8 +58,8 @@
   }
   
   .hero h1 {
-    max-width: 600px;
-    font-size: clamp(2rem, 3.15vw, 3.35rem);
+    max-width: 680px;
+    font-size: clamp(2.15rem, 3.45vw, 3.65rem);
     line-height: 1.12;
     margin-bottom: 24px;
     font-weight: 800;
@@ -56,9 +71,17 @@
     margin-bottom: 25px;
   }
   
+  .hero-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
   .hero-buttons button,
   .hero-buttons a {
-    margin: 0 5px;
+    margin: 0;
   }
   
   /* ===== BUTTONS ===== */
@@ -66,10 +89,10 @@
     background: linear-gradient(135deg, #2f7d36 0%, #7da63c 100%);
     color: white;
     border: none;
-    padding: 9px 18px;
+    padding: 11px 22px;
     border-radius: 30px;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
   }
   
@@ -81,10 +104,10 @@
     background-color: transparent;
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.9);
-    padding: 8px 18px;
+    padding: 10px 22px;
     border-radius: 30px;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
     display: inline-flex;
     align-items: center;
@@ -94,42 +117,63 @@
   
   /* ===== SERVICES ===== */
 .services-section {
-    padding: 0 40px 42px;
+    padding: 0 40px 76px;
     text-align: center;
-    background:
-      linear-gradient(180deg, #ffffff 0%, #ffffff 70%, #f6faf2 100%);
+    background: #ffffff;
     position: relative;
     z-index: 5;
+}
+
+.services-section::before {
+    content: none;
 }
   
   .services-grid {
     display: flex;
     justify-content: center;
-    gap: 18px;
-    margin-top: -20px;
+    gap: 22px;
+    margin: 0 auto -62px;
     flex-wrap: wrap;
+    max-width: 980px;
+    position: relative;
+    top: -86px;
+    z-index: 2;
   }
   
   .service-card {
-    background:
-      linear-gradient(180deg, #ffffff 0%, #fbfdf8 100%);
-    width: 132px;
-    min-height: 86px;
-    padding: 9px 9px 8px;
-    border-radius: 6px;
-    box-shadow: 0 10px 26px rgba(41, 76, 35, 0.13);
-    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    width: 178px;
+    min-height: 146px;
+    padding: 20px 18px 18px;
+    border: 1px solid rgba(65, 102, 48, 0.1);
+    border-radius: 8px;
+    box-shadow:
+      0 22px 44px rgba(31, 70, 27, 0.14),
+      0 2px 8px rgba(31, 70, 27, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
   }
   
   .service-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-7px);
+    box-shadow:
+      0 28px 54px rgba(31, 70, 27, 0.18),
+      0 4px 12px rgba(31, 70, 27, 0.06);
   }
   
   .service-img {
-    width: 31px;
-    height: 27px;
-    margin-bottom: 5px;
+    width: 48px;
+    height: 46px;
+    margin-bottom: 14px;
     object-fit: contain;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 5px 10px rgba(91, 132, 45, 0.14));
   }
 
   .service-card p {
@@ -517,12 +561,14 @@
 /* Removed override grid and image placeholder for clean design */
 
 .service-card h3 {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   color: #1d4d0f;
-  line-height: 1.2;
+  line-height: 1.18;
   hyphens: auto;
   overflow-wrap: anywhere;
+  position: relative;
+  z-index: 1;
 }
 
 /* Responsive adjustments */
@@ -762,6 +808,115 @@
   margin-bottom: 20px;
 }
 
+/* ================= CONTRACTS SECTION ================= */
+.contracts-section {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 88px 34px 92px;
+  text-align: center;
+  background:
+    repeating-linear-gradient(
+      118deg,
+      rgba(128, 164, 60, 0.055) 0 1px,
+      transparent 1px 18px
+    ),
+    linear-gradient(180deg, #f8fbf4 0%, #ffffff 100%);
+}
+
+.contracts-header {
+  max-width: 700px;
+  margin: 0 auto 34px;
+}
+
+.contracts-header .about-badge {
+  display: inline-block;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.contracts-header h2 {
+  color: #1b5e20;
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  line-height: 1.08;
+  margin-bottom: 16px;
+}
+
+.contracts-header h2 span + span::before {
+  content: " ";
+}
+
+.contracts-header p {
+  color: #4d5b4b;
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.contracts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 34px;
+}
+
+.contract-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 260px;
+  padding: 26px 24px;
+  border: 1px solid rgba(54, 94, 41, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 42px rgba(37, 74, 31, 0.09);
+  text-align: left;
+}
+
+.contract-card.featured {
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f1f8e8 100%);
+  border-color: rgba(111, 157, 51, 0.34);
+  transform: translateY(-10px);
+}
+
+.contract-period {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #e9f4df;
+  color: #2f7d36;
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.contract-card h3 {
+  color: #173f14;
+  font-size: 1.35rem;
+  line-height: 1.16;
+  margin: 18px 0 12px;
+}
+
+.contract-passage {
+  color: #2f7d36;
+  font-size: 1.04rem;
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+
+.contract-card p:not(.contract-passage) {
+  color: #53624f;
+  line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.contract-card strong {
+  margin-top: auto;
+  color: #1b5e20;
+  font-size: 0.95rem;
+}
+
 /* Responsive */
 @media (max-width: 968px) {
   .seo-section {
@@ -774,6 +929,17 @@
   
   .seo-content p {
     font-size: 1rem;
+  }
+
+  .contracts-grid {
+    grid-template-columns: 1fr;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .contract-card.featured {
+    transform: none;
   }
 }
 /* ================= BOTTOM CTA BUTTONS ================= */
@@ -814,6 +980,104 @@
   background: #1b5e20;
   color: white;
   transform: translateY(-3px);
+}
+
+/* ================= QUICK REQUEST SECTION ================= */
+.quick-request-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr);
+  gap: 42px;
+  align-items: start;
+  max-width: 1120px;
+  margin: 0 auto 76px;
+  padding: 54px 34px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 250, 242, 0.98) 100%);
+}
+
+.quick-request-copy h2 {
+  color: #1b5e20;
+  font-size: clamp(1.9rem, 3vw, 2.7rem);
+  line-height: 1.12;
+  margin: 16px 0;
+}
+
+.quick-request-copy p {
+  color: #4d5b4b;
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.quick-request-form {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid rgba(54, 94, 41, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(37, 74, 31, 0.1);
+}
+
+.quick-request-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quick-request-form label {
+  display: grid;
+  gap: 7px;
+  color: #22451d;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.quick-request-form input,
+.quick-request-form textarea {
+  width: 100%;
+  border: 1px solid rgba(35, 70, 28, 0.16);
+  border-radius: 6px;
+  padding: 12px 13px;
+  color: #1f2d1f;
+  font: inherit;
+  font-weight: 500;
+  background: #fbfdf8;
+  outline: none;
+}
+
+.quick-request-form input:focus,
+.quick-request-form textarea:focus {
+  border-color: #6f9d33;
+  box-shadow: 0 0 0 3px rgba(111, 157, 51, 0.16);
+}
+
+.quick-request-form textarea {
+  resize: vertical;
+  min-height: 112px;
+}
+
+.quick-request-form .primary-btn {
+  width: fit-content;
+  min-width: 170px;
+  padding: 12px 22px;
+}
+
+.quick-request-message {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.quick-request-message.success {
+  color: #1b5e20;
+  background: #ecf8ed;
+}
+
+.quick-request-message.error {
+  color: #8a1f14;
+  background: #fff0ec;
 }
 
 .local-seo-section {
@@ -858,22 +1122,35 @@
   }
 
   .services-section {
-    padding: 0 18px 34px;
+    padding: 0 18px 52px;
+    background: #ffffff;
   }
 
   .services-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    max-width: 320px;
+    gap: 14px;
+    max-width: 350px;
     width: 100%;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: -54px;
+    top: -70px;
   }
 
   .service-card {
     width: 100%;
-    min-height: 92px;
+    min-height: 126px;
+    padding: 16px 12px;
+  }
+
+  .service-img {
+    width: 44px;
+    height: 38px;
+  }
+
+  .service-card h3 {
+    font-size: 11px;
   }
 
   .about-section {
@@ -908,10 +1185,34 @@
   }
 
   .before-after-section,
+  .contracts-section,
   .reviews-section,
   .contact-section {
     padding-left: 20px;
     padding-right: 20px;
+  }
+
+  .contracts-section {
+    padding-top: 64px;
+    padding-bottom: 68px;
+  }
+
+  .contracts-header h2 {
+    font-size: 30px;
+    overflow-wrap: anywhere;
+  }
+
+  .contracts-header h2 span {
+    display: block;
+  }
+
+  .contracts-header h2 span + span::before {
+    content: "";
+  }
+
+  .contract-card {
+    min-height: auto;
+    padding: 22px 20px;
   }
 
   .home-cta-buttons {
@@ -920,6 +1221,25 @@
   }
 
   .home-cta-buttons button {
+    width: 100%;
+  }
+
+  .quick-request-section {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-bottom: 52px;
+    padding: 38px 20px;
+  }
+
+  .quick-request-form {
+    padding: 18px;
+  }
+
+  .quick-request-row {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-request-form .primary-btn {
     width: 100%;
   }
 }
@@ -931,10 +1251,395 @@
 
   .services-grid {
     grid-template-columns: 1fr;
-    max-width: 210px;
+    max-width: 240px;
   }
 
   .contact-card {
     padding: 24px 20px;
+  }
+}
+
+/* ================= FINAL HOMEPAGE POLISH ================= */
+.home-container {
+  background: #ffffff;
+  color: #263326;
+}
+
+.hero {
+  height: clamp(430px, 57vh, 610px);
+  background-position: center 42%;
+}
+
+.hero::after {
+  height: 78px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
+}
+
+.hero-overlay {
+  background:
+    linear-gradient(180deg, rgba(4, 8, 5, 0.48) 0%, rgba(4, 8, 5, 0.54) 100%);
+  padding: 70px 22px 132px;
+}
+
+.hero-kicker {
+  margin-bottom: 14px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.hero h1 {
+  max-width: 760px;
+  margin-bottom: 28px;
+  font-size: clamp(2.55rem, 5vw, 4.65rem);
+  line-height: 1.04;
+}
+
+.hero-buttons {
+  gap: 14px;
+}
+
+.primary-btn,
+.secondary-btn {
+  min-height: 42px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.72);
+}
+
+.services-section {
+  padding: 0 28px 74px;
+  background: #ffffff;
+}
+
+.services-grid {
+  max-width: 1060px;
+  gap: 18px;
+  top: -92px;
+  margin-bottom: -54px;
+}
+
+.service-card {
+  width: 190px;
+  min-height: 154px;
+  padding: 22px 18px 20px;
+  border-color: rgba(30, 75, 23, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 20px 48px rgba(25, 58, 23, 0.12);
+}
+
+.service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 58px rgba(25, 58, 23, 0.16);
+}
+
+.service-img {
+  width: 52px;
+  height: 48px;
+}
+
+.service-card h3 {
+  max-width: 150px;
+  color: #174714;
+  font-size: 13px;
+  line-height: 1.18;
+}
+
+.services-section > div[style] {
+  margin-top: 22px !important;
+}
+
+.services-section > div[style] .primary-btn {
+  min-height: 38px;
+  padding: 0 20px;
+  font-size: 11px;
+}
+
+.about-section {
+  max-width: 1120px;
+  gap: 70px;
+  padding: 86px 34px 118px;
+  background: #ffffff;
+}
+
+.about-left {
+  max-width: 520px;
+}
+
+.about-badge {
+  margin-bottom: 14px;
+  color: #6f9630;
+  font-size: 11px;
+}
+
+.about-left h2 {
+  margin-bottom: 24px;
+  color: #164516;
+  font-size: clamp(2rem, 3.4vw, 3.2rem);
+  line-height: 1.05;
+}
+
+.about-left p,
+.about-left ul li {
+  color: #4b5948;
+  font-size: 15px;
+  line-height: 1.78;
+}
+
+.about-left ul {
+  margin: 28px 0;
+}
+
+.about-left ul li {
+  padding-left: 18px;
+  margin-bottom: 12px;
+}
+
+.about-right {
+  flex: 0 0 min(420px, 42vw);
+}
+
+.about-image {
+  max-width: 420px;
+  aspect-ratio: 4 / 5;
+  border-radius: 8px;
+  box-shadow: 0 24px 54px rgba(19, 49, 20, 0.14);
+}
+
+.before-after-section {
+  padding: 88px 24px 98px;
+  background: linear-gradient(180deg, #f7faf4 0%, #eef5e9 100%);
+}
+
+.before-after-section h2,
+.contracts-header h2,
+.seo-content h2,
+.contact-header h2 {
+  color: #174714;
+  font-weight: 850;
+}
+
+.before-after-section h2 {
+  margin-bottom: 38px;
+  font-size: clamp(2rem, 3.2vw, 3rem);
+}
+
+.before-after-container {
+  max-width: 640px;
+}
+
+.before-after-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 22px 52px rgba(20, 50, 20, 0.16);
+}
+
+.contracts-section {
+  max-width: none;
+  padding: 92px 28px 96px;
+  background: #ffffff;
+}
+
+.contracts-header {
+  max-width: 760px;
+}
+
+.contracts-header h2 {
+  font-size: clamp(2.2rem, 3.8vw, 3.4rem);
+}
+
+.contracts-header p {
+  color: #546250;
+}
+
+.contracts-grid {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 22px;
+}
+
+.contract-card {
+  min-height: 270px;
+  border-color: rgba(35, 76, 28, 0.1);
+  background: #ffffff;
+  box-shadow: 0 20px 48px rgba(33, 70, 29, 0.09);
+}
+
+.contract-card.featured {
+  background: #f8fbf4;
+  border-color: rgba(111, 157, 51, 0.28);
+}
+
+.seo-section {
+  max-width: none;
+  padding: 92px 28px;
+  background: #f8faf6;
+}
+
+.seo-content {
+  max-width: 860px;
+  padding: 42px 48px;
+  border-left: 4px solid #80a43c;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(31, 70, 27, 0.07);
+}
+
+.seo-content h2 {
+  font-size: clamp(2rem, 3vw, 2.8rem);
+}
+
+.seo-content p {
+  color: #4b5948;
+}
+
+.reviews-section {
+  padding: 88px 28px 72px;
+  background: #ffffff;
+}
+
+.home-cta-buttons {
+  margin: 58px 0 36px;
+}
+
+.quick-request-section {
+  max-width: 1120px;
+  gap: 54px;
+  margin-bottom: 88px;
+  padding: 64px 42px;
+  border-top: 1px solid rgba(34, 80, 28, 0.08);
+  border-bottom: 1px solid rgba(34, 80, 28, 0.08);
+  background: #f8faf6;
+}
+
+.quick-request-copy h2 {
+  color: #174714;
+  font-size: clamp(2rem, 3.4vw, 3.1rem);
+}
+
+.quick-request-form {
+  border-radius: 8px;
+  box-shadow: 0 22px 54px rgba(33, 70, 29, 0.1);
+}
+
+.quick-request-form input,
+.quick-request-form textarea {
+  background: #ffffff;
+}
+
+.contact-section {
+  padding: 94px 28px;
+}
+
+.contact-cards {
+  gap: 22px;
+}
+
+.contact-card {
+  border-radius: 8px;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.14);
+}
+
+.map-section {
+  height: 360px;
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    height: 560px;
+  }
+
+  .hero-overlay {
+    padding: 58px 18px 130px;
+  }
+
+  .hero h1 {
+    max-width: 560px;
+    font-size: 44px;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 520px;
+    top: -82px;
+  }
+
+  .service-card {
+    width: 100%;
+  }
+
+  .about-section {
+    gap: 38px;
+    padding: 72px 24px 88px;
+  }
+
+  .contracts-grid {
+    grid-template-columns: 1fr;
+    max-width: 620px;
+  }
+
+  .quick-request-section {
+    grid-template-columns: 1fr;
+    padding: 52px 24px;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero {
+    height: 590px;
+  }
+
+  .hero h1 {
+    max-width: 340px;
+    font-size: 36px;
+  }
+
+  .hero-buttons {
+    width: min(100%, 320px);
+  }
+
+  .hero-buttons button,
+  .hero-buttons a {
+    width: 100%;
+  }
+
+  .services-section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+    max-width: 270px;
+    top: -76px;
+    margin-bottom: -42px;
+  }
+
+  .service-card {
+    min-height: 136px;
+  }
+
+  .about-section,
+  .before-after-section,
+  .contracts-section,
+  .seo-section,
+  .reviews-section,
+  .contact-section {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .seo-content,
+  .quick-request-form {
+    padding: 24px 20px;
+  }
+
+  .home-cta-buttons {
+    padding: 0 18px;
   }
 }
