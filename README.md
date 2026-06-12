@@ -1,144 +1,217 @@
 # JR Jardinage
 
-## Professional Gardening Service Management Platform
+JR Jardinage is a full-stack gardening service management platform for public quote requests, customer accounts, appointment scheduling, and admin calendar management.
 
-JR Jardinage is a full-stack web application designed to manage gardening service requests, appointment scheduling, and customer administration for a local gardening business.
-
-The platform replaces a basic time-slot booking system with a professional request-based scheduling workflow, reflecting how real gardening companies operate.
+The project uses a React/Vite frontend, a Flask API backend, SQLAlchemy, JWT authentication, email notifications, and a production database hosted outside the app.
 
 ---
 
-## Project Overview
+## Main Features
 
-JR Jardinage allows:
+- Public homepage for JR Jardinage services
+- Public quote request form for non-active clients
+- Customer signup and login
+- Customer appointment requests
+- Admin login
+- Admin customer management
+- Active and non-active client records
+- Admin appointment calendar
+- Click-to-create appointments from the admin calendar
+- Block and unblock unavailable dates
+- Email notifications for account creation, password reset, and public requests
+- Responsive mobile navigation with burger menu
+- PWA support through a web manifest and service worker
 
-- Customers to request gardening services
-- Admin to review and schedule appointments
-- Full calendar management
-- Multi-day scheduling
-- Conflict detection with warning system
-- Customer account management with temporary passwords
-- Controlled appointment lifecycle
+---
 
-This system models real-world service business logic instead of simple slot booking.
+## Tech Stack
+
+### Frontend
+
+- React
+- Vite
+- React Big Calendar
+- date-fns
+- CSS modules/global CSS
+- PWA manifest and service worker
+
+### Backend
+
+- Python
+- Flask
+- Flask-CORS
+- Flask-SQLAlchemy
+- SQLAlchemy
+- PyJWT
+- Werkzeug password hashing
+- SMTP email sending
+
+### Database
+
+- MySQL for local Docker/local testing
+- PostgreSQL/Supabase supported for production through `DATABASE_URL`
 
 ---
 
 ## Architecture
 
-The application follows a layered architecture that separates responsibilities between the API layer, business logic, and data access.
-
-### Backend (Flask)
-
-The backend is organized into structured layers inside the `backend/app` directory:
-
-- **API Layer (`api/v1`)** – Handles HTTP requests and responses. These route files expose the REST API endpoints used by the frontend.
-- **Service Layer (`services`)** – Contains the core business logic such as authentication, appointment scheduling, validation rules, and email notifications.
-- **Models (`models`)** – SQLAlchemy ORM models representing database entities such as customers, appointments, and service requests.
-- **Utilities (`utils`)** – Helper utilities including JWT token generation, password handling, and email sending.
-- **Persistence / Repository Layer (`persistence`)** – Responsible for database interactions and abstraction of data access.
-
-This layered design keeps the application maintainable and prevents business logic from being mixed with route handlers.
-
-### Frontend (React + Vite)
-
-The frontend is structured using a component‑based architecture:
-
-- **Pages (`src/pages`)** – Main application screens such as Login, AdminDashboard, Calendar, and Booking.
-- **Components (`src/components`)** – Reusable UI elements such as alerts and shared interface components.
-- **Gallery (`src/gallery`)** – Static media assets used in the interface.
-- **Styles (`src/styles`)** – CSS styling separated from React components.
-
-The frontend communicates with the backend through REST API calls and manages application state to control navigation and workflow.
-
-This separation between frontend UI and backend services improves scalability and code readability.
-
-### Architecture Diagram
-
 ```mermaid
 flowchart TD
-    A[React Frontend<br/>Vite] -->|REST API| B[Flask API Layer]
+    A[React + Vite Frontend] -->|/api requests| B[Flask API]
     B --> C[Service Layer]
-    C --> D[Repository / Persistence Layer]
-    D --> E[(MySQL Database)]
+    C --> D[SQLAlchemy Models]
+    D --> E[(MySQL or PostgreSQL)]
+    C --> F[Email Utility]
+    C --> G[JWT Auth]
+```
 
-    C --> F[Email Service]
-    C --> G[JWT Authentication]
+The backend is split into:
+
+- `backend/app/api/v1` - route definitions
+- `backend/app/services` - business logic
+- `backend/app/models` - SQLAlchemy models
+- `backend/app/persistence` - database access helpers
+- `backend/app/utils` - JWT and email helpers
+
+The frontend is split into:
+
+- `frontend/src/pages` - main screens
+- `frontend/src/components` - reusable UI pieces
+- `frontend/src/api` - API URL and authenticated request helpers
+- `frontend/public` - PWA assets
+
+---
+
+## Project Structure
+
+```text
+Jardinage_jr/
+├── backend/
+│   ├── api/
+│   │   └── index.py
+│   ├── app/
+│   │   ├── api/v1/
+│   │   ├── models/
+│   │   ├── persistence/
+│   │   ├── services/
+│   │   └── utils/
+│   ├── config.py
+│   ├── run.py
+│   ├── requirements.txt
+│   └── vercel.json
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── api/
+│   │   ├── components/
+│   │   └── pages/
+│   ├── package.json
+│   └── vercel.json
+├── docker/
+├── docker-compose.yml
+└── README.md
 ```
 
 ---
 
-## Technologies Used
+## Environment Variables
 
+Never commit real secrets to GitHub. Keep them in `backend/.env` locally and in Vercel Environment Variables in production.
+
+### Backend Required Variables
+
+```env
+SECRET_KEY=generate_a_long_random_secret
+DATABASE_URL=your_database_connection_string
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_admin_password
+FRONTEND_URL=https://your-production-frontend.vercel.app
+```
+
+### Backend Email Variables
+
+```env
+MAIL_USERNAME=your_gmail_address
+MAIL_PASSWORD=your_gmail_app_password
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+ADMIN_NOTIFICATION_EMAIL=where_public_form_notifications_go
+```
+
+### Optional CORS Variable
+
+Use this if more than one frontend URL should be allowed:
+
+```env
+FRONTEND_ORIGINS=http://localhost:5173,https://your-production-frontend.vercel.app
+```
+
+### Sensitive Variables
+
+Mark these as sensitive/secret in Vercel:
+
+```env
+SECRET_KEY
+DATABASE_URL
+ADMIN_PASSWORD
+MAIL_PASSWORD
+```
+
+To generate a strong local secret:
+
+```bash
+openssl rand -hex 32
+```
+
+---
+
+## Local Development
 
 ### Backend
 
-- Flask (Python)
-- SQLAlchemy
-- MySQL
-- Flask-CORS
-- JWT Authentication
-- Werkzeug (password hashing)
-- Flask-Mail (email notifications)
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python run.py
+```
+
+Backend URL:
+
+```text
+http://127.0.0.1:5000
+```
 
 ### Frontend
 
-- React (Vite)
-- React Big Calendar
-- date-fns
-- Drag & Drop Calendar Addon
-
-### Database
-
-- MySQL
-
-### Database Diagram
-
-```mermaid
-erDiagram
-    CUSTOMER {
-        int id
-        string name
-        string email
-        string phone
-        string password_hash
-        boolean force_password_change
-    }
-
-    SERVICE_REQUEST {
-        int id
-        int customer_id
-        string description
-        string address
-        date preferred_date
-        string status
-    }
-
-    APPOINTMENT {
-        int id
-        int request_id
-        datetime scheduled_start
-        datetime scheduled_end
-        string status
-    }
-
-    BLOCKED_DATE {
-        int id
-        date blocked_date
-    }
-
-    CUSTOMER ||--o{ SERVICE_REQUEST : creates
-    SERVICE_REQUEST ||--o| APPOINTMENT : becomes
+```bash
+cd frontend
+npm install
+npm run dev
 ```
+
+Frontend URL:
+
+```text
+http://localhost:5173
+```
+
+In development, the frontend uses:
+
+```text
+http://127.0.0.1:5000
+```
+
+unless `VITE_API_URL` is set.
 
 ---
 
 ## Run With Docker
 
-You can run the full stack with Docker Compose:
+From the project root:
 
 ```bash
-cp .env.docker.example .env
 docker compose up --build
 ```
 
@@ -150,25 +223,13 @@ Backend:  http://localhost:5000
 MySQL:    localhost:3307
 ```
 
-The Docker setup starts:
-
-- `db` - MySQL 8.4 with a persistent `mysql_data` volume
-- `backend` - Flask API on port `5000`
-- `frontend` - Vite React app on port `5173`
-
-For local Docker development, the backend uses this internal database URL:
-
-```text
-mysql+pymysql://jardinage:password123@db:3306/jardinage_db
-```
-
-To stop the stack:
+To stop containers:
 
 ```bash
 docker compose down
 ```
 
-To also delete the MySQL Docker volume and reset the database:
+To remove the local Docker database volume too:
 
 ```bash
 docker compose down -v
@@ -176,326 +237,154 @@ docker compose down -v
 
 ---
 
-## Authentication System
+## Testing
 
-### Customer Authentication
+### Backend Tests
 
-- Email + Password
-- Passwords hashed using `generate_password_hash`
-- Temporary password system for admin-created accounts
-- Forced password change on first login
-- Password reset functionality via email token
-- JWT-based authentication
-
-### Admin Authentication
-
-- Seeded admin account
-- JWT role-based authentication
-
----
-
-## Booking System Redesign
-
-### Original Model
-
-Customers could:
-
-- Book exact time slots
-- Overbook days
-- Ignore job duration
-- Create scheduling conflicts
-
-This model did not reflect real gardening operations.
-
----
-
-### Current Model – Request-Based Scheduling
-
-#### Customer Workflow
-
-1. Submit service request
-2. Choose preferred date
-3. Provide address and description
-4. Status = `"pending"`
-
-#### Admin Workflow
-
-1. Review request
-2. Estimate job duration
-3. Assign start & end datetime
-4. Status = `"scheduled"`
-5. Appointment appears on calendar
-
----
-
-### Appointment Lifecycle
-
-| Status     | Meaning                  |
-|------------|--------------------------|
-| pending    | Waiting for admin review |
-| scheduled  | Confirmed appointment    |
-| cancelled  | Cancelled by admin       |
-| completed  | (Future upgrade)         |
-
-This introduces structured state management instead of simple CRUD operations.
-
----
-
-## Calendar Features
-
-- Drag & Drop appointment rescheduling
-- Multi-day appointments supported
-- Blocked dates (admin-controlled)
-- Conflict warning (not forced blocking)
-- Double-booking allowed with confirmation
-- Appointment cancellation via modal
-- Visual conflict indicators
-
----
-
-## Project Structure
-
-```
-JR_Jardinage/
-│
-├── backend/
-│   ├── routes/
-│   │   ├── admin_routes.py
-│   │   ├── appointment_routes.py
-│   │   ├── customer_routes.py
-│   │   └── service_request_routes.py
-│   │
-│   ├── services/
-│   │   ├── admin_service.py
-│   │   ├── appointment_service.py
-│   │   └── customer_service.py
-│   │
-│   ├── repositories/
-│   │   ├── admin_repository.py
-│   │   ├── appointment_repository.py
-│   │   └── customer_repository.py
-│   │
-│   ├── models.py
-│   ├── app.py
-│   └── config.py
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── AdminDashboard.jsx
-│   │   │   ├── AdminCalendar.jsx
-│   │   │   ├── Account.jsx
-│   │   │   ├── Booking.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── Signup.jsx
-│   │   │   ├── ResetPassword.jsx
-│   │   │   ├── RequestReset.jsx
-│   │   │   ├── ChangePassword.jsx
-│   │   │   └── Home.jsx
-│   │   ├── gallery/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── package.json
-│
-└── README.md
-```
-
----
-
-## Installation (Local Development)
-
-### Backend Setup
+From `backend/`:
 
 ```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate   # Mac/Linux
-# venv\Scripts\activate    # Windows
-pip install -r requirements.txt
-python3 app.py
+python -m unittest tests/tests.py
 ```
 
-**Server runs on:**
-```
-http://127.0.0.1:5000
-```
+The backend tests use the configured database connection, so local MySQL must be running if your test environment points to MySQL.
 
----
+### Frontend Build
 
-### Frontend Setup
+From `frontend/`:
 
 ```bash
-cd frontend
-npm install
-npm run dev
+npm run build
 ```
 
-**Frontend runs on:**
+Vite may warn if the JavaScript bundle is larger than 500 kB. That warning does not mean the build failed.
+
+---
+
+## Deployment Notes
+
+The project is deployed as two Vercel projects:
+
+- Frontend: React/Vite app
+- Backend: Flask API using `@vercel/python`
+
+### Frontend API Routing
+
+The frontend uses relative API routes in production:
+
+```js
+fetch("/api/...")
 ```
-http://localhost:5173
+
+`frontend/vercel.json` rewrites those requests to the deployed Flask backend.
+
+### Backend Routing
+
+`backend/vercel.json` sends all backend requests to:
+
+```text
+backend/api/index.py
 ```
 
----
+That file imports the Flask app from `backend/run.py`.
 
-## Key Features
+### Production Checklist
 
-### Customer Portal
+Before production deploy:
 
-- Service request submission
-- Appointment history view
-- Account management
-- Password change functionality
-- Password reset via email
-
-### Admin Dashboard
-
-- Customer management (create, edit, delete)
-- Service request review
-- Appointment scheduling
-- Interactive calendar with drag & drop
-- Multi-day appointment support
-- Conflict detection
-- Temporary password generation and resend
-
-### Security Features
-
-- Password hashing with Werkzeug
-- JWT authentication
-- Secure password reset tokens
-- Email verification for password reset
-- Session management
+1. Push the correct branch, usually `main`.
+2. Set backend environment variables in Vercel.
+3. Make sure `FRONTEND_URL` matches the real production frontend URL.
+4. Make sure frontend rewrites point to the real production backend URL.
+5. Redeploy backend after changing env vars.
+6. Redeploy frontend after changing frontend routing or build files.
 
 ---
 
-## Key Engineering Decisions
+## Security Notes
 
-**Separation of Concerns**  
-Routes → Services → Repository layering
+Recent security hardening added:
 
-**State-Driven Workflow**  
-Appointments controlled via lifecycle states
+- Hardcoded email credentials were removed from the codebase.
+- Email credentials now come from environment variables.
+- `SECRET_KEY` is required and no longer falls back to a weak default.
+- Admin API routes require a valid admin JWT.
+- Frontend admin requests now send the stored admin token automatically.
+- CORS allows local development and configured production frontend origins.
+- OPTIONS preflight requests are handled for browser requests.
 
-**Business-Realistic Model**  
-Request-based instead of self-booked time slots
+Important: if any secret was ever committed to GitHub, rotate it even after removing it from the current code because it may still exist in Git history.
 
-**Admin-Controlled Scheduling**  
-Calendar reflects confirmed work only
+Recommended future security improvements:
 
-**Security First**  
-Password hashing and JWT authentication implemented early
-
----
-
-## Future Improvements
-
-- Automatic 24‑hour appointment reminder emails
-- SMS reminders
-- Invoice generation system
-- Completed status tracking
-- Enhanced customer dashboard
-- Production deployment (Docker + Nginx)
-- Role-based middleware protection
-- Smart time-overlap conflict detection
-- Advanced mobile UI optimization
-- Payment integration
-- Customer admin communication 
+- Add rate limiting to login and password reset routes.
+- Add admin two-factor authentication.
+- Move auth tokens from `localStorage` to a more secure cookie-based setup.
+- Add centralized request validation.
+- Add automated secret scanning in GitHub.
 
 ---
 
-## System Evolution
+## How The Latest Security Changes Were Made
 
-The project evolved from:
+The latest security pass changed both backend and frontend behavior without changing the normal user workflow.
 
-**Basic slot booking**  
-→ Duration-aware scheduling  
-→ Request-based workflow  
-→ Admin-controlled service management  
-→ Multi-day calendar system  
-→ Password reset functionality
+### Email Secrets
 
-This significantly improved:
+Before, the Gmail sender address and app password were written directly in `email_utils.py`.
 
-- Architectural quality
-- Business realism
-- Scalability
-- Code maintainability
-- User experience
+Now, the backend reads them from:
 
----
+```env
+MAIL_USERNAME
+MAIL_PASSWORD
+MAIL_SERVER
+MAIL_PORT
+```
 
-## Mobile Compatibility
+The app also cleans spaces from Gmail app passwords, because Google often displays app passwords in grouped chunks.
 
-The system is responsive and usable on mobile devices.  
-Future iterations will include dedicated mobile UI optimization.
+### Flask Secret Key
 
----
+Before, the backend could fall back to a simple development secret.
 
-## Academic Context
+Now, `SECRET_KEY` is mandatory. If it is missing, the backend stops early so the mistake is obvious.
 
-This project demonstrates:
+### Admin Route Protection
 
-- Full-stack development
-- Authentication systems
-- Business workflow modeling
-- Calendar integration
-- State management
-- Backend architecture layering
-- Real-world problem solving
-- Email integration
-- Security best practices
+Admin endpoints now use a shared `require_admin` decorator. It checks:
+
+- Is there an `Authorization` header?
+- Is the JWT valid?
+- Does the token role equal `admin`?
+
+If not, the API returns `401` or `403`.
+
+### Frontend Admin Requests
+
+The frontend now has an `adminFetch()` helper. It wraps normal `fetch()` and automatically adds:
+
+```http
+Authorization: Bearer <token>
+```
+
+That keeps admin dashboard and calendar calls working with the new backend protection.
 
 ---
 
 ## Author
 
-**Omar Rouigui**  
+Omar Rouigui  
 Full Stack Development Student  
 Holberton School
 
 ---
 
-## Source Repository
+## Repository
 
-The full project source code is available on GitHub:
-
+```text
 https://github.com/omarrui/Jardinage_jr
-
-The repository contains both the **frontend (React)** and **backend (Flask API)** code.  
-Development was managed using **Git version control** with multiple branches for feature development, improvements, and fixes.
-
----
-
-## Project Deliverables
-
-Sprint Reviews  
-doc/sprint_review.md
-
-Retrospective  
-doc/retrospective.md
-
-Bug Tracking  
-doc/bug-tracking.md
-
-Testing Evidence and Results  
-doc/results.md  
-doc/results_postman/
-
-Sprint Planning  
-Project planning and sprint management were tracked using Trello:  
-https://trello.com/invite/b/69787ac1c6b8b3f2e1919544/ATTI0c9de3400fc3577a98f7831a04f52cfeB03268D6/my-trello-board
-
-Source Repository  
-https://github.com/omarrui/Jardinage_jr
-
-Production Environment
-
-The system currently runs in a local development environment:
-
-Backend (Flask API)  
-http://127.0.0.1:5000
-
-Frontend (React + Vite)  
-http://localhost:5173
+```
 
 ---
 
@@ -505,10 +394,4 @@ This project is part of an academic portfolio.
 
 ---
 
-## Contributing
-
-This is an academic project, but feedback and suggestions are welcome!
-
----
-
-**Last Updated:** March 2026
+**Last Updated:** June 2026
