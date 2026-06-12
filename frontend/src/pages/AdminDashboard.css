@@ -441,6 +441,27 @@
   color: #68440c;
 }
 
+.admin-blocked-summary {
+  margin: 8px 0 18px;
+  padding: 16px;
+  border: 1px solid #f2b7b7;
+  border-radius: 8px;
+  background: #fff3f3;
+  color: #7f1d1d;
+  display: grid;
+  gap: 8px;
+  line-height: 1.45;
+}
+
+.admin-blocked-summary strong {
+  color: #611515;
+  font-size: 18px;
+}
+
+.admin-blocked-summary span {
+  font-size: 14px;
+}
+
 .admin-side-panel-actions {
   position: sticky;
   bottom: -24px;

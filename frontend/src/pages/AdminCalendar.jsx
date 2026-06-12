@@ -186,7 +186,21 @@ function AdminCalendar() {
     const isoDate = format(clickedDate, "yyyy-MM-dd");
 
     if (blockedDates.includes(isoDate)) {
-      showAlert("⚠️ Cette date est actuellement bloquée pour les rendez‑vous. Supprimez-la manuellement si vous voulez la débloquer.");
+      setQuickAppointment({
+        isBlocked: true,
+        mode: "existing",
+        customerId: "",
+        date: isoDate,
+        startTime: "09:00",
+        endTime: "17:00",
+        address: "",
+        description: "",
+        newCustomer: {
+          name: "",
+          email: "",
+          phone: ""
+        }
+      });
       return;
     }
 
@@ -285,7 +299,7 @@ function AdminCalendar() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const isoDate = normalized.toISOString().split("T")[0];
+    const isoDate = format(normalized, "yyyy-MM-dd");
 
     if (blockedDates.includes(isoDate)) {
       return {
@@ -366,6 +380,31 @@ function AdminCalendar() {
       fetchAvailability();
     } catch (error) {
       console.error("Failed to block date", error);
+      showAlert("Erreur de connexion");
+    }
+  };
+
+  const handleUnblockQuickDate = async () => {
+    if (!quickAppointment?.date) return;
+
+    try {
+      const response = await fetch(
+        apiUrl(`/api/admin/availability/${quickAppointment.date}`),
+        { method: "DELETE" }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showAlert(data.error || "Erreur lors du déblocage de la date");
+        return;
+      }
+
+      showAlert("Date débloquée");
+      setQuickAppointment(null);
+      fetchAvailability();
+    } catch (error) {
+      console.error("Failed to unblock date", error);
       showAlert("Erreur de connexion");
     }
   };
@@ -536,8 +575,8 @@ function AdminCalendar() {
           <aside className="admin-side-panel">
             <div className="admin-side-panel-header">
               <div>
-                <p>Nouveau depuis le planning</p>
-                <h3>Ajouter un rendez-vous</h3>
+                <p>{quickAppointment.isBlocked ? "Date indisponible" : "Nouveau depuis le planning"}</p>
+                <h3>{quickAppointment.isBlocked ? "Date bloquée" : "Ajouter un rendez-vous"}</h3>
               </div>
               <button
                 type="button"
@@ -549,157 +588,178 @@ function AdminCalendar() {
               </button>
             </div>
 
-            <div className="admin-segmented-control">
-              <button
-                type="button"
-                className={quickAppointment.mode === "existing" ? "is-active" : ""}
-                onClick={() => updateQuickAppointment("mode", "existing")}
-              >
-                Client existant
-              </button>
-              <button
-                type="button"
-                className={quickAppointment.mode === "new" ? "is-active" : ""}
-                onClick={() => updateQuickAppointment("mode", "new")}
-              >
-                Nouveau client
-              </button>
-            </div>
-
-            {quickAppointment.mode === "existing" ? (
-              <div className="admin-form-group">
-                <label>Rechercher un client</label>
-                <input
-                  type="text"
-                  value={customerSearchQuery}
-                  onChange={(e) => setCustomerSearchQuery(e.target.value)}
-                  className="admin-input"
-                  placeholder="Nom, email ou téléphone"
-                />
-
-                <label>Client</label>
-                <select
-                  value={quickAppointment.customerId}
-                  onChange={(e) => updateQuickAppointment("customerId", e.target.value)}
-                  className="admin-input"
-                >
-                  <option value="">Choisir un client</option>
-                  {filteredCustomers.map(customer => (
-                    <option key={customer.id} value={customer.id}>
-                      {customer.name} - {customer.phone || "sans téléphone"}
-                    </option>
-                  ))}
-                </select>
+            {quickAppointment.isBlocked ? (
+              <div className="admin-blocked-summary">
+                <strong>{new Date(`${quickAppointment.date}T12:00:00`).toLocaleDateString("fr-FR")}</strong>
+                <span>Cette date est bloquée dans le planning. Débloquez-la pour pouvoir ajouter des rendez-vous dessus.</span>
               </div>
             ) : (
-              <div className="admin-form-group">
-                <label>Nom du client</label>
-                <input
-                  type="text"
-                  value={quickAppointment.newCustomer.name}
-                  onChange={(e) => updateQuickCustomer("name", e.target.value)}
-                  className="admin-input"
-                  placeholder="Nom"
-                />
+              <>
+                <div className="admin-segmented-control">
+                  <button
+                    type="button"
+                    className={quickAppointment.mode === "existing" ? "is-active" : ""}
+                    onClick={() => updateQuickAppointment("mode", "existing")}
+                  >
+                    Client existant
+                  </button>
+                  <button
+                    type="button"
+                    className={quickAppointment.mode === "new" ? "is-active" : ""}
+                    onClick={() => updateQuickAppointment("mode", "new")}
+                  >
+                    Nouveau client
+                  </button>
+                </div>
 
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={quickAppointment.newCustomer.email}
-                  onChange={(e) => updateQuickCustomer("email", e.target.value)}
-                  className="admin-input"
-                  placeholder="Email optionnel"
-                />
+                {quickAppointment.mode === "existing" ? (
+                  <div className="admin-form-group">
+                    <label>Rechercher un client</label>
+                    <input
+                      type="text"
+                      value={customerSearchQuery}
+                      onChange={(e) => setCustomerSearchQuery(e.target.value)}
+                      className="admin-input"
+                      placeholder="Nom, email ou téléphone"
+                    />
 
-                <label>Téléphone</label>
-                <input
-                  type="text"
-                  value={quickAppointment.newCustomer.phone}
-                  onChange={(e) => updateQuickCustomer("phone", e.target.value)}
-                  className="admin-input"
-                  placeholder="Téléphone"
-                />
-              </div>
+                    <label>Client</label>
+                    <select
+                      value={quickAppointment.customerId}
+                      onChange={(e) => updateQuickAppointment("customerId", e.target.value)}
+                      className="admin-input"
+                    >
+                      <option value="">Choisir un client</option>
+                      {filteredCustomers.map(customer => (
+                        <option key={customer.id} value={customer.id}>
+                          {customer.name} - {customer.phone || "sans téléphone"}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="admin-form-group">
+                    <label>Nom du client</label>
+                    <input
+                      type="text"
+                      value={quickAppointment.newCustomer.name}
+                      onChange={(e) => updateQuickCustomer("name", e.target.value)}
+                      className="admin-input"
+                      placeholder="Nom"
+                    />
+
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      value={quickAppointment.newCustomer.email}
+                      onChange={(e) => updateQuickCustomer("email", e.target.value)}
+                      className="admin-input"
+                      placeholder="Email optionnel"
+                    />
+
+                    <label>Téléphone</label>
+                    <input
+                      type="text"
+                      value={quickAppointment.newCustomer.phone}
+                      onChange={(e) => updateQuickCustomer("phone", e.target.value)}
+                      className="admin-input"
+                      placeholder="Téléphone"
+                    />
+                  </div>
+                )}
+
+                <div className="admin-form-grid">
+                  <div className="admin-form-group">
+                    <label>Date</label>
+                    <input
+                      type="date"
+                      value={quickAppointment.date}
+                      onChange={(e) => updateQuickAppointment("date", e.target.value)}
+                      className="admin-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Début</label>
+                    <input
+                      type="time"
+                      value={quickAppointment.startTime}
+                      onChange={(e) => updateQuickAppointment("startTime", e.target.value)}
+                      className="admin-input"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Fin</label>
+                    <input
+                      type="time"
+                      value={quickAppointment.endTime}
+                      onChange={(e) => updateQuickAppointment("endTime", e.target.value)}
+                      className="admin-input"
+                    />
+                  </div>
+                </div>
+
+                {quickConflicts.length > 0 && (
+                  <div className="admin-conflict-note">
+                    <strong>Créneau déjà occupé</strong>
+                    <span>
+                      {quickConflicts.map(conflict => conflict.customer_name).join(", ")}
+                    </span>
+                  </div>
+                )}
+
+                <div className="admin-form-group">
+                  <label>Adresse d'intervention</label>
+                  <input
+                    type="text"
+                    value={quickAppointment.address}
+                    onChange={(e) => updateQuickAppointment("address", e.target.value)}
+                    className="admin-input"
+                    placeholder="Adresse"
+                  />
+                </div>
+
+                <div className="admin-form-group">
+                  <label>Description</label>
+                  <textarea
+                    value={quickAppointment.description}
+                    onChange={(e) => updateQuickAppointment("description", e.target.value)}
+                    className="admin-input admin-textarea"
+                    placeholder="Notes pour l'intervention"
+                  />
+                </div>
+              </>
             )}
-
-            <div className="admin-form-grid">
-              <div className="admin-form-group">
-                <label>Date</label>
-                <input
-                  type="date"
-                  value={quickAppointment.date}
-                  onChange={(e) => updateQuickAppointment("date", e.target.value)}
-                  className="admin-input"
-                />
-              </div>
-
-              <div className="admin-form-group">
-                <label>Début</label>
-                <input
-                  type="time"
-                  value={quickAppointment.startTime}
-                  onChange={(e) => updateQuickAppointment("startTime", e.target.value)}
-                  className="admin-input"
-                />
-              </div>
-
-              <div className="admin-form-group">
-                <label>Fin</label>
-                <input
-                  type="time"
-                  value={quickAppointment.endTime}
-                  onChange={(e) => updateQuickAppointment("endTime", e.target.value)}
-                  className="admin-input"
-                />
-              </div>
-            </div>
-
-            {quickConflicts.length > 0 && (
-              <div className="admin-conflict-note">
-                <strong>Créneau déjà occupé</strong>
-                <span>
-                  {quickConflicts.map(conflict => conflict.customer_name).join(", ")}
-                </span>
-              </div>
-            )}
-
-            <div className="admin-form-group">
-              <label>Adresse d'intervention</label>
-              <input
-                type="text"
-                value={quickAppointment.address}
-                onChange={(e) => updateQuickAppointment("address", e.target.value)}
-                className="admin-input"
-                placeholder="Adresse"
-              />
-            </div>
-
-            <div className="admin-form-group">
-              <label>Description</label>
-              <textarea
-                value={quickAppointment.description}
-                onChange={(e) => updateQuickAppointment("description", e.target.value)}
-                className="admin-input admin-textarea"
-                placeholder="Notes pour l'intervention"
-              />
-            </div>
 
             <div className="admin-side-panel-actions">
-              <button
-                type="button"
-                onClick={handleCreateQuickAppointment}
-                className="admin-btn primary"
-                disabled={isSavingQuickAppointment}
-              >
-                {isSavingQuickAppointment ? "Création..." : "Créer le rendez-vous"}
-              </button>
-              <button
-                type="button"
-                onClick={handleBlockQuickDate}
-                className="admin-btn"
-              >
-                Bloquer cette date
-              </button>
+              {quickAppointment.isBlocked ? (
+                <button
+                  type="button"
+                  onClick={handleUnblockQuickDate}
+                  className="admin-btn primary"
+                >
+                  Débloquer cette date
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleCreateQuickAppointment}
+                    className="admin-btn primary"
+                    disabled={isSavingQuickAppointment}
+                  >
+                    {isSavingQuickAppointment ? "Création..." : "Créer le rendez-vous"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBlockQuickDate}
+                    className="admin-btn"
+                  >
+                    Bloquer cette date
+                  </button>
+                </>
+              )}
             </div>
           </aside>
         </div>
