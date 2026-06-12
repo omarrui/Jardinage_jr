@@ -23,6 +23,7 @@ def parse_allowed_origins():
     origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "https://jardinage-ir.vercel.app",
     ]
 
     for env_name in ("FRONTEND_URL", "FRONTEND_ORIGINS"):

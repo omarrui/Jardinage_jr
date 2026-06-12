@@ -224,6 +224,15 @@ function Booking({ goHome }) {
             )}
           </div>
         )}
+
+        <button
+          type="button"
+          className="secondary-btn"
+          onClick={goHome}
+          style={{ marginTop: "18px" }}
+        >
+          Retour à l'accueil
+        </button>
       </div>
     </div>
   );

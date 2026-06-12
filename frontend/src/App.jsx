@@ -12,19 +12,63 @@ import RequestReset from "./pages/RequestReset";
 import ClientAppointments from "./pages/ClientAppointments";
 import logo from "./gallery/logojr.webp";
 
+const PAGE_HASHES = {
+  home: "",
+  signup: "signup",
+  login: "login",
+  booking: "booking",
+  appointments: "appointments",
+  account: "account",
+  admin: "admin",
+  changePassword: "change-password",
+  requestReset: "request-reset"
+};
+
+const HASH_TO_PAGE = Object.entries(PAGE_HASHES).reduce((pages, [page, hash]) => {
+  if (hash) pages[hash] = page;
+  return pages;
+}, {});
+
+function getPageFromLocation() {
+  if (
+    window.location.pathname === "/reset-password" ||
+    window.location.search.includes("token=")
+  ) {
+    return "resetPassword";
+  }
+
+  const hash = window.location.hash.replace(/^#\/?/, "");
+  return HASH_TO_PAGE[hash] || "home";
+}
+
+function getUrlForPage(page) {
+  const hash = PAGE_HASHES[page];
+  return `${window.location.pathname}${window.location.search}${hash ? `#/${hash}` : ""}`;
+}
+
 function App() {
-  const [currentPage, setCurrentPage] = useState(() => {
-    if (
-      window.location.pathname === "/reset-password" ||
-      window.location.search.includes("token=")
-    ) {
-      return "resetPassword";
-    }
-    return "home";
-  });
+  const [currentPage, setCurrentPage] = useState(getPageFromLocation);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navigateToPage = (page, options = {}) => {
+    setCurrentPage(page);
+    setIsMenuOpen(false);
+
+    if (page === "resetPassword") return;
+
+    const nextUrl = getUrlForPage(page);
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+    if (nextUrl !== currentUrl) {
+      if (options.replace) {
+        window.history.replaceState({ page }, "", nextUrl);
+      } else {
+        window.history.pushState({ page }, "", nextUrl);
+      }
+    }
+  };
 
   useEffect(() => {
     if (
@@ -40,52 +84,64 @@ function App() {
     if (token && role === "customer") {
       setIsLoggedIn(true);
       setIsAdmin(false);
-      setCurrentPage("home");
     }
 
     if (token && role === "admin") {
       setIsLoggedIn(true);
       setIsAdmin(true);
-      setCurrentPage("admin");
+      navigateToPage("admin", { replace: true });
     }
+  }, []);
+
+  useEffect(() => {
+    const handleBrowserNavigation = () => {
+      setCurrentPage(getPageFromLocation());
+      setIsMenuOpen(false);
+    };
+
+    window.addEventListener("popstate", handleBrowserNavigation);
+    window.addEventListener("hashchange", handleBrowserNavigation);
+
+    return () => {
+      window.removeEventListener("popstate", handleBrowserNavigation);
+      window.removeEventListener("hashchange", handleBrowserNavigation);
+    };
   }, []);
 
   function handleCustomerLogin() {
     setIsLoggedIn(true);
     setIsAdmin(false);
-    setCurrentPage("home");
+    navigateToPage("home", { replace: true });
   }
 
   function handleAdminLogin() {
     setIsLoggedIn(true);
     setIsAdmin(true);
-    setCurrentPage("admin");
+    navigateToPage("admin", { replace: true });
   }
 
   function handleForcePasswordChange(customerId) {
     localStorage.setItem("customer_id", customerId);
-    setCurrentPage("changePassword");
+    navigateToPage("changePassword");
   }
 
   function handleLogout() {
     localStorage.clear();
     setIsLoggedIn(false);
     setIsAdmin(false);
-    setCurrentPage("home");
-    setIsMenuOpen(false);
+    navigateToPage("home", { replace: true });
   }
 
   const handleLogoClick = () => {
-    setCurrentPage("home");
-    setIsMenuOpen(false);
+    navigateToPage("home");
   };
 
   //  Extract ternary into helper function
   const handleGoToBooking = () => {
     if (isLoggedIn) {
-      setCurrentPage("booking");
+      navigateToPage("booking");
     } else {
-      setCurrentPage("login");
+      navigateToPage("login");
     }
   };
 
@@ -93,11 +149,11 @@ function App() {
     setIsMenuOpen(false);
 
     if (isLoggedIn && !isAdmin) {
-      setCurrentPage("booking");
+      navigateToPage("booking");
       return;
     }
 
-    setCurrentPage("home");
+    navigateToPage("home");
     window.setTimeout(() => {
       document.getElementById("demande-sans-compte")?.scrollIntoView({ behavior: "smooth" });
     }, 0);
@@ -107,22 +163,21 @@ function App() {
     setIsMenuOpen(false);
 
     if (isLoggedIn && !isAdmin) {
-      setCurrentPage("appointments");
+      navigateToPage("appointments");
     }
     // Do nothing if not logged in or is admin
   };
 
   const goToHomeSection = (selector) => {
     setIsMenuOpen(false);
-    setCurrentPage("home");
+    navigateToPage("home");
     window.setTimeout(() => {
       document.querySelector(selector)?.scrollIntoView({ behavior: "smooth" });
     }, 0);
   };
 
   const goToPage = (page) => {
-    setCurrentPage(page);
-    setIsMenuOpen(false);
+    navigateToPage(page);
   };
 
   const renderAuthButtons = () => {
@@ -171,7 +226,7 @@ function App() {
 
   if (currentPage === "resetPassword") {
     return (
-      <ResetPassword goToLogin={() => setCurrentPage("login")} />
+      <ResetPassword goToLogin={() => navigateToPage("login")} />
     );
   }
 
@@ -239,14 +294,14 @@ function App() {
       {currentPage === "home" && (
         <Home
           goToQuoteForm={handleGoToQuoteForm}
-          goToSignup={() => setCurrentPage("signup")}
+          goToSignup={() => navigateToPage("signup")}
           goToClientAppointments={isLoggedIn && !isAdmin ? handleGoToAppointments : null} 
         />
       )}  
         {currentPage === "signup" && (
           <Signup
-            goHome={() => setCurrentPage("home")}
-            goToLogin={() => setCurrentPage("login")}
+            goHome={() => navigateToPage("home")}
+            goToLogin={() => navigateToPage("login")}
           />
         )}
   
@@ -255,21 +310,21 @@ function App() {
             onCustomerLogin={handleCustomerLogin}
             onAdminLogin={handleAdminLogin}
             onForcePasswordChange={handleForcePasswordChange}
-            goHome={() => setCurrentPage("home")}
-            goToResetRequest={() => setCurrentPage("requestReset")}
+            goHome={() => navigateToPage("home")}
+            goToResetRequest={() => navigateToPage("requestReset")}
           />
         )}
   
         {currentPage === "booking" && (
-          <Booking goHome={() => setCurrentPage("home")} />
+          <Booking goHome={() => navigateToPage("home")} />
         )}
 
         {currentPage === "appointments" && (
-          <ClientAppointments goHome={() => setCurrentPage("home")} />
+          <ClientAppointments goHome={() => navigateToPage("home")} />
         )}
   
         {currentPage === "account" && (
-          <Account goHome={() => setCurrentPage("home")} />
+          <Account goHome={() => navigateToPage("home")} />
         )}
   
         {currentPage === "admin" && (
@@ -278,13 +333,13 @@ function App() {
   
         {currentPage === "changePassword" && (
           <ChangePassword
-            goToLogin={() => setCurrentPage("login")}
-            goHome={() => setCurrentPage("home")}
+            goToLogin={() => navigateToPage("login")}
+            goHome={() => navigateToPage("home")}
           />
         )}
   
         {currentPage === "requestReset" && (
-          <RequestReset goToLogin={() => setCurrentPage("login")} />
+          <RequestReset goToLogin={() => navigateToPage("login")} />
         )}
       </div>
       {currentPage !== "admin" && (
