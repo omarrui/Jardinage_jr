@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://jardinage-ir-tz7r.vercel.app/api/:path*"
+      "destination": "https://jardinage-jr-tz7r.vercel.app/api/:path*"
     }
   ]
 }

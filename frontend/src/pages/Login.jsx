@@ -17,6 +17,17 @@ function Login({
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  async function readJsonResponse(response) {
+    const contentType = response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      return response.json();
+    }
+
+    const text = await response.text();
+    throw new Error(text || `Unexpected non-JSON response (${response.status})`);
+  }
+
   function handleChange(e) {
     setFormData({
       ...formData,
@@ -39,7 +50,7 @@ function Login({
           body: JSON.stringify(formData),
         });
 
-        data = await response.json();
+        data = await readJsonResponse(response);
 
         if (data.error) {
           setMessage(data.error);
@@ -59,7 +70,7 @@ function Login({
           body: JSON.stringify(formData),
         });
 
-        data = await response.json();
+        data = await readJsonResponse(response);
 
         if (data.error) {
           setMessage(data.error);
@@ -98,7 +109,7 @@ function Login({
         body: JSON.stringify({ email: formData.email, password: formData.password })
       });
 
-      const data = await response.json();
+      const data = await readJsonResponse(response);
 
       if (response.ok) {
         // Store the admin token
@@ -110,6 +121,7 @@ function Login({
         setMessage(data.error || "Invalid admin credentials");
       }
     } catch (err) {
+      console.error("Admin login error:", err);
       setMessage("Connection error");
     }
   }
