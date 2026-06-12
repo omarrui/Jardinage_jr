@@ -101,7 +101,7 @@ def create_public_service_request(data):
         db.session.add(service_request)
         db.session.commit()
 
-        admin_email = os.getenv("ADMIN_NOTIFICATION_EMAIL") or os.getenv("ADMIN_EMAIL")
+        admin_email = os.getenv("ADMIN_NOTIFICATION_EMAIL") or "rouiguiomar1@gmail.com"
         if admin_email:
             email_sent = send_email(
                 admin_email,
