@@ -24,6 +24,7 @@ function App() {
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     if (
@@ -71,10 +72,12 @@ function App() {
     setIsLoggedIn(false);
     setIsAdmin(false);
     setCurrentPage("home");
+    setIsMenuOpen(false);
   }
 
   const handleLogoClick = () => {
     setCurrentPage("home");
+    setIsMenuOpen(false);
   };
 
   //  Extract ternary into helper function
@@ -87,6 +90,8 @@ function App() {
   };
 
   const handleGoToQuoteForm = () => {
+    setIsMenuOpen(false);
+
     if (isLoggedIn && !isAdmin) {
       setCurrentPage("booking");
       return;
@@ -99,6 +104,8 @@ function App() {
   };
 
   const handleGoToAppointments = () => {
+    setIsMenuOpen(false);
+
     if (isLoggedIn && !isAdmin) {
       setCurrentPage("appointments");
     }
@@ -106,10 +113,16 @@ function App() {
   };
 
   const goToHomeSection = (selector) => {
+    setIsMenuOpen(false);
     setCurrentPage("home");
     window.setTimeout(() => {
       document.querySelector(selector)?.scrollIntoView({ behavior: "smooth" });
     }, 0);
+  };
+
+  const goToPage = (page) => {
+    setCurrentPage(page);
+    setIsMenuOpen(false);
   };
 
   const renderAuthButtons = () => {
@@ -117,7 +130,7 @@ function App() {
       return (
         <>
           <button
-            onClick={() => setCurrentPage("admin")}
+            onClick={() => goToPage("admin")}
             className="primary-btn"
           >
             Admin
@@ -132,19 +145,19 @@ function App() {
     return (
       <>
         <button
-          onClick={() => setCurrentPage("booking")}
+          onClick={() => goToPage("booking")}
           className="primary-btn"
         >
           Demander un service
         </button>
         <button
-          onClick={() => setCurrentPage("appointments")}
+          onClick={() => goToPage("appointments")}
           className="primary-btn"
         >
           Mes rendez-vous
         </button>
         <button
-          onClick={() => setCurrentPage("account")}
+          onClick={() => goToPage("account")}
           className="primary-btn"
         >
           Mon compte
@@ -181,7 +194,23 @@ function App() {
             <img src={logo} alt="JR Jardinage Logo" />
           </button>
 
-          <div className="site-nav-links">
+          <button
+            type="button"
+            className={`site-menu-toggle ${isMenuOpen ? "is-open" : ""}`}
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="site-nav-links"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <div
+            id="site-nav-links"
+            className={`site-nav-links ${isMenuOpen ? "is-open" : ""}`}
+          >
             <button onClick={() => goToHomeSection(".about-section")}>A PROPOS</button>
             <button onClick={() => goToHomeSection(".services-section")}>NOS SERVICES</button>
             <button onClick={() => goToHomeSection(".before-after-section")}>NOS REALISATIONS</button>
@@ -192,10 +221,10 @@ function App() {
                 <button onClick={handleGoToQuoteForm} className="quote-btn">
                   DEMANDER UN DEVIS
                 </button>
-                <button onClick={() => setCurrentPage("login")} className="auth-nav-btn auth-login-btn">
+                <button onClick={() => goToPage("login")} className="auth-nav-btn auth-login-btn">
                   Connexion
                 </button>
-                <button onClick={() => setCurrentPage("signup")} className="auth-nav-btn auth-signup-btn">
+                <button onClick={() => goToPage("signup")} className="auth-nav-btn auth-signup-btn">
                   Inscription
                 </button>
               </>
