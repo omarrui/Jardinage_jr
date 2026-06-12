@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminCalendar from "./AdminCalendar";
 import CustomAlert from "../components/CustomAlert";
 import "./AdminDashboard.css";
-import { apiUrl } from "../api/apiConfig";
+import { adminFetch } from "../api/apiConfig";
 
 function AdminDashboard({ goHome }) {
   const [adminSection, setAdminSection] = useState("planning");
@@ -57,13 +57,7 @@ function AdminDashboard({ goHome }) {
      LOAD CLIENTS
    */
   const fetchClients = () => {
-    const token = localStorage.getItem("token");
-    
-    fetch(apiUrl("/api/admin/customers"), {
-      headers: {
-        "Authorization": `Bearer ${token}`  
-      }
-    })
+    adminFetch("/api/admin/customers")
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -77,7 +71,7 @@ function AdminDashboard({ goHome }) {
      LOAD APPOINTMENT REQUESTS
    */
   const fetchAppointmentRequests = () => {
-    fetch(apiUrl("/api/admin/appointment-requests"))
+    adminFetch("/api/admin/appointment-requests")
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data.requests)) {
@@ -145,8 +139,8 @@ function AdminDashboard({ goHome }) {
       return;
     }
 
-    const response = await fetch(
-      apiUrl("/api/admin/customers"),
+    const response = await adminFetch(
+      "/api/admin/customers",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -177,8 +171,8 @@ function AdminDashboard({ goHome }) {
      RESEND TEMP PASSWORD
    */
   const resendTempPassword = async (customerId) => {
-    const response = await fetch(
-      apiUrl(`/api/admin/resend-temp-password/${customerId}`),
+    const response = await adminFetch(
+      `/api/admin/resend-temp-password/${customerId}`,
       { method: "POST" }
     );
 
@@ -292,8 +286,8 @@ function AdminDashboard({ goHome }) {
                       onClick={async () => {
                         showConfirm("Refuser cette demande de rendez-vous ?", async () => {
                           try {
-                            const response = await fetch(
-                              apiUrl(`/api/admin/appointment-requests/${req.id}/cancel`),
+                            const response = await adminFetch(
+                              `/api/admin/appointment-requests/${req.id}/cancel`,
                               {
                                 method: "PUT",
                                 headers: { "Content-Type": "application/json" }
@@ -429,8 +423,8 @@ function AdminDashboard({ goHome }) {
                         className="admin-btn danger"
                         onClick={() => {
                           showConfirm("Êtes-vous sûr de vouloir supprimer ce client ?", () => {
-                            fetch(
-                              apiUrl(`/api/admin/customers/${client.id}`),
+                            adminFetch(
+                              `/api/admin/customers/${client.id}`,
                               { method: "DELETE" }
                             ).then(() => fetchClients());
                           });
@@ -477,8 +471,8 @@ function AdminDashboard({ goHome }) {
                             return;
                           }
 
-                          await fetch(
-                            apiUrl(`/api/admin/customers/${client.id}`),
+                          await adminFetch(
+                            `/api/admin/customers/${client.id}`,
                             {
                               method: "PUT",
                               headers: { "Content-Type": "application/json" },
@@ -655,8 +649,8 @@ function AdminDashboard({ goHome }) {
 
                   // Check for conflicts before creating
                   try {
-                    const checkResponse = await fetch(
-                      apiUrl("/api/admin/appointment-requests")
+                    const checkResponse = await adminFetch(
+                      "/api/admin/appointment-requests"
                     );
                     const checkData = await checkResponse.json();
 
@@ -695,8 +689,8 @@ function AdminDashboard({ goHome }) {
                               payload.customer_id = selectedClientForAppointment.id;
                             }
                         
-                            const response = await fetch(
-                              apiUrl("/api/admin/appointments"),
+                            const response = await adminFetch(
+                              "/api/admin/appointments",
                               {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -747,8 +741,8 @@ function AdminDashboard({ goHome }) {
                     payload.customer_id = selectedClientForAppointment.id;
                   }
 
-                  const response = await fetch(
-                    apiUrl("/api/admin/appointments"),
+                  const response = await adminFetch(
+                    "/api/admin/appointments",
                     {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },

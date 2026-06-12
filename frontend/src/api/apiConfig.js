@@ -6,3 +6,19 @@ export function apiUrl(path) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return API_URL ? `${API_URL}${normalizedPath}` : normalizedPath;
 }
+
+export function adminAuthHeaders(extraHeaders = {}) {
+  const token = localStorage.getItem("token");
+
+  return {
+    ...extraHeaders,
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  };
+}
+
+export function adminFetch(path, options = {}) {
+  return fetch(apiUrl(path), {
+    ...options,
+    headers: adminAuthHeaders(options.headers || {})
+  });
+}

@@ -3,7 +3,7 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { apiUrl } from "../api/apiConfig";
+import { adminFetch } from "../api/apiConfig";
 
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import fr from "date-fns/locale/fr";
@@ -48,7 +48,7 @@ function AdminCalendar() {
   };
 
   const fetchEvents = () => {
-    fetch(apiUrl("/api/admin/appointment-requests"))
+    adminFetch("/api/admin/appointment-requests")
       .then(res => res.json())
       .then(data => {
         if (!Array.isArray(data.requests)) return;
@@ -73,13 +73,7 @@ function AdminCalendar() {
   };
 
   const fetchCustomers = () => {
-    const token = localStorage.getItem("token");
-
-    fetch(apiUrl("/api/admin/customers"), {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    })
+    adminFetch("/api/admin/customers")
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -92,7 +86,7 @@ function AdminCalendar() {
   };
 
   const fetchAvailability = () => {
-    fetch(apiUrl("/api/admin/availability"))
+    adminFetch("/api/admin/availability")
       .then(res => res.json())
       .then(data => {
         if (!Array.isArray(data)) return;
@@ -150,8 +144,8 @@ function AdminCalendar() {
     setEvents(prev => prev.map(e => e.id === event.id ? updatedEvent : e));
 
     try {
-      const response = await fetch(
-        apiUrl(`/api/admin/service-requests/${event.id}`),
+      const response = await adminFetch(
+        `/api/admin/service-requests/${event.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -239,8 +233,8 @@ function AdminCalendar() {
 
   const handleDeleteAppointment = async () => {
     try {
-      const response = await fetch(
-        apiUrl(`/api/admin/service-requests/${selectedEvent.id}`),
+      const response = await adminFetch(
+        `/api/admin/service-requests/${selectedEvent.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -264,8 +258,8 @@ function AdminCalendar() {
 
   const handleUpdateAppointment = async () => {
     try {
-      const response = await fetch(
-        apiUrl(`/api/admin/service-requests/${selectedEvent.id}`),
+      const response = await adminFetch(
+        `/api/admin/service-requests/${selectedEvent.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -362,7 +356,7 @@ function AdminCalendar() {
     if (!quickAppointment?.date) return;
 
     try {
-      const response = await fetch(apiUrl("/api/admin/availability"), {
+      const response = await adminFetch("/api/admin/availability", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date: quickAppointment.date })
@@ -388,8 +382,8 @@ function AdminCalendar() {
     if (!quickAppointment?.date) return;
 
     try {
-      const response = await fetch(
-        apiUrl(`/api/admin/availability/${quickAppointment.date}`),
+      const response = await adminFetch(
+        `/api/admin/availability/${quickAppointment.date}`,
         { method: "DELETE" }
       );
 
@@ -439,7 +433,7 @@ function AdminCalendar() {
           return;
         }
 
-        const customerResponse = await fetch(apiUrl("/api/admin/customers"), {
+        const customerResponse = await adminFetch("/api/admin/customers", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -474,7 +468,7 @@ function AdminCalendar() {
         return;
       }
 
-      const response = await fetch(apiUrl("/api/admin/appointments"), {
+      const response = await adminFetch("/api/admin/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

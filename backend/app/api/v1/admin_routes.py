@@ -2,30 +2,43 @@ from flask import request, jsonify, current_app
 from app.services import admin_service
 from app.models.models import Availability, ServiceRequest, db
 from app.utils.jwt_utils import verify_token, generate_token
+from functools import wraps
 import os
+
+
+def require_admin(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return "", 204
+
+        auth_header = request.headers.get("Authorization", "")
+        token = auth_header.split(" ", 1)[1] if auth_header.startswith("Bearer ") else auth_header
+
+        if not token:
+            return jsonify({"error": "Missing token"}), 401
+
+        payload = verify_token(token)
+
+        if not payload or payload.get("role") != "admin":
+            return jsonify({"error": "Unauthorized"}), 403
+
+        return fn(*args, **kwargs)
+
+    return wrapper
 
 
 def register_admin_routes(app):
 
     @app.route("/api/admin/customers", methods=["GET"])
+    @require_admin
     def admin_get_all_customers():
-        # authentication
-        auth_header = request.headers.get("Authorization")
-        
-        if not auth_header:
-            return jsonify({"error": "Missing token"}), 401
-        
-        token = auth_header.split(" ")[1] if " " in auth_header else auth_header
-        payload = verify_token(token)
-        
-        if not payload or payload.get("role") != "admin":
-            return jsonify({"error": "Unauthorized"}), 403
-
         response, status = admin_service.get_all_customers()
         return jsonify(response), status
     
 
     @app.route("/api/admin/customers", methods=["POST"])
+    @require_admin
     def admin_create_customer():
         data = request.get_json()
         response, status = admin_service.create_customer_by_admin(data)
@@ -58,12 +71,14 @@ def register_admin_routes(app):
     
 
     @app.route("/api/admin/customers/<int:customer_id>", methods=["DELETE"])
+    @require_admin
     def delete_customer(customer_id):
         response, status = admin_service.delete_customer(customer_id)
         return jsonify(response), status
     
     
     @app.route("/api/admin/customers/<int:customer_id>", methods=["PUT"])
+    @require_admin
     def update_customer(customer_id):
         data = request.get_json()
 
@@ -72,41 +87,48 @@ def register_admin_routes(app):
 
 
     @app.route("/api/admin/resend-temp-password/<int:customer_id>", methods=["POST"])
+    @require_admin
     def resend_temp_password(customer_id):
         response, status = admin_service.resend_temp_password(customer_id)
         return jsonify(response), status
     
 
     @app.route("/api/admin/service-requests", methods=["GET"])
+    @require_admin
     def admin_get_all_service_requests():
         response, status = admin_service.get_all_service_requests()
         return jsonify(response), status
 
 
     @app.route("/api/admin/service-requests/<int:request_id>", methods=["PUT"])
+    @require_admin
     def admin_update_service_request(request_id):
         data = request.get_json()
         response, status = admin_service.update_service_request(request_id, data)
         return jsonify(response), status
     
     @app.route("/api/admin/create-appointment", methods=["POST"])
+    @require_admin
     def create_appointment():
         data = request.get_json()
         response, status = admin_service.create_appointment(data)
         return jsonify(response), status
     
     @app.route("/api/admin/appointments", methods=["POST"])
+    @require_admin
     def create_appointment_v2():
         data = request.get_json()
         response, status = admin_service.create_appointment(data)
         return jsonify(response), status
     
     @app.route("/api/admin/appointment-requests", methods=["GET"])
+    @require_admin
     def get_appointment_requests():
         response, status = admin_service.get_all_service_requests()
         return jsonify(response), status
 
     @app.route("/api/admin/availability", methods=["POST"])
+    @require_admin
     def block_date():
         data = request.get_json()
         date = data.get("date")
@@ -118,11 +140,13 @@ def register_admin_routes(app):
         return {"message": "Date bloquée"}, 201
 
     @app.route("/api/admin/availability", methods=["GET"])
+    @require_admin
     def get_blocked_dates():
         dates = Availability.query.all()
         return jsonify([{"date": d.date} for d in dates]), 200
     
     @app.route("/api/admin/availability/<string:date>", methods=["DELETE"])
+    @require_admin
     def delete_availability(date):
         blocked = Availability.query.filter_by(date=date).first()
 
@@ -135,6 +159,7 @@ def register_admin_routes(app):
         return {"message": "Date débloquée"}, 200
 
     @app.route("/api/admin/appointments/<int:appointment_id>", methods=["DELETE"])
+    @require_admin
     def delete_appointment(appointment_id):
         from app.models.models import ServiceRequest, db
         
@@ -149,6 +174,7 @@ def register_admin_routes(app):
         return jsonify({"message": "Rendez-vous annulé"}), 200
 
     @app.route("/api/admin/appointments/<int:appointment_id>", methods=["PUT"])
+    @require_admin
     def update_appointment(appointment_id):
         from app.models.models import ServiceRequest, db
         from datetime import datetime
@@ -168,6 +194,7 @@ def register_admin_routes(app):
         return jsonify({"message": "Rendez-vous modifié"}), 200
     
     @app.route("/api/admin/appointment-requests/<int:request_id>/cancel", methods=["PUT"])
+    @require_admin
     def cancel_appointment_request(request_id):
 
         request_obj = ServiceRequest.query.get(request_id)
