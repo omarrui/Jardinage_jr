@@ -81,6 +81,7 @@ register_customer_routes(app)
 register_appointment_routes(app)
 register_admin_routes(app)
 register_booking_routes(app)
+register_service_request_routes(app)
 
 
 @app.route("/")

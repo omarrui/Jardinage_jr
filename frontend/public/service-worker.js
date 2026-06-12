@@ -1,4 +1,4 @@
-const CACHE_NAME = "jr-jardinage-v1";
+const CACHE_NAME = "jr-jardinage-v2";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
@@ -28,7 +28,11 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  if (request.method !== "GET" || url.pathname.startsWith("/api/")) {
+  if (
+    request.method !== "GET" ||
+    url.origin !== self.location.origin ||
+    url.pathname.startsWith("/api/")
+  ) {
     return;
   }
 
@@ -52,12 +56,12 @@ self.addEventListener("fetch", (event) => {
       }
 
       return fetch(request).then((response) => {
-        if (response.ok && url.origin === self.location.origin) {
+        if (response.ok) {
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
         }
         return response;
-      });
+      }).catch(() => cachedResponse);
     })
   );
 });
