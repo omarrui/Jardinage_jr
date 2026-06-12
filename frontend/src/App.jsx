@@ -192,11 +192,11 @@ function App() {
                 <button onClick={handleGoToQuoteForm} className="quote-btn">
                   DEMANDER UN DEVIS
                 </button>
-                <button onClick={() => setCurrentPage("login")} className="round-nav-btn" aria-label="Connexion">
-                  ↗
+                <button onClick={() => setCurrentPage("login")} className="auth-nav-btn auth-login-btn">
+                  Connexion
                 </button>
-                <button onClick={() => setCurrentPage("signup")} className="round-nav-btn" aria-label="Inscription">
-                  +
+                <button onClick={() => setCurrentPage("signup")} className="auth-nav-btn auth-signup-btn">
+                  Inscription
                 </button>
               </>
             ) : renderAuthButtons()

@@ -26,7 +26,7 @@ def create_customer_by_admin(data):
 
     # INTERNAL RECORD ONLY
     if not has_account:
-        admin_repository.create_customer(
+        customer = admin_repository.create_customer(
             name=name,
             email=email,
             phone=phone,
@@ -34,7 +34,16 @@ def create_customer_by_admin(data):
             has_account=False,
             must_change_password=True
         )
-        return {"message": "Internal customer created"}, 201
+        return {
+            "message": "Internal customer created",
+            "customer": {
+                "id": customer.id,
+                "name": customer.name,
+                "email": customer.email,
+                "phone": customer.phone,
+                "has_account": customer.has_account
+            }
+        }, 201
 
     # LOGIN ACCOUNT CASE
     if not email:
@@ -50,7 +59,7 @@ def create_customer_by_admin(data):
     
     hashed_password = generate_password_hash(temp_password)
 
-    admin_repository.create_customer(
+    customer = admin_repository.create_customer(
         name=name,
         email=email,
         phone=phone,
@@ -77,7 +86,16 @@ JR Jardinage
 """
     )
 
-    return {"message": "Customer account created and email sent"}, 201
+    return {
+        "message": "Customer account created and email sent",
+        "customer": {
+            "id": customer.id,
+            "name": customer.name,
+            "email": customer.email,
+            "phone": customer.phone,
+            "has_account": customer.has_account
+        }
+    }, 201
 
 
 def resend_temp_password(customer_id):

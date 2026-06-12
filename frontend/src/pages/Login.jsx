@@ -114,125 +114,60 @@ function Login({
     }
   }
 
-  const containerStyle = {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "linear-gradient(135deg, #1b5e20, #2e7d32)",
-    padding: "20px"
-  };
-
-  const cardStyle = {
-    background: "white",
-    padding: "40px",
-    borderRadius: "16px",
-    width: "100%",
-    maxWidth: "420px",
-    boxShadow: "0 15px 40px rgba(0,0,0,0.2)",
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px"
-  };
-
-  const inputStyle = {
-    padding: "12px 14px",
-    borderRadius: "8px",
-    border: "1px solid #ddd",
-    fontSize: "14px",
-    outline: "none",
-    width: "100%"
-  };
-
-  const passwordContainerStyle = {
-    position: "relative",
-    width: "100%"
-  };
-
-  const eyeButtonStyle = {
-    position: "absolute",
-    right: "12px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "18px",
-    color: "#666"
-  };
-
-  const primaryBtn = {
-    padding: "12px",
-    borderRadius: "8px",
-    border: "none",
-    background: "#1b5e20",
-    color: "white",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "0.2s ease"
-  };
-
-  const secondaryBtn = {
-    background: "none",
-    border: "none",
-    color: "#1b5e20",
-    fontWeight: "600",
-    cursor: "pointer"
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h2 style={{ margin: 0, textAlign: "center" }}>Connexion</h2>
+    <div className="auth-screen">
+      <div className="auth-card">
+        <div className="auth-heading">
+          <span>Espace client</span>
+          <h2>Connexion</h2>
+          <p>Accédez à vos demandes et rendez-vous JR Jardinage.</p>
+        </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        <form onSubmit={handleSubmit} className="auth-form">
           <input
             type="email"
             name="email"
             placeholder="Email"
             onChange={handleChange}
-            style={inputStyle}
             required
           />
 
           {/* Password field with toggle */}
-          <div style={passwordContainerStyle}>
+          <div className="auth-password-field">
             <input
               type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Mot de passe"
               onChange={handleChange}
-              style={inputStyle}
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              style={eyeButtonStyle}
               aria-label={showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
             >
-              {showPassword ? "👁️" : "👁️‍🗨️"}
+              {showPassword ? "Cacher" : "Voir"}
             </button>
           </div>
 
-          <button type="submit" style={primaryBtn}>
+          <button type="submit" className="auth-submit-btn">
             Se connecter
           </button>
         </form>
 
-        <div style={{ textAlign: "center", fontSize: "14px" }}>
+        <div className="auth-inline-action">
           Mot de passe oublié ?{" "}
-          <button type="button" onClick={goToResetRequest} style={secondaryBtn}>
+          <button type="button" onClick={goToResetRequest}>
             Réinitialiser ici
           </button>
         </div>
 
-        <button onClick={goHome} style={{ ...secondaryBtn, alignSelf: "center" }}>
-          ← Retour à l'accueil
+        <button onClick={goHome} className="auth-ghost-btn">
+          Retour à l'accueil
         </button>
 
         {message && (
-          <p style={{ color: "red", textAlign: "center", margin: 0 }}>
+          <p className="auth-message auth-message-error">
             {message}
           </p>
         )}

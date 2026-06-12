@@ -49,86 +49,24 @@ function Signup({ goToLogin, goHome }) {
     }
   }
 
-  const containerStyle = {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "linear-gradient(135deg, #1b5e20, #2e7d32)",
-    padding: "20px"
-  };
-
-  const cardStyle = {
-    background: "white",
-    padding: "40px",
-    borderRadius: "16px",
-    width: "100%",
-    maxWidth: "420px",
-    boxShadow: "0 15px 40px rgba(0,0,0,0.2)",
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px"
-  };
-
-  const inputStyle = {
-    padding: "12px 14px",
-    borderRadius: "8px",
-    border: "1px solid #ddd",
-    fontSize: "14px",
-    outline: "none",
-    width: "100%"
-  };
-
-  const passwordContainerStyle = {
-    position: "relative",
-    width: "100%"
-  };
-
-  const eyeButtonStyle = {
-    position: "absolute",
-    right: "12px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "18px",
-    color: "#666"
-  };
-
-  const primaryBtn = {
-    padding: "12px",
-    borderRadius: "8px",
-    border: "none",
-    background: "#e67e22",
-    color: "white",
-    fontWeight: "600",
-    cursor: "pointer"
-  };
-
-  const secondaryBtn = {
-    background: "none",
-    border: "none",
-    color: "#1b5e20",
-    fontWeight: "600",
-    cursor: "pointer"
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h2 style={{ margin: 0, textAlign: "center" }}>Inscription Client</h2>
+    <div className="auth-screen">
+      <div className="auth-card">
+        <div className="auth-heading">
+          <span>Nouveau client</span>
+          <h2>Inscription</h2>
+          <p>Créez votre accès pour gérer vos demandes plus rapidement.</p>
+        </div>
 
         <form
           onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "15px" }}
+          className="auth-form"
         >
           <input
             type="text"
             name="name"
             placeholder="Nom"
             onChange={handleChange}
-            style={inputStyle}
             required
           />
           <input
@@ -136,27 +74,24 @@ function Signup({ goToLogin, goHome }) {
             name="email"
             placeholder="Email"
             onChange={handleChange}
-            style={inputStyle}
             required
           />
 
           {/* Password field with eye toggle */}
-          <div style={passwordContainerStyle}>
+          <div className="auth-password-field">
             <input
               type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Mot de passe"
               onChange={handleChange}
-              style={inputStyle}
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              style={eyeButtonStyle}
               aria-label={showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
             >
-              {showPassword ? "👁️" : "👁️‍🗨️"}
+              {showPassword ? "Cacher" : "Voir"}
             </button>
           </div>
 
@@ -166,7 +101,6 @@ function Signup({ goToLogin, goHome }) {
             name="confirmPassword"
             placeholder="Confirmer le mot de passe"
             onChange={handleChange}
-            style={inputStyle}
             required
           />
 
@@ -175,28 +109,27 @@ function Signup({ goToLogin, goHome }) {
             name="phone"
             placeholder="Téléphone"
             onChange={handleChange}
-            style={inputStyle}
             required
           />
 
-          <button type="submit" style={primaryBtn}>
+          <button type="submit" className="auth-submit-btn">
             S'inscrire
           </button>
         </form>
 
-        <div style={{ textAlign: "center", fontSize: "14px" }}>
+        <div className="auth-inline-action">
           Vous avez déjà un compte ?{" "}
-          <button onClick={goToLogin} style={secondaryBtn}>
+          <button onClick={goToLogin}>
             Se connecter
           </button>
         </div>
 
-        <button onClick={goHome} style={{ ...secondaryBtn, alignSelf: "center" }}>
-          ← Retour à l'accueil
+        <button onClick={goHome} className="auth-ghost-btn">
+          Retour à l'accueil
         </button>
 
         {message && (
-          <p style={{ textAlign: "center", margin: 0 }}>
+          <p className={message.includes("succès") ? "auth-message auth-message-success" : "auth-message auth-message-error"}>
             {message}
           </p>
         )}
