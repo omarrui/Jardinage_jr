@@ -190,31 +190,33 @@ function AdminDashboard({ goHome }) {
         <div>
           <h2 className="admin-sidebar-title">Admin <span>JR Jardinage</span></h2>
 
-          <button
-            onClick={() => setAdminSection("planning")}
-            className={`admin-nav-button ${adminSection === "planning" ? "is-active" : ""}`}
-          >
-            <span>Planning</span>
-          </button>
+          <nav className="admin-nav" aria-label="Navigation admin">
+            <button
+              onClick={() => setAdminSection("planning")}
+              className={`admin-nav-button ${adminSection === "planning" ? "is-active" : ""}`}
+            >
+              <span>Planning</span>
+            </button>
 
-          <button
-            onClick={() => setAdminSection("clients")}
-            className={`admin-nav-button ${adminSection === "clients" ? "is-active" : ""}`}
-          >
-            <span>Clients</span>
-          </button>
+            <button
+              onClick={() => setAdminSection("clients")}
+              className={`admin-nav-button ${adminSection === "clients" ? "is-active" : ""}`}
+            >
+              <span>Clients</span>
+            </button>
 
-          <button
-            onClick={() => setAdminSection("appointments")}
-            className={`admin-nav-button ${adminSection === "appointments" ? "is-active" : ""}`}
-          >
-            <span>Rendez-vous</span>
-            {pendingRequests > 0 && (
-              <span className="admin-badge">
-                {pendingRequests}
-              </span>
-            )}
-          </button>
+            <button
+              onClick={() => setAdminSection("appointments")}
+              className={`admin-nav-button ${adminSection === "appointments" ? "is-active" : ""}`}
+            >
+              <span>Rendez-vous</span>
+              {pendingRequests > 0 && (
+                <span className="admin-badge">
+                  {pendingRequests}
+                </span>
+              )}
+            </button>
+          </nav>
         </div>
 
         <button

@@ -40,35 +40,42 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
     };
   }, []);
 
-  const handleMouseDown = () => {
-    setIsDragging(true);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e) => {
+  const updateSliderFromEvent = (e) => {
     if (!wrapperRef.current) return;
 
     const rect = wrapperRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = (x / rect.width) * 100;
-    
+
     setSliderPosition(Math.min(Math.max(percentage, 0), 100));
   };
 
+  const handleSliderPointerDown = (e) => {
+    setIsDragging(true);
+    updateSliderFromEvent(e);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+
+  const handleSliderPointerMove = (e) => {
+    if (!isDragging) return;
+    updateSliderFromEvent(e);
+  };
+
+  const handleSliderPointerUp = (e) => {
+    setIsDragging(false);
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+  };
+
   useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
+    const stopDragging = () => setIsDragging(false);
+    window.addEventListener("pointerup", stopDragging);
+    window.addEventListener("pointercancel", stopDragging);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("pointerup", stopDragging);
+      window.removeEventListener("pointercancel", stopDragging);
     };
-  }, [isDragging]);
+  }, []);
 
   const updateQuickRequest = (field, value) => {
     setQuickRequest((current) => ({
@@ -159,31 +166,31 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
       <section className="services-section">
         <div className="services-grid">
           <div className="service-card">
-            <img src={debroussaillageImg} alt="Débroussaillage" className="service-img" />
+            <img src={debroussaillageImg} alt="Service de débroussaillage au Muy" className="service-img" loading="lazy" />
             <h3>Débroussaillage</h3>
             <p>Nettoyage de terrain, coupe des herbes hautes et remise au propre.</p>
           </div>
 
           <div className="service-card">
-            <img src={tailleBuissonImg} alt="Taille de haie" className="service-img" />
+            <img src={tailleBuissonImg} alt="Service de taille de haie dans le Var" className="service-img" loading="lazy" />
             <h3>Taille de haie</h3>
             <p>Taille soignée pour garder des haies nettes, denses et harmonieuses.</p>
           </div>
 
           <div className="service-card">
-            <img src={entretienImg} alt="Taille et entretien phytosanitaire des arbustes" className="service-img" />
+            <img src={entretienImg} alt="Taille et entretien phytosanitaire des arbustes" className="service-img" loading="lazy" />
             <h3>Taille et entretien phytosanitaire de vos arbustes</h3>
             <p>Soins adaptés pour préserver la forme, la vigueur et la santé des arbustes.</p>
           </div>
 
           <div className="service-card">
-            <img src={decoupeImg} alt="Création paysagère" className="service-img" />
+            <img src={decoupeImg} alt="Service de création paysagère au Muy" className="service-img" loading="lazy" />
             <h3>Création paysagère</h3>
             <p>Aménagement et mise en valeur de vos espaces extérieurs.</p>
           </div>
 
           <div className="service-card">
-            <img src={elagageImg} alt="Élagage mineur" className="service-img" />
+            <img src={elagageImg} alt="Service d'élagage mineur au Muy" className="service-img" loading="lazy" />
             <h3>Élagage mineur</h3>
             <p>Élagage léger et sécurisé pour entretenir les arbres de petite hauteur.</p>
           </div>
@@ -280,6 +287,7 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
             src={votreJardinImg}
             alt="Votre jardin entretenu au Muy"
             className="about-image"
+            loading="lazy"
           />
         </div>
       </section>
@@ -289,11 +297,19 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
         <h2>Avant / Après – Transformation de jardin</h2>
 
         <div className="before-after-container">
-          <div className="before-after-wrapper" ref={wrapperRef}>
+          <div
+            className="before-after-wrapper"
+            ref={wrapperRef}
+            onPointerDown={handleSliderPointerDown}
+            onPointerMove={handleSliderPointerMove}
+            onPointerUp={handleSliderPointerUp}
+            onPointerLeave={() => setIsDragging(false)}
+          >
             <img
               src={afterImage}
-              alt="apres entretien jardin"
+              alt="Jardin après intervention de JR Jardinage"
               className="after-image"
+              loading="lazy"
             />
             
             <div 
@@ -302,15 +318,16 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
             >
               <img  
                 src={beforeImage}
-                alt="Avant entretien jardin"
+                alt="Jardin avant intervention de JR Jardinage"
                 className="before-image"
+                loading="lazy"
               />
             </div>
 
             <div 
               className="slider-line"
               style={{ left: `${sliderPosition}%` }}
-              onMouseDown={handleMouseDown}
+              aria-hidden="true"
             >
               <div className="slider-button">⟷</div>
             </div>
@@ -398,6 +415,43 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
             className="elfsight-app-0c6785b5-07cc-434a-a653-3b406ff5f6ef"
             data-elfsight-app-lazy
           ></div>
+        </div>
+      </section>
+
+      {/* ================= FAQ SECTION ================= */}
+      <section className="faq-section" id="faq">
+        <div className="faq-header">
+          <span className="about-badge">Questions fréquentes</span>
+          <h2>Tout savoir avant de demander un devis</h2>
+        </div>
+
+        <div className="faq-grid">
+          <article className="faq-card">
+            <h3>Intervenez-vous uniquement au Muy ?</h3>
+            <p>
+              JR Jardinage intervient au Muy et dans un rayon d'environ 30 km,
+              notamment vers Les Arcs, Fréjus, Puget-sur-Argens,
+              Roquebrune-sur-Argens et Le Luc.
+            </p>
+          </article>
+
+          <article className="faq-card">
+            <h3>Proposez-vous des devis gratuits ?</h3>
+            <p>
+              Oui, vous pouvez envoyer une demande de devis gratuitement depuis
+              le formulaire du site. JR Jardinage vous recontacte ensuite pour
+              préciser votre besoin.
+            </p>
+          </article>
+
+          <article className="faq-card">
+            <h3>Quels services de jardinage proposez-vous ?</h3>
+            <p>
+              Nous proposons le débroussaillage, la taille de haie, l'entretien
+              des arbustes, la création paysagère, l'élagage mineur et les
+              contrats d'entretien de jardin.
+            </p>
+          </article>
         </div>
       </section>
 
@@ -560,7 +614,7 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
         <div className="partner-section">
           <p>Nos partenaires</p>
           <a href="https://www.jardiniers-sap.fr/" target="_blank" rel="noopener noreferrer">
-            <img src={jardiniersSapLogo} alt="Jardiniers SAP" className="partner-logo" />
+            <img src={jardiniersSapLogo} alt="Partenaire Jardiniers SAP" className="partner-logo" loading="lazy" />
           </a>
         </div>
       </section>
@@ -568,6 +622,7 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
       {/* =================== MAP SECTION ================== */}
       <section className="map-section">
         <iframe
+          title="Carte de la zone d'intervention JR Jardinage au Muy"
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2893.605991073233!2d6.560979315576652!3d43.4606318791274!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12c9f5f9c6bbde83%3A0x7915df94a91f0bce!2sLe%20Muy%2C%20France!5e0!3m2!1fr!2sfr!4v1709019012345"
           width="100%"
           height="450"
@@ -576,43 +631,6 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
           loading="lazy"
         />
       </section>
-
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: [
-              {
-                "@type": "Question",
-                name: "Intervenez-vous uniquement au Muy ?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: "Nous intervenons au Muy et dans les communes voisines du Var (83) pour l'entretien et l'élagage de jardin."
-                }
-              },
-              {
-                "@type": "Question",
-                name: "Proposez-vous des devis gratuits ?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: "Oui, tous nos devis sont gratuits et sans engagement."
-                }
-              },
-              {
-                "@type": "Question",
-                name: "Quels types de services proposez-vous ?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: "Débroussaillage, taille de haie, taille et entretien phytosanitaire des arbustes, création paysagère et élagage mineur."
-                }
-              }
-            ]
-          })
-        }}
-      />
     </div>
   );
 }
