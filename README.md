@@ -218,6 +218,27 @@ docker compose up --build
 Then open:
 
 ```text
+http://localhost:5173
+```
+
+---
+
+## Node.js Microservices Branch
+
+The `nodejs-microservices` branch replaces the Flask backend container with a Node.js microservices setup:
+
+- `api-gateway` keeps the same `/api/...` frontend contract on port `5000`
+- `auth-service` owns login, signup, password reset, profiles, and admin customer management
+- `appointment-service` owns requests, appointments, scheduling, cancellation, and blocked dates
+- `notification-service` owns email delivery
+
+See:
+
+```text
+node-services/README.md
+```
+
+```text
 Frontend: http://localhost:5173
 Backend:  http://localhost:5000
 MySQL:    localhost:3307

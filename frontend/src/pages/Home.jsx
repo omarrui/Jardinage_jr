@@ -15,7 +15,6 @@ import { apiUrl } from "../api/apiConfig";
 
 function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
   const [sliderPosition, setSliderPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
   const [quickRequest, setQuickRequest] = useState({
     name: "",
     email: "",
@@ -27,6 +26,7 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
   const [quickRequestMessage, setQuickRequestMessage] = useState("");
   const [quickRequestStatus, setQuickRequestStatus] = useState("");
   const wrapperRef = useRef(null);
+  const isDraggingRef = useRef(false);
   const todayStr = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
@@ -40,40 +40,60 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
     };
   }, []);
 
-  const updateSliderFromEvent = (e) => {
+  const getSliderClientX = (event) => {
+    if (event.touches?.length) return event.touches[0].clientX;
+    if (event.changedTouches?.length) return event.changedTouches[0].clientX;
+    return event.clientX;
+  };
+
+  const updateSliderFromEvent = (event) => {
     if (!wrapperRef.current) return;
 
     const rect = wrapperRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const x = getSliderClientX(event) - rect.left;
     const percentage = (x / rect.width) * 100;
 
     setSliderPosition(Math.min(Math.max(percentage, 0), 100));
   };
 
   const handleSliderPointerDown = (e) => {
-    setIsDragging(true);
+    e.preventDefault();
+    isDraggingRef.current = true;
     updateSliderFromEvent(e);
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
 
-  const handleSliderPointerMove = (e) => {
-    if (!isDragging) return;
+  const handleSliderTouchStart = (e) => {
+    e.preventDefault();
+    isDraggingRef.current = true;
     updateSliderFromEvent(e);
   };
 
-  const handleSliderPointerUp = (e) => {
-    setIsDragging(false);
-    e.currentTarget.releasePointerCapture?.(e.pointerId);
+  const stopSliderDrag = () => {
+    isDraggingRef.current = false;
   };
 
   useEffect(() => {
-    const stopDragging = () => setIsDragging(false);
-    window.addEventListener("pointerup", stopDragging);
-    window.addEventListener("pointercancel", stopDragging);
+    const moveSlider = (event) => {
+      if (!isDraggingRef.current) return;
+      if (event.cancelable) event.preventDefault();
+      updateSliderFromEvent(event);
+    };
+
+    window.addEventListener("pointermove", moveSlider);
+    window.addEventListener("pointerup", stopSliderDrag);
+    window.addEventListener("pointercancel", stopSliderDrag);
+    window.addEventListener("touchmove", moveSlider, { passive: false });
+    window.addEventListener("touchend", stopSliderDrag);
+    window.addEventListener("touchcancel", stopSliderDrag);
 
     return () => {
-      window.removeEventListener("pointerup", stopDragging);
-      window.removeEventListener("pointercancel", stopDragging);
+      window.removeEventListener("pointermove", moveSlider);
+      window.removeEventListener("pointerup", stopSliderDrag);
+      window.removeEventListener("pointercancel", stopSliderDrag);
+      window.removeEventListener("touchmove", moveSlider);
+      window.removeEventListener("touchend", stopSliderDrag);
+      window.removeEventListener("touchcancel", stopSliderDrag);
     };
   }, []);
 
@@ -301,9 +321,7 @@ function Home({ goToQuoteForm, goToSignup, goToClientAppointments }) {
             className="before-after-wrapper"
             ref={wrapperRef}
             onPointerDown={handleSliderPointerDown}
-            onPointerMove={handleSliderPointerMove}
-            onPointerUp={handleSliderPointerUp}
-            onPointerLeave={() => setIsDragging(false)}
+            onTouchStart={handleSliderTouchStart}
           >
             <img
               src={afterImage}

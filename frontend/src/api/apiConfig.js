@@ -20,5 +20,12 @@ export function adminFetch(path, options = {}) {
   return fetch(apiUrl(path), {
     ...options,
     headers: adminAuthHeaders(options.headers || {})
+  }).then((response) => {
+    if (response.status === 401 || response.status === 403) {
+      localStorage.clear();
+      window.location.hash = "#/login";
+    }
+
+    return response;
   });
 }
