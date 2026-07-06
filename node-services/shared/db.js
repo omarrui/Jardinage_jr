@@ -2,6 +2,8 @@ const mysql = require("mysql2/promise");
 
 const databaseUrl = process.env.DATABASE_URL;
 
+// A pool keeps reusable database connections open.
+// That is better than creating a new MySQL connection for every request.
 const pool = databaseUrl
   ? mysql.createPool(databaseUrl)
   : mysql.createPool({
@@ -14,11 +16,15 @@ const pool = databaseUrl
       connectionLimit: Number(process.env.DB_POOL_LIMIT || 10)
     });
 
+// Small wrapper used by services so they do not repeat pool.execute everywhere.
+// Parameters are passed separately to protect against SQL injection.
 async function query(sql, params = []) {
   const [rows] = await pool.execute(sql, params);
   return rows;
 }
 
+// For this learning branch, services create the same tables the Flask app used.
+// In a larger production setup, schema changes would normally live in migrations.
 async function initDatabase() {
   await query(`
     CREATE TABLE IF NOT EXISTS admins (

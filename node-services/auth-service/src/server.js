@@ -7,12 +7,16 @@ const { postJson } = require("../../shared/http");
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
+
+// The auth service does not send SMTP email directly.
+// It asks the notification service to send emails through this internal URL.
 const notificationUrl = process.env.NOTIFICATION_SERVICE_URL
   ? `${process.env.NOTIFICATION_SERVICE_URL}/internal/email`
   : "";
 
 app.use(express.json());
 
+// Public API responses should not expose database-only details like password hashes.
 function publicCustomer(customer) {
   return {
     id: customer.id,
@@ -24,6 +28,7 @@ function publicCustomer(customer) {
   };
 }
 
+// These small repository-style helpers keep SQL lookup code out of route bodies.
 async function getCustomerByEmail(email) {
   const rows = await query("SELECT * FROM customers WHERE email = ? LIMIT 1", [email]);
   return rows[0] || null;
@@ -34,14 +39,18 @@ async function getCustomerById(id) {
   return rows[0] || null;
 }
 
+// Used when the admin creates an account and the customer must change password.
 function randomPassword() {
   return crypto.randomBytes(9).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 12);
 }
 
+// Quick uptime check for Docker or manual debugging.
 app.get("/health", (req, res) => {
   res.json({ status: "ok", service: "auth-service" });
 });
 
+// Customer signup:
+// validate input -> hash password -> create customer or activate public-request customer.
 app.post("/api/signup", async (req, res) => {
   const { name, email, password, phone } = req.body || {};
 
@@ -54,9 +63,13 @@ app.post("/api/signup", async (req, res) => {
   }
 
   const existing = await getCustomerByEmail(email);
+
+  // Never store raw passwords. bcrypt stores a one-way hash instead.
   const passwordHash = await bcrypt.hash(password, 12);
 
   if (existing) {
+    // Public quote requests can create customers without accounts.
+    // If that email later signs up, we upgrade that record into a real account.
     if (!existing.password) {
       await query(
         "UPDATE customers SET name = ?, phone = ?, password = ?, has_account = TRUE, must_change_password = FALSE WHERE id = ?",
@@ -76,6 +89,8 @@ app.post("/api/signup", async (req, res) => {
   return res.status(201).json({ message: "Customer registered successfully" });
 });
 
+// Customer login:
+// find user -> compare password hash -> return JWT token or force password change.
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body || {};
 
@@ -96,6 +111,7 @@ app.post("/api/login", async (req, res) => {
   }
 
   if (customer.must_change_password) {
+    // Admin-created accounts start here because they receive a temporary password.
     return res.json({
       message: "You must change your password",
       force_password_change: true,
@@ -105,6 +121,7 @@ app.post("/api/login", async (req, res) => {
 
   return res.json({
     message: "Login successful",
+    // The token lets React call protected routes without sending the password again.
     token: generateToken({ customer_id: customer.id, role: "customer" }),
     role: "customer",
     customer_id: customer.id,
@@ -112,6 +129,8 @@ app.post("/api/login", async (req, res) => {
   });
 });
 
+// Admin login is environment-variable based in this branch.
+// This avoids needing an admins table seed during local Docker setup.
 app.post("/api/admin/login", (req, res) => {
   const { email, password } = req.body || {};
 
@@ -126,6 +145,8 @@ app.post("/api/admin/login", (req, res) => {
   return res.status(401).json({ error: "Invalid admin credentials" });
 });
 
+// Password reset step 1:
+// generate a short-lived code and ask notification-service to email it.
 app.post("/api/customer/forgot-password", async (req, res) => {
   const { email } = req.body || {};
 
@@ -140,6 +161,7 @@ app.post("/api/customer/forgot-password", async (req, res) => {
   }
 
   const code = String(crypto.randomInt(100000, 999999));
+  // Reset codes expire quickly so an old email cannot be reused later.
   const expiry = new Date(Date.now() + 10 * 60 * 1000);
 
   await query("UPDATE customers SET reset_code = ?, reset_code_expiry = ? WHERE id = ?", [
@@ -157,6 +179,8 @@ app.post("/api/customer/forgot-password", async (req, res) => {
   return res.json({ message: "Reset code sent to your email." });
 });
 
+// Password reset step 2:
+// verify code + expiry, then replace the password hash.
 app.post("/api/customer/reset-password", async (req, res) => {
   const { email, code, new_password } = req.body || {};
 
@@ -183,6 +207,8 @@ app.post("/api/customer/reset-password", async (req, res) => {
   return res.json({ message: "Password updated successfully" });
 });
 
+// First login for admin-created customers.
+// They know the temporary password, then must choose their own real password.
 app.post("/api/customer/force-change-password", async (req, res) => {
   const { customer_id, new_password } = req.body || {};
 
@@ -205,6 +231,7 @@ app.post("/api/customer/force-change-password", async (req, res) => {
   return res.json({ message: "Password updated successfully" });
 });
 
+// Logged-in password change flow from the account page.
 app.put("/api/customer/change-password", async (req, res) => {
   const { customer_id, current_password, new_password } = req.body || {};
 
@@ -230,6 +257,8 @@ app.put("/api/customer/change-password", async (req, res) => {
   return res.json({ message: "Password updated successfully" });
 });
 
+// Legacy-compatible password-change endpoint kept because the frontend had
+// more than one password-change route during the migration.
 app.post("/api/change-password", async (req, res) => {
   const { email, old_password, new_password } = req.body || {};
 
@@ -257,6 +286,7 @@ app.post("/api/change-password", async (req, res) => {
   return res.json({ message: "Password changed successfully" });
 });
 
+// Customer profile update.
 app.put("/api/customer/update-profile", async (req, res) => {
   const { customer_id, name, email, phone } = req.body || {};
 
@@ -271,6 +301,7 @@ app.put("/api/customer/update-profile", async (req, res) => {
   }
 
   if (email && email !== customer.email) {
+    // Emails must stay unique because login uses email as the identity.
     const existing = await getCustomerByEmail(email);
     if (existing) {
       return res.status(400).json({ error: "Email already in use" });
@@ -285,6 +316,7 @@ app.put("/api/customer/update-profile", async (req, res) => {
   return res.json({ message: "Profile updated successfully" });
 });
 
+// Customer profile read.
 app.get("/api/customer/get-profile/:customerId", async (req, res) => {
   const customer = await getCustomerById(req.params.customerId);
 
@@ -299,6 +331,8 @@ app.get("/api/customer/get-profile/:customerId", async (req, res) => {
   });
 });
 
+// Everything below this point is admin-only customer management.
+// requireAdmin checks the JWT before the handler runs.
 app.get("/api/admin/customers", requireAdmin, async (req, res) => {
   const rows = await query("SELECT id, name, email, phone, has_account, must_change_password FROM customers ORDER BY id DESC");
   return res.json(rows.map(publicCustomer));
@@ -312,6 +346,8 @@ app.post("/api/admin/customers", requireAdmin, async (req, res) => {
   }
 
   if (!has_account) {
+    // Internal customer: admin wants the client in the database,
+    // but the client cannot log in yet.
     const result = await query(
       "INSERT INTO customers (name, email, phone, has_account, must_change_password) VALUES (?, ?, ?, FALSE, TRUE)",
       [name, email || null, phone]
@@ -337,6 +373,7 @@ app.post("/api/admin/customers", requireAdmin, async (req, res) => {
   const customer = await getCustomerById(result.insertId);
 
   await postJson(notificationUrl, {
+    // Service-to-service call: auth-service asks notification-service to email.
     to: email,
     subject: "Votre compte JR Jardinage",
     text: `Bonjour ${name},\n\nVotre compte JR Jardinage a été créé.\n\nMot de passe temporaire : ${tempPassword}\n\nVeuillez le modifier lors de votre première connexion.\n\nJR Jardinage`
@@ -378,6 +415,7 @@ app.delete("/api/admin/customers/:customerId", requireAdmin, async (req, res) =>
   }
 
   if (!customer.must_change_password) {
+    // Activated customers are protected from accidental admin deletion.
     return res.status(400).json({ error: "Cannot delete activated customer" });
   }
 
@@ -416,6 +454,9 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: "Auth service error" });
 });
 
+// Start order:
+// 1. ensure database tables exist
+// 2. start listening for HTTP requests
 initDatabase()
   .then(() => {
     app.listen(port, () => console.log(`Auth service listening on port ${port}`));

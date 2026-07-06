@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JR Jardinage - Node.js Microservices Code Walkthrough</title>
+  <style>
+    @page { size: A4; margin: 15mm; }
+    :root {
+      --ink: #172018;
+      --muted: #606b5f;
+      --green: #1f6b3a;
+      --green-dark: #164f2c;
+      --line: #d8e3d5;
+      --soft: #f3f8f0;
+      --code-bg: #eef5ea;
+      --code: #102319;
+      --blue: #276a9c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11.2pt;
+      line-height: 1.45;
+      background: #fff;
+    }
+    main { max-width: 920px; margin: 0 auto; padding: 28px; }
+    h1, h2, h3 { color: var(--green-dark); line-height: 1.18; page-break-after: avoid; }
+    h1 { font-size: 29pt; margin: 0 0 8px; }
+    h2 { font-size: 18pt; margin: 28px 0 10px; padding-top: 8px; border-top: 2px solid var(--line); }
+    h3 { font-size: 13.4pt; margin: 18px 0 7px; }
+    p { margin: 0 0 9px; }
+    ul, ol { margin: 6px 0 12px 23px; padding: 0; }
+    li { margin: 4px 0; }
+    code {
+      color: var(--code);
+      background: var(--code-bg);
+      border: 1px solid #d7e8d1;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 9.4pt;
+    }
+    pre {
+      margin: 10px 0 14px;
+      padding: 11px 12px;
+      color: var(--code);
+      background: var(--code-bg);
+      border: 1px solid #d7e8d1;
+      border-radius: 7px;
+      white-space: pre-wrap;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8.9pt;
+      line-height: 1.34;
+      page-break-inside: avoid;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; page-break-inside: avoid; }
+    th, td { border: 1px solid var(--line); padding: 7px 8px; vertical-align: top; text-align: left; }
+    th { color: var(--green-dark); background: var(--soft); }
+    .cover { padding: 34px 0 26px; border-bottom: 3px solid var(--green); margin-bottom: 22px; }
+    .subtitle { color: var(--muted); font-size: 13.5pt; margin-bottom: 16px; }
+    .note, .checkpoint, .file-card {
+      margin: 12px 0 16px;
+      padding: 11px 13px;
+      border-radius: 7px;
+      page-break-inside: avoid;
+    }
+    .note { background: var(--soft); border-left: 5px solid var(--green); }
+    .checkpoint { background: #f4f9ff; border-left: 5px solid var(--blue); }
+    .file-card { background: #fbfdf9; border: 1px solid var(--line); }
+    .diagram {
+      margin: 12px 0 16px;
+      padding: 12px;
+      background: #f8fbf6;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 9.2pt;
+      white-space: pre-wrap;
+      page-break-inside: avoid;
+    }
+    .page-break { page-break-before: always; }
+    .small { color: var(--muted); font-size: 9.7pt; }
+    @media print { main { max-width: none; padding: 0; } }
+  </style>
+</head>
+<body>
+<main>
+  <section class="cover">
+    <h1>Node.js Microservices Code Walkthrough</h1>
+    <p class="subtitle">A teacher-style explanation of the actual code files we added in the JR Jardinage microservices branch.</p>
+    <p><strong>Branch:</strong> <code>nodejs-microservices</code></p>
+    <p><strong>Main folder:</strong> <code>node-services/</code></p>
+  </section>
+
+  <section>
+    <h2>1. How to Read the Node Code</h2>
+    <p>Each service follows almost the same shape. Once you understand one file, the others become much easier.</p>
+    <div class="diagram">1. Import dependencies
+2. Create the Express app
+3. Read environment variables
+4. Register middleware
+5. Define helper functions
+6. Define routes
+7. Define error handler
+8. Start the server</div>
+
+    <div class="note">
+      <strong>Teacher note:</strong> A route is a backend endpoint. For example, <code>POST /api/login</code> is a route. A handler is the function that runs when that route is called.
+    </div>
+  </section>
+
+  <section>
+    <h2>2. API Gateway Code</h2>
+    <div class="file-card">
+      <strong>File:</strong> <code>node-services/api-gateway/src/server.js</code><br>
+      <strong>Job:</strong> receive frontend requests and forward them to the right service.
+    </div>
+
+    <h3>Important imports</h3>
+    <pre>const cors = require("cors");
+const express = require("express");
+const morgan = require("morgan");
+const { createProxyMiddleware } = require("http-proxy-middleware");</pre>
+
+    <ul>
+      <li><code>express</code>: creates the API server.</li>
+      <li><code>cors</code>: allows the React frontend to call the backend from another port.</li>
+      <li><code>morgan</code>: logs requests in the terminal.</li>
+      <li><code>http-proxy-middleware</code>: forwards requests to another service.</li>
+    </ul>
+
+    <h3>Service URLs</h3>
+    <pre>const authServiceUrl = process.env.AUTH_SERVICE_URL || "http://auth-service:3001";
+const appointmentServiceUrl =
+  process.env.APPOINTMENT_SERVICE_URL || "http://appointment-service:3002";</pre>
+
+    <p>The gateway does not contain login logic or appointment logic. It only knows where those services are.</p>
+
+    <h3>Proxy route groups</h3>
+    <pre>app.use([
+  "/api/signup",
+  "/api/login",
+  "/api/admin/login"
+], createProxyMiddleware(proxyOptions(authServiceUrl)));</pre>
+
+    <p>This means: if the request path starts with one of those routes, send it to the auth service.</p>
+
+    <div class="checkpoint">
+      <strong>Key idea:</strong> the gateway keeps the public API stable. React still calls <code>/api/login</code>, but internally the request goes to <code>auth-service</code>.
+    </div>
+  </section>
+
+  <section class="page-break">
+    <h2>3. Shared Database Code</h2>
+    <div class="file-card">
+      <strong>File:</strong> <code>node-services/shared/db.js</code><br>
+      <strong>Job:</strong> connect to MySQL and provide a reusable <code>query</code> helper.
+    </div>
+
+    <h3>Connection pool</h3>
+    <pre>const pool = mysql.createPool({
+  host: process.env.DB_HOST || "127.0.0.1",
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER || "jardinage",
+  password: process.env.DB_PASSWORD || "password123",
+  database: process.env.DB_NAME || "jardinage_db"
+});</pre>
+
+    <p>A pool means Node keeps a group of reusable database connections. This is better than opening and closing a connection for every request.</p>
+
+    <h3>The query helper</h3>
+    <pre>async function query(sql, params = []) {
+  const [rows] = await pool.execute(sql, params);
+  return rows;
+}</pre>
+
+    <p>The important part is that values are passed separately through <code>params</code>. That protects against SQL injection.</p>
+
+    <h3>Database initialization</h3>
+    <p><code>initDatabase()</code> creates the tables if they do not already exist. It creates:</p>
+    <ul>
+      <li><code>admins</code></li>
+      <li><code>customers</code></li>
+      <li><code>service_requests</code></li>
+      <li><code>availability</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. Shared Auth Code</h2>
+    <div class="file-card">
+      <strong>File:</strong> <code>node-services/shared/auth.js</code><br>
+      <strong>Job:</strong> create JWTs, verify JWTs, and protect routes.
+    </div>
+
+    <h3>Generate token</h3>
+    <pre>function generateToken(payload) {
+  return jwt.sign(payload, secret, { expiresIn: "24h" });
+}</pre>
+
+    <p>The payload contains data like:</p>
+    <pre>{ customer_id: 12, role: "customer" }</pre>
+
+    <h3>Admin middleware</h3>
+    <pre>function requireAdmin(req, res, next) {
+  const payload = verifyToken(getBearerToken(req));
+
+  if (!payload) return res.status(401).json({ error: "Missing token" });
+  if (payload.role !== "admin") return res.status(403).json({ error: "Unauthorized" });
+
+  req.auth = payload;
+  return next();
+}</pre>
+
+    <p><code>next()</code> means: the user passed the check, so continue to the real route.</p>
+  </section>
+
+  <section class="page-break">
+    <h2>5. Auth Service Code</h2>
+    <div class="file-card">
+      <strong>File:</strong> <code>node-services/auth-service/src/server.js</code><br>
+      <strong>Job:</strong> own customers, login, password reset, and admin customer management.
+    </div>
+
+    <h3>Password hashing</h3>
+    <pre>const passwordHash = await bcrypt.hash(password, 12);</pre>
+
+    <p>We never store raw passwords. We store a hash. During login, we compare the typed password against that hash:</p>
+
+    <pre>const passwordMatches = await bcrypt.compare(password, customer.password);</pre>
+
+    <h3>Signup route flow</h3>
+    <ol>
+      <li>Read <code>name</code>, <code>email</code>, <code>password</code>, and <code>phone</code>.</li>
+      <li>Reject missing fields.</li>
+      <li>Reject invalid email format.</li>
+      <li>Check if the email already exists.</li>
+      <li>Hash the password.</li>
+      <li>Create a customer or upgrade a public-request customer.</li>
+    </ol>
+
+    <h3>Login route flow</h3>
+    <ol>
+      <li>Find the customer by email.</li>
+      <li>Reject if no customer exists.</li>
+      <li>Compare the password with <code>bcrypt.compare</code>.</li>
+      <li>If <code>must_change_password</code> is true, tell frontend to force password change.</li>
+      <li>Otherwise return a JWT token.</li>
+    </ol>
+
+    <pre>return res.json({
+  message: "Login successful",
+  token: generateToken({ customer_id: customer.id, role: "customer" }),
+  role: "customer",
+  customer_id: customer.id
+});</pre>
+
+    <h3>Admin customer creation</h3>
+    <p>The admin can create two types of customers:</p>
+    <table>
+      <thead>
+        <tr><th>Type</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Internal customer</td>
+          <td>Stored in admin dashboard, but cannot log in yet.</td>
+        </tr>
+        <tr>
+          <td>Login account</td>
+          <td>Gets a temporary password by email and must change it on first login.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="page-break">
+    <h2>6. Appointment Service Code</h2>
+    <div class="file-card">
+      <strong>File:</strong> <code>node-services/appointment-service/src/server.js</code><br>
+      <strong>Job:</strong> own requests, appointments, scheduling, cancellations, and blocked dates.
+    </div>
+
+    <h3>Formatting helper</h3>
+    <pre>function serviceRequestRow(row) {
+  return {
+    id: row.id,
+    customer_id: row.customer_id,
+    customer_name: row.customer_name,
+    status: row.status,
+    scheduled_start: iso(row.scheduled_start)
+  };
+}</pre>
+
+    <p>This turns raw database rows into frontend-friendly JSON.</p>
+
+    <h3>Customer service request route</h3>
+    <pre>app.post(["/api/service-requests", "/api/appointments"], async (req, res) =&gt; {
+  // validate customer and date
+  // insert pending service request
+});</pre>
+
+    <p>This supports both routes because the original Flask app had both during development.</p>
+
+    <h3>Public quote route</h3>
+    <p>This route is special because the visitor may not have an account.</p>
+    <ol>
+      <li>Validate name, phone, address, and preferred date.</li>
+      <li>If email belongs to an existing account, ask user to log in.</li>
+      <li>Otherwise create or reuse a non-active customer.</li>
+      <li>Create a pending service request.</li>
+      <li>Ask notification service to email the admin.</li>
+    </ol>
+
+    <h3>Admin scheduling</h3>
+    <p>The shared <code>saveAppointment</code> function supports two cases:</p>
+    <table>
+      <thead>
+        <tr><th>Case</th><th>What happens</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>request_id</code> exists</td>
+          <td>Admin confirms an existing customer request.</td>
+        </tr>
+        <tr>
+          <td><code>customer_id</code> exists</td>
+          <td>Admin creates a new appointment directly from the calendar.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <pre>if (request_id) {
+  // schedule existing request
+}
+
+if (customer_id) {
+  // create direct appointment
+}</pre>
+  </section>
+
+  <section>
+    <h2>7. Notification Service Code</h2>
+    <div class="file-card">
+      <strong>File:</strong> <code>node-services/notification-service/src/server.js</code><br>
+      <strong>Job:</strong> send email for the other services.
+    </div>
+
+    <h3>Why it returns null locally</h3>
+    <pre>if (!process.env.MAIL_USERNAME || !process.env.MAIL_PASSWORD) {
+  return null;
+}</pre>
+
+    <p>This allows local Docker testing even if you did not configure Gmail/SMTP yet.</p>
+
+    <h3>Email route</h3>
+    <pre>app.post("/internal/email", async (req, res) =&gt; {
+  const { to, subject, text } = req.body || {};
+  // validate fields
+  // send email or skip in local mode
+});</pre>
+
+    <p>This route is called by backend services, not directly by React.</p>
+  </section>
+
+  <section class="page-break">
+    <h2>8. Dockerfiles</h2>
+    <p>Each service has its own Dockerfile. They follow this pattern:</p>
+    <pre>FROM node:20-alpine
+WORKDIR /app/service-name
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY src ./src
+CMD ["npm", "start"]</pre>
+
+    <p>Meaning:</p>
+    <ul>
+      <li>Start from a small Node.js image.</li>
+      <li>Copy dependencies first so Docker can cache install steps.</li>
+      <li>Copy source code.</li>
+      <li>Run the service with <code>npm start</code>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>9. Docker Compose Code</h2>
+    <p><code>docker-compose.yml</code> is the orchestra. It starts all containers and gives each service its environment variables.</p>
+
+    <pre>api-gateway:
+  environment:
+    AUTH_SERVICE_URL: http://auth-service:3001
+    APPOINTMENT_SERVICE_URL: http://appointment-service:3002</pre>
+
+    <p>Inside Docker, services can call each other by service name, like <code>auth-service</code> or <code>appointment-service</code>.</p>
+
+    <h3>Depends on</h3>
+    <pre>depends_on:
+  db:
+    condition: service_healthy</pre>
+
+    <p>This tells Docker: do not start the service until the database is ready.</p>
+  </section>
+
+  <section class="page-break">
+    <h2>10. Code Reading Checklist</h2>
+    <p>When you open any Node service file, ask these questions:</p>
+    <ol>
+      <li>What domain does this service own?</li>
+      <li>Which environment variables does it need?</li>
+      <li>Which routes are public?</li>
+      <li>Which routes are protected by <code>requireAdmin</code> or <code>requireCustomer</code>?</li>
+      <li>Which database tables does it read or write?</li>
+      <li>Does it call another service?</li>
+      <li>What JSON shape does it return to the frontend?</li>
+    </ol>
+
+    <div class="checkpoint">
+      <strong>Best mental model:</strong> route handler = receive request, validate, use helpers/database, return JSON.
+    </div>
+  </section>
+
+  <section>
+    <h2>11. Study Exercise</h2>
+    <p>Pick one route and explain it in five sentences. Example:</p>
+    <pre>POST /api/public/service-requests</pre>
+    <ol>
+      <li>This route belongs to the appointment service.</li>
+      <li>It receives a quote request from a visitor without an account.</li>
+      <li>It creates or reuses a non-active customer record.</li>
+      <li>It creates a pending service request.</li>
+      <li>It asks notification service to email the admin.</li>
+    </ol>
+
+    <p class="small">Generated for JR Jardinage, branch <code>nodejs-microservices</code>.</p>
+  </section>
+</main>
+</body>
+</html>

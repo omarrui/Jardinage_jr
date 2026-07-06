@@ -7,6 +7,8 @@ const port = Number(process.env.PORT || 3003);
 app.use(express.json());
 
 function createTransporter() {
+  // Local development should not crash just because email credentials are absent.
+  // When credentials are missing, the service logs the email instead of sending it.
   if (!process.env.MAIL_USERNAME || !process.env.MAIL_PASSWORD) {
     return null;
   }
@@ -26,6 +28,8 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", service: "notification-service" });
 });
 
+// Internal route: other services call this to send email.
+// It is not meant to be called directly by the React frontend.
 app.post("/internal/email", async (req, res) => {
   const { to, subject, text } = req.body || {};
 
@@ -36,6 +40,7 @@ app.post("/internal/email", async (req, res) => {
   const transporter = createTransporter();
 
   if (!transporter) {
+    // This makes Docker/local testing easier: app flows still work without SMTP.
     console.log("Email skipped because MAIL_USERNAME or MAIL_PASSWORD is missing:", {
       to,
       subject

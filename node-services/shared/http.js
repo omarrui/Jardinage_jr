@@ -2,6 +2,8 @@ async function postJson(url, payload) {
   if (!url) return { ok: false };
 
   try {
+    // Used for service-to-service communication, for example:
+    // auth-service -> notification-service.
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
